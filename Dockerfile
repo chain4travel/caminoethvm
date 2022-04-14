@@ -5,23 +5,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends bash=5.0-4 git=
 
 ARG CAMINO_VERSION
 
-RUN mkdir -p $GOPATH/src/github.com/ava-labs
-WORKDIR $GOPATH/src/github.com/ava-labs
+RUN mkdir -p $GOPATH/src/github.com/chain4travel
+WORKDIR $GOPATH/src/github.com/chain4travel
 
 RUN git clone -b $CAMINO_VERSION --single-branch https://github.com/chain4travel/caminogo.git
 
-# Copy coreth repo into desired location
-COPY . coreth
+# Copy caminoethvm repo into desired location
+COPY . caminoethvm
 
-# Set the workdir to AvalancheGo and update coreth dependency to local version
+# Set the workdir to CaminoGo and update caminoethvm dependency to local version
 WORKDIR $GOPATH/src/github.com/chain4travel/caminogo
-# Run go mod download here to improve caching of AvalancheGo specific depednencies
+# Run go mod download here to improve caching of CaminoGo specific depednencies
 RUN go mod download
-# Replace the coreth dependency
-RUN go mod edit -replace github.com/chain4travel/caminoethvm=../coreth
+# Replace the caminoethvm dependency
+RUN go mod edit -replace github.com/chain4travel/caminoethvm=../caminoethvm
 RUN go mod download
 
-# Build the AvalancheGo binary with local version of coreth.
+# Build the CaminoGo binary with local version of caminoethvm.
 RUN ./scripts/build_camino.sh
 # Create the plugins directory in the standard location so the build directory will be recognized
 # as valid.
