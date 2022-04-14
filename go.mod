@@ -101,3 +101,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
+
+replace github.com/ava-labs/avalanchego v1.7.8 => github.com/chain4travel/caminogo v0.0.0-20220326070849-a3acb342eb13
