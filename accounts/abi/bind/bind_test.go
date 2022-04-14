@@ -1,3 +1,14 @@
+// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
+//
+// This file is a derived work, based on ava-labs code whose
+// original notices appear below.
+//
+// It is distributed under the same license conditions as the
+// original code from which it is derived.
+//
+// Much love to the original authors for their work.
+// **********************************************************
+
 // (c) 2019-2020, Ava Labs, Inc.
 //
 // This file is a derived work, based on the go-ethereum library whose original
@@ -298,9 +309,9 @@ var bindTests = []struct {
 		`
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -353,9 +364,9 @@ var bindTests = []struct {
 		`
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -399,9 +410,9 @@ var bindTests = []struct {
 		`
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -456,10 +467,10 @@ var bindTests = []struct {
 			"math/big"
 			"reflect"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
 			"github.com/ethereum/go-ethereum/common"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -505,9 +516,9 @@ var bindTests = []struct {
 		`
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -571,9 +582,9 @@ var bindTests = []struct {
 		`
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -616,10 +627,10 @@ var bindTests = []struct {
 		[]string{`6060604052609f8060106000396000f3606060405260e060020a6000350463f97a60058114601a575b005b600060605260c0604052600d60809081527f4920646f6e27742065786973740000000000000000000000000000000000000060a052602060c0908152600d60e081905281906101009060a09080838184600060046012f15050815172ffffffffffffffffffffffffffffffffffffff1916909152505060405161012081900392509050f3`},
 		[]string{`[{"constant":true,"inputs":[],"name":"String","outputs":[{"name":"","type":"string"}],"type":"function"}]`},
 		`
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
 			"github.com/ethereum/go-ethereum/common"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/core"
 		`,
 		`
 			// Create a simulator and wrap a non-deployed contract
@@ -655,10 +666,10 @@ var bindTests = []struct {
 		[]string{`6080604052348015600f57600080fd5b5060888061001e6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c8063d5f6622514602d575b600080fd5b6033604c565b6040805192835260208301919091528051918290030190f35b600a809156fea264697066735822beefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef64736f6c6343decafe0033`},
 		[]string{`[{"inputs":[],"name":"Struct","outputs":[{"internalType":"uint256","name":"a","type":"uint256"},{"internalType":"uint256","name":"b","type":"uint256"}],"stateMutability":"pure","type":"function"}]`},
 		`
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
 			"github.com/ethereum/go-ethereum/common"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/core"
 		`,
 		`
 			// Create a simulator and wrap a non-deployed contract
@@ -703,9 +714,9 @@ var bindTests = []struct {
 		`
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -752,10 +763,10 @@ var bindTests = []struct {
 		`
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
 			"github.com/ethereum/go-ethereum/common"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -828,9 +839,9 @@ var bindTests = []struct {
 			"fmt"
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -921,10 +932,10 @@ var bindTests = []struct {
 			"math/big"
 			"time"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
 			"github.com/ethereum/go-ethereum/common"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -1112,9 +1123,9 @@ var bindTests = []struct {
 		`
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -1247,9 +1258,9 @@ var bindTests = []struct {
 			"math/big"
 			"reflect"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 
@@ -1389,9 +1400,9 @@ var bindTests = []struct {
 		`
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -1455,11 +1466,11 @@ var bindTests = []struct {
 		"math/big"
 		"time"
 
-		"github.com/ava-labs/coreth/accounts/abi/bind"
-		"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-		"github.com/ava-labs/coreth/core"
+		"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+		"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+		"github.com/chain4travel/caminoethvm/core"
 		"github.com/ethereum/go-ethereum/crypto"
-		"github.com/ava-labs/coreth/params"
+		"github.com/chain4travel/caminoethvm/params"
 		`,
 		`
 		// Initialize test accounts
@@ -1566,10 +1577,10 @@ var bindTests = []struct {
 		`
 		"math/big"
 
-		"github.com/ava-labs/coreth/accounts/abi/bind"
-		"github.com/ava-labs/coreth/accounts/abi/bind/backends"
+		"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+		"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
 		"github.com/ethereum/go-ethereum/crypto"
-		"github.com/ava-labs/coreth/core"
+		"github.com/chain4travel/caminoethvm/core"
 		`,
 		`
 		// Initialize test accounts
@@ -1629,10 +1640,10 @@ var bindTests = []struct {
 		`
 		"math/big"
 
-		"github.com/ava-labs/coreth/accounts/abi/bind"
-		"github.com/ava-labs/coreth/accounts/abi/bind/backends"
+		"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+		"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
 		"github.com/ethereum/go-ethereum/crypto"
-		"github.com/ava-labs/coreth/core"
+		"github.com/chain4travel/caminoethvm/core"
         `,
 		`
 		key, _ := crypto.GenerateKey()
@@ -1691,9 +1702,9 @@ var bindTests = []struct {
 		`
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -1752,9 +1763,9 @@ var bindTests = []struct {
 			"bytes"
 			"math/big"
 	
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 	   `,
 		`
@@ -1840,9 +1851,9 @@ var bindTests = []struct {
 		`
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 	   `,
 		`
@@ -1909,9 +1920,9 @@ var bindTests = []struct {
 		`
 				"math/big"
 		
-				"github.com/ava-labs/coreth/accounts/abi/bind"
-				"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-				"github.com/ava-labs/coreth/core"
+				"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+				"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+				"github.com/chain4travel/caminoethvm/core"
 				"github.com/ethereum/go-ethereum/crypto"
 		   `,
 		`
@@ -1960,9 +1971,9 @@ var bindTests = []struct {
 		imports: `
 			"math/big"
 
-			"github.com/ava-labs/coreth/accounts/abi/bind"
-			"github.com/ava-labs/coreth/accounts/abi/bind/backends"
-			"github.com/ava-labs/coreth/core"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+			"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+			"github.com/chain4travel/caminoethvm/core"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		tester: `
@@ -2066,7 +2077,7 @@ func golangBindings(t *testing.T, overload bool) {
 		t.Fatalf("failed to convert binding test to modules: %v\n%s", err, out)
 	}
 	pwd, _ := os.Getwd()
-	replacer := exec.Command(gocmd, "mod", "edit", "-x", "-require", "github.com/ava-labs/coreth@v0.0.0", "-replace", "github.com/ava-labs/coreth="+filepath.Join(pwd, "..", "..", "..")) // Repo root
+	replacer := exec.Command(gocmd, "mod", "edit", "-x", "-require", "github.com/chain4travel/caminoethvm@v0.0.0", "-replace", "github.com/chain4travel/caminoethvm="+filepath.Join(pwd, "..", "..", "..")) // Repo root
 	replacer.Dir = pkg
 	if out, err := replacer.CombinedOutput(); err != nil {
 		t.Fatalf("failed to replace binding test dependency to current source tree: %v\n%s", err, out)

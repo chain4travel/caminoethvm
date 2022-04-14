@@ -1,3 +1,14 @@
+// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
+//
+// This file is a derived work, based on ava-labs code whose
+// original notices appear below.
+//
+// It is distributed under the same license conditions as the
+// original code from which it is derived.
+//
+// Much love to the original authors for their work.
+// **********************************************************
+
 // (c) 2019-2020, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
@@ -17,7 +28,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ava-labs/coreth/trie"
+	"github.com/chain4travel/caminoethvm/trie"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -44,14 +55,14 @@ import (
 
 	engCommon "github.com/ava-labs/avalanchego/snow/engine/common"
 
-	"github.com/ava-labs/coreth/consensus/dummy"
-	"github.com/ava-labs/coreth/core"
-	"github.com/ava-labs/coreth/core/types"
-	"github.com/ava-labs/coreth/eth"
-	"github.com/ava-labs/coreth/params"
-	"github.com/ava-labs/coreth/rpc"
+	"github.com/chain4travel/caminoethvm/consensus/dummy"
+	"github.com/chain4travel/caminoethvm/core"
+	"github.com/chain4travel/caminoethvm/core/types"
+	"github.com/chain4travel/caminoethvm/eth"
+	"github.com/chain4travel/caminoethvm/params"
+	"github.com/chain4travel/caminoethvm/rpc"
 
-	accountKeystore "github.com/ava-labs/coreth/accounts/keystore"
+	accountKeystore "github.com/chain4travel/caminoethvm/accounts/keystore"
 )
 
 var (

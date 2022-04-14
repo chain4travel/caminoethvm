@@ -1,3 +1,14 @@
+// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
+//
+// This file is a derived work, based on ava-labs code whose
+// original notices appear below.
+//
+// It is distributed under the same license conditions as the
+// original code from which it is derived.
+//
+// Much love to the original authors for their work.
+// **********************************************************
+
 // (c) 2019-2020, Ava Labs, Inc. All rights reserved.
 
 // NOTE from Ted: to compile from solidity source using the code, make sure
@@ -15,7 +26,7 @@ import (
 
 	"testing"
 
-	"github.com/ava-labs/coreth/core/types"
+	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/ethereum/go-ethereum/log"
@@ -30,7 +41,7 @@ func TestCounter(t *testing.T) {
 
 	// NOTE: use precompiled `counter.sol` for portability, do not remove the
 	// following code (for debug purpose)
-	//counterSrc, err := filepath.Abs(gopath + "/src/github.com/ava-labs/coreth/examples/counter/counter.sol")
+	//counterSrc, err := filepath.Abs(gopath + "/src/github.com/chain4travel/caminoethvm/examples/counter/counter.sol")
 	// if err != nil {
 	// 	t.Fatal(err)
 	// }

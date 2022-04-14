@@ -1,3 +1,14 @@
+// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
+//
+// This file is a derived work, based on ava-labs code whose
+// original notices appear below.
+//
+// It is distributed under the same license conditions as the
+// original code from which it is derived.
+//
+// Much love to the original authors for their work.
+// **********************************************************
+
 // (c) 2019-2020, Ava Labs, Inc.
 //
 // This file is a derived work, based on the go-ethereum library whose original
@@ -34,26 +45,26 @@ import (
 	"time"
 
 	"github.com/ava-labs/avalanchego/utils/timer/mockable"
-	"github.com/ava-labs/coreth/accounts"
-	"github.com/ava-labs/coreth/consensus"
-	"github.com/ava-labs/coreth/consensus/dummy"
-	"github.com/ava-labs/coreth/core"
-	"github.com/ava-labs/coreth/core/bloombits"
-	"github.com/ava-labs/coreth/core/rawdb"
-	"github.com/ava-labs/coreth/core/state/pruner"
-	"github.com/ava-labs/coreth/core/types"
-	"github.com/ava-labs/coreth/core/vm"
-	"github.com/ava-labs/coreth/eth/ethconfig"
-	"github.com/ava-labs/coreth/eth/filters"
-	"github.com/ava-labs/coreth/eth/gasprice"
-	"github.com/ava-labs/coreth/eth/tracers"
-	"github.com/ava-labs/coreth/ethdb"
-	"github.com/ava-labs/coreth/internal/ethapi"
-	"github.com/ava-labs/coreth/internal/shutdowncheck"
-	"github.com/ava-labs/coreth/miner"
-	"github.com/ava-labs/coreth/node"
-	"github.com/ava-labs/coreth/params"
-	"github.com/ava-labs/coreth/rpc"
+	"github.com/chain4travel/caminoethvm/accounts"
+	"github.com/chain4travel/caminoethvm/consensus"
+	"github.com/chain4travel/caminoethvm/consensus/dummy"
+	"github.com/chain4travel/caminoethvm/core"
+	"github.com/chain4travel/caminoethvm/core/bloombits"
+	"github.com/chain4travel/caminoethvm/core/rawdb"
+	"github.com/chain4travel/caminoethvm/core/state/pruner"
+	"github.com/chain4travel/caminoethvm/core/types"
+	"github.com/chain4travel/caminoethvm/core/vm"
+	"github.com/chain4travel/caminoethvm/eth/ethconfig"
+	"github.com/chain4travel/caminoethvm/eth/filters"
+	"github.com/chain4travel/caminoethvm/eth/gasprice"
+	"github.com/chain4travel/caminoethvm/eth/tracers"
+	"github.com/chain4travel/caminoethvm/ethdb"
+	"github.com/chain4travel/caminoethvm/internal/ethapi"
+	"github.com/chain4travel/caminoethvm/internal/shutdowncheck"
+	"github.com/chain4travel/caminoethvm/miner"
+	"github.com/chain4travel/caminoethvm/node"
+	"github.com/chain4travel/caminoethvm/params"
+	"github.com/chain4travel/caminoethvm/rpc"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"

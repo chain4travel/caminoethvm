@@ -1,3 +1,14 @@
+// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
+//
+// This file is a derived work, based on ava-labs code whose
+// original notices appear below.
+//
+// It is distributed under the same license conditions as the
+// original code from which it is derived.
+//
+// Much love to the original authors for their work.
+// **********************************************************
+
 // (c) 2019-2020, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
@@ -8,14 +19,14 @@ import (
 	"time"
 
 	"github.com/ava-labs/avalanchego/utils/timer/mockable"
-	"github.com/ava-labs/coreth/consensus/dummy"
-	"github.com/ava-labs/coreth/core"
-	"github.com/ava-labs/coreth/core/state"
-	"github.com/ava-labs/coreth/core/types"
-	"github.com/ava-labs/coreth/eth"
-	"github.com/ava-labs/coreth/ethdb"
-	"github.com/ava-labs/coreth/node"
-	"github.com/ava-labs/coreth/rpc"
+	"github.com/chain4travel/caminoethvm/consensus/dummy"
+	"github.com/chain4travel/caminoethvm/core"
+	"github.com/chain4travel/caminoethvm/core/state"
+	"github.com/chain4travel/caminoethvm/core/types"
+	"github.com/chain4travel/caminoethvm/eth"
+	"github.com/chain4travel/caminoethvm/ethdb"
+	"github.com/chain4travel/caminoethvm/node"
+	"github.com/chain4travel/caminoethvm/rpc"
 	"github.com/ethereum/go-ethereum/common"
 )
 

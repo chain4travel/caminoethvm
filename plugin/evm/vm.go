@@ -1,3 +1,14 @@
+// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
+//
+// This file is a derived work, based on ava-labs code whose
+// original notices appear below.
+//
+// It is distributed under the same license conditions as the
+// original code from which it is derived.
+//
+// Much love to the original authors for their work.
+// **********************************************************
+
 // (c) 2019-2020, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
@@ -17,20 +28,20 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ava-labs/coreth/plugin/evm/message"
+	"github.com/chain4travel/caminoethvm/plugin/evm/message"
 
 	avalanchegoMetrics "github.com/ava-labs/avalanchego/api/metrics"
-	coreth "github.com/ava-labs/coreth/chain"
-	"github.com/ava-labs/coreth/consensus/dummy"
-	"github.com/ava-labs/coreth/core"
-	"github.com/ava-labs/coreth/core/state"
-	"github.com/ava-labs/coreth/core/types"
-	"github.com/ava-labs/coreth/eth/ethconfig"
-	corethPrometheus "github.com/ava-labs/coreth/metrics/prometheus"
-	"github.com/ava-labs/coreth/node"
-	"github.com/ava-labs/coreth/params"
-	"github.com/ava-labs/coreth/peer"
-	"github.com/ava-labs/coreth/rpc"
+	coreth "github.com/chain4travel/caminoethvm/chain"
+	"github.com/chain4travel/caminoethvm/consensus/dummy"
+	"github.com/chain4travel/caminoethvm/core"
+	"github.com/chain4travel/caminoethvm/core/state"
+	"github.com/chain4travel/caminoethvm/core/types"
+	"github.com/chain4travel/caminoethvm/eth/ethconfig"
+	corethPrometheus "github.com/chain4travel/caminoethvm/metrics/prometheus"
+	"github.com/chain4travel/caminoethvm/node"
+	"github.com/chain4travel/caminoethvm/params"
+	"github.com/chain4travel/caminoethvm/peer"
+	"github.com/chain4travel/caminoethvm/rpc"
 
 	"github.com/prometheus/client_golang/prometheus"
 	// Force-load tracer engine to trigger registration
@@ -38,7 +49,7 @@ import (
 	// We must import this package (not referenced elsewhere) so that the native "callTracer"
 	// is added to a map of client-accessible tracers. In geth, this is done
 	// inside of cmd/geth.
-	_ "github.com/ava-labs/coreth/eth/tracers/native"
+	_ "github.com/chain4travel/caminoethvm/eth/tracers/native"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
