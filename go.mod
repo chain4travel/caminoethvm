@@ -1,4 +1,4 @@
-module github.com/ava-labs/coreth
+module github.com/chain4travel/caminoethvm
 
 go 1.17
 

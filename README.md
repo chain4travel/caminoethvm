@@ -12,7 +12,7 @@ Coreth is a dependency of AvalancheGo which is used to implement the EVM based V
 
 ```bash
 cd $GOPATH/src/github.com/ava-labs/avalanchego
-go mod edit -replace github.com/ava-labs/coreth=../coreth
+go mod edit -replace github.com/chain4travel/caminoethvm=../coreth
 ```
 
 Note: the C-Chain originally ran in a separate process from the main AvalancheGo process and communicated with it over a local gRPC connection. When this was the case, AvalancheGo's build script would download Coreth, compile it, and place the binary into the `avalanchego/build/plugins` directory.
