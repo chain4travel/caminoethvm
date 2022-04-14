@@ -18,7 +18,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/ava-labs/avalanchego/utils/formatting"
+	"github.com/chain4travel/caminogo/utils/formatting"
 	"github.com/chain4travel/caminoethvm/core"
 )
 

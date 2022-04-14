@@ -22,7 +22,7 @@ import (
 
 	"github.com/chain4travel/caminoethvm/params"
 
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminoethvm/core/rawdb"
 	"github.com/chain4travel/caminoethvm/ethdb/memorydb"
 	"github.com/chain4travel/caminoethvm/plugin/evm/message"

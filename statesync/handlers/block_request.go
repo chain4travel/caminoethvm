@@ -19,8 +19,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/ava-labs/avalanchego/codec"
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/chain4travel/caminogo/codec"
+	"github.com/chain4travel/caminogo/ids"
 
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/peer"

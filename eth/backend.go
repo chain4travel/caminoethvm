@@ -44,7 +44,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ava-labs/avalanchego/utils/timer/mockable"
+	"github.com/chain4travel/caminogo/utils/timer/mockable"
 	"github.com/chain4travel/caminoethvm/accounts"
 	"github.com/chain4travel/caminoethvm/consensus"
 	"github.com/chain4travel/caminoethvm/consensus/dummy"

@@ -23,11 +23,11 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/ava-labs/avalanchego/codec"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/snow/validators"
-	"github.com/ava-labs/avalanchego/version"
+	"github.com/chain4travel/caminogo/codec"
+	"github.com/chain4travel/caminogo/ids"
+	"github.com/chain4travel/caminogo/snow/engine/common"
+	"github.com/chain4travel/caminogo/snow/validators"
+	"github.com/chain4travel/caminogo/version"
 
 	"github.com/chain4travel/caminoethvm/plugin/evm/message"
 	"github.com/ethereum/go-ethereum/log"

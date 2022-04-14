@@ -45,7 +45,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminoethvm/accounts"
 	"github.com/chain4travel/caminoethvm/accounts/keystore"
 	"github.com/chain4travel/caminoethvm/accounts/scwallet"

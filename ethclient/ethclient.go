@@ -45,7 +45,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminoethvm/accounts/abi/bind"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/interfaces"

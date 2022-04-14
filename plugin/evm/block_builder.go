@@ -22,9 +22,9 @@ import (
 	coreth "github.com/chain4travel/caminoethvm/chain"
 	"github.com/chain4travel/caminoethvm/params"
 
-	"github.com/ava-labs/avalanchego/snow"
-	commonEng "github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/utils/timer"
+	"github.com/chain4travel/caminogo/snow"
+	commonEng "github.com/chain4travel/caminogo/snow/engine/common"
+	"github.com/chain4travel/caminogo/utils/timer"
 	"github.com/ethereum/go-ethereum/log"
 )
 

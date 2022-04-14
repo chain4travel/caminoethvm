@@ -20,9 +20,9 @@ import (
 
 	"github.com/hashicorp/go-plugin"
 
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/utils/ulimit"
-	"github.com/ava-labs/avalanchego/vms/rpcchainvm"
+	"github.com/chain4travel/caminogo/utils/logging"
+	"github.com/chain4travel/caminogo/utils/ulimit"
+	"github.com/chain4travel/caminogo/vms/rpcchainvm"
 
 	"github.com/chain4travel/caminoethvm/plugin/evm"
 )

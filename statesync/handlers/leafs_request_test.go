@@ -20,7 +20,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminoethvm/ethdb/memorydb"
 	"github.com/chain4travel/caminoethvm/plugin/evm/message"
 	"github.com/chain4travel/caminoethvm/statesync/handlers/stats"

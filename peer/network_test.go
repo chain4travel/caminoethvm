@@ -23,14 +23,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ava-labs/avalanchego/snow/engine/common"
+	"github.com/chain4travel/caminogo/snow/engine/common"
 
 	"github.com/chain4travel/caminoethvm/plugin/evm/message"
 
-	"github.com/ava-labs/avalanchego/codec"
-	"github.com/ava-labs/avalanchego/codec/linearcodec"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/version"
+	"github.com/chain4travel/caminogo/codec"
+	"github.com/chain4travel/caminogo/codec/linearcodec"
+	"github.com/chain4travel/caminogo/ids"
+	"github.com/chain4travel/caminogo/version"
 	"github.com/stretchr/testify/assert"
 )
 

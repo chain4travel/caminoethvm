@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/chain4travel/caminogo/ids"
 
 	"github.com/stretchr/testify/assert"
 

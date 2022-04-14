@@ -22,7 +22,7 @@ import (
 
 	"github.com/chain4travel/caminoethvm/params"
 
-	"github.com/ava-labs/avalanchego/snow"
+	"github.com/chain4travel/caminogo/snow"
 )
 
 func TestBlockBuilderShutsDown(t *testing.T) {

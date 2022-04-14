@@ -15,7 +15,7 @@
 package evm
 
 import (
-	"github.com/ava-labs/avalanchego/database"
+	"github.com/chain4travel/caminogo/database"
 	"github.com/chain4travel/caminoethvm/ethdb"
 )
 

@@ -18,7 +18,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/core"
 	"github.com/chain4travel/caminoethvm/core/types"

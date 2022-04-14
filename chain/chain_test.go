@@ -20,7 +20,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/ava-labs/avalanchego/utils/timer/mockable"
+	"github.com/chain4travel/caminogo/utils/timer/mockable"
 	"github.com/chain4travel/caminoethvm/accounts/keystore"
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/core"

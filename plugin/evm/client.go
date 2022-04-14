@@ -7,11 +7,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ava-labs/avalanchego/api"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/formatting"
-	cjson "github.com/ava-labs/avalanchego/utils/json"
-	"github.com/ava-labs/avalanchego/utils/rpc"
+	"github.com/chain4travel/caminogo/api"
+	"github.com/chain4travel/caminogo/ids"
+	"github.com/chain4travel/caminogo/utils/formatting"
+	cjson "github.com/chain4travel/caminogo/utils/json"
+	"github.com/chain4travel/caminogo/utils/rpc"
 	"github.com/ethereum/go-ethereum/log"
 )
 
