@@ -16,5 +16,5 @@ source "$CORETH_PATH"/scripts/constants.sh
 echo "Building Docker Image: $dockerhub_repo:$build_image_id based of $camino_version"
 docker build -t "$dockerhub_repo:$build_image_id" "$CORETH_PATH" -f "$CORETH_PATH/Dockerfile" \
   --build-arg CAMINO_VERSION="$camino_version" \
-  --build-arg CORETH_COMMIT="$coreth_commit" \
+  --build-arg CORETH_COMMIT="$caminoethvm_commit" \
   --build-arg CURRENT_BRANCH="$current_branch"

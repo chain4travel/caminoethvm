@@ -39,15 +39,15 @@ source "$CORETH_PATH"/scripts/constants.sh
 if [[ $# -eq 1 ]]; then
     binary_path=$1
 elif [[ $# -ne 0 ]]; then
-    echo "Invalid arguments to build coreth. Requires either no arguments (default) or one arguments to specify binary location."
+    echo "Invalid arguments to build caminoethvm. Requires either no arguments (default) or one arguments to specify binary location."
     exit 1
 fi
 
 # Check if CORETH_COMMIT is set, if not retrieve the last commit from the repo.
 # This is used in the Dockerfile to allow a commit hash to be passed in without
 # including the .git/ directory within the Docker image.
-coreth_commit=${CORETH_COMMIT:-$( git rev-list -1 HEAD )}
+caminoethvm_commit=${CORETH_COMMIT:-$( git rev-list -1 HEAD )}
 
 # Build Coreth, which is run as a subprocess
-echo "Building Coreth Version: $coreth_version; GitCommit: $coreth_commit"
-go build -ldflags "-X github.com/chain4travel/caminoethvm/plugin/evm.GitCommit=$coreth_commit -X github.com/chain4travel/caminoethvm/plugin/evm.Version=$coreth_version" -o "$binary_path" "plugin/"*.go
+echo "Building Coreth Version: $caminoethvm_version; GitCommit: $caminoethvm_commit"
+go build -ldflags "-X github.com/chain4travel/caminoethvm/plugin/evm.GitCommit=$caminoethvm_commit -X github.com/chain4travel/caminoethvm/plugin/evm.Version=$caminoethvm_version" -o "$binary_path" "plugin/"*.go
