@@ -4,7 +4,7 @@
 GOPATH="$(go env GOPATH)"
 
 # Set binary location
-binary_path=${CORETH_BINARY_PATH:-"$GOPATH/src/github.com/chain4travel/caminogo/build/plugins/evm"}
+binary_path=${CAMINOETHVM_BINARY_PATH:-"$GOPATH/src/github.com/chain4travel/caminogo/build/plugins/evm"}
 
 # Avalabs docker hub
 dockerhub_repo="avaplatform/caminogo"
@@ -17,7 +17,7 @@ echo "Using branch: ${current_branch}"
 # Use an abbreviated version of the full commit to tag the image.
 
 # WARNING: this will use the most recent commit even if there are un-committed changes present
-caminoethvm_commit="$(git --git-dir="$CORETH_PATH/.git" rev-parse HEAD)"
+caminoethvm_commit="$(git --git-dir="$CAMINOETHVM_PATH/.git" rev-parse HEAD)"
 caminoethvm_commit_id="${caminoethvm_commit::8}"
 
 build_image_id=${BUILD_IMAGE_ID:-"$camino_version-$caminoethvm_commit_id"}
