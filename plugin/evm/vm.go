@@ -30,7 +30,7 @@ import (
 
 	"github.com/chain4travel/caminoethvm/plugin/evm/message"
 
-	avalanchegoMetrics "github.com/chain4travel/caminogo/api/metrics"
+	caminogoMetrics "github.com/chain4travel/caminogo/api/metrics"
 	coreth "github.com/chain4travel/caminoethvm/chain"
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/core"
@@ -56,7 +56,7 @@ import (
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/rlp"
 
-	avalancheRPC "github.com/gorilla/rpc/v2"
+	caminoRPC "github.com/gorilla/rpc/v2"
 
 	"github.com/chain4travel/caminogo/cache"
 	"github.com/chain4travel/caminogo/codec"
@@ -85,7 +85,7 @@ import (
 
 	commonEng "github.com/chain4travel/caminogo/snow/engine/common"
 
-	avalancheJSON "github.com/chain4travel/caminogo/utils/json"
+	caminoJSON "github.com/chain4travel/caminogo/utils/json"
 )
 
 const (
@@ -247,7 +247,7 @@ type VM struct {
 	networkCodec codec.Manager
 
 	// Metrics
-	multiGatherer avalanchegoMetrics.MultiGatherer
+	multiGatherer caminogoMetrics.MultiGatherer
 
 	bootstrapped bool
 	IsPlugin     bool
@@ -512,7 +512,7 @@ func (vm *VM) Initialize(
 		return err
 	}
 
-	vm.multiGatherer = avalanchegoMetrics.NewMultiGatherer()
+	vm.multiGatherer = caminogoMetrics.NewMultiGatherer()
 
 	// Initialize [vm.State]
 	if err := vm.initChainState(&Block{
@@ -985,9 +985,9 @@ func (vm *VM) Version() (string, error) {
 //     By default the LockOption is WriteLock
 //     [lockOption] should have either 0 or 1 elements. Elements beside the first are ignored.
 func newHandler(name string, service interface{}, lockOption ...commonEng.LockOption) (*commonEng.HTTPHandler, error) {
-	server := avalancheRPC.NewServer()
-	server.RegisterCodec(avalancheJSON.NewCodec(), "application/json")
-	server.RegisterCodec(avalancheJSON.NewCodec(), "application/json;charset=UTF-8")
+	server := caminoRPC.NewServer()
+	server.RegisterCodec(caminoJSON.NewCodec(), "application/json")
+	server.RegisterCodec(caminoJSON.NewCodec(), "application/json;charset=UTF-8")
 	if err := server.RegisterService(service, name); err != nil {
 		return nil, err
 	}

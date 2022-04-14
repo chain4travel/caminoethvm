@@ -15,7 +15,7 @@ cd $GOPATH/src/github.com/chain4travel/caminogo
 go mod edit -replace github.com/chain4travel/caminoethvm=../coreth
 ```
 
-Note: the C-Chain originally ran in a separate process from the main AvalancheGo process and communicated with it over a local gRPC connection. When this was the case, AvalancheGo's build script would download Coreth, compile it, and place the binary into the `avalanchego/build/plugins` directory.
+Note: the C-Chain originally ran in a separate process from the main AvalancheGo process and communicated with it over a local gRPC connection. When this was the case, AvalancheGo's build script would download Coreth, compile it, and place the binary into the `caminogo/build/plugins` directory.
 
 ## API
 
@@ -28,11 +28,11 @@ The C-Chain supports the following API namespaces:
 
 Only the `eth` namespace is enabled by default. 
 To enable the other namespaces see the instructions for passing in the `coreth-config` parameter to AvalancheGo: https://docs.avax.network/build/references/command-line-interface#plugins.
-Full documentation for the C-Chain's API can be found [here.](https://docs.avax.network/build/avalanchego-apis/c-chain)
+Full documentation for the C-Chain's API can be found [here.](https://docs.avax.network/build/caminogo-apis/c-chain)
 
 ## Compatibility
 
-The C-Chain is compatible with almost all Ethereum tooling, including [Remix,](https://docs.avax.network/build/tutorials/smart-contracts/deploy-a-smart-contract-on-avalanche-using-remix-and-metamask) [Metamask](https://docs.avax.network/build/tutorials/smart-contracts/deploy-a-smart-contract-on-avalanche-using-remix-and-metamask) and [Truffle.](https://docs.avax.network/build/tutorials/smart-contracts/using-truffle-with-the-avalanche-c-chain)
+The C-Chain is compatible with almost all Ethereum tooling, including [Remix,](https://docs.avax.network/build/tutorials/smart-contracts/deploy-a-smart-contract-on-camino-using-remix-and-metamask) [Metamask](https://docs.avax.network/build/tutorials/smart-contracts/deploy-a-smart-contract-on-camino-using-remix-and-metamask) and [Truffle.](https://docs.avax.network/build/tutorials/smart-contracts/using-truffle-with-the-camino-c-chain)
 
 ## Differences Between Avalanche C-Chain and Ethereum
 

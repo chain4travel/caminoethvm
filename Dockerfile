@@ -22,7 +22,7 @@ RUN go mod edit -replace github.com/chain4travel/caminoethvm=../coreth
 RUN go mod download
 
 # Build the AvalancheGo binary with local version of coreth.
-RUN ./scripts/build_avalanche.sh
+RUN ./scripts/build_camino.sh
 # Create the plugins directory in the standard location so the build directory will be recognized
 # as valid.
 RUN mkdir build/plugins
@@ -31,10 +31,10 @@ RUN mkdir build/plugins
 FROM debian:11-slim AS execution
 
 # Maintain compatibility with previous images
-RUN mkdir -p /avalanchego/build
-WORKDIR /avalanchego/build
+RUN mkdir -p /caminogo/build
+WORKDIR /caminogo/build
 
 # Copy the executables into the container
 COPY --from=builder /go/src/github.com/chain4travel/caminogo/build .
 
-CMD [ "./avalanchego" ]
+CMD [ "./caminogo" ]
