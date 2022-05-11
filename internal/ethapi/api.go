@@ -45,7 +45,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminoethvm/accounts"
 	"github.com/chain4travel/caminoethvm/accounts/keystore"
 	"github.com/chain4travel/caminoethvm/accounts/scwallet"
@@ -56,6 +55,7 @@ import (
 	"github.com/chain4travel/caminoethvm/eth/tracers/logger"
 	"github.com/chain4travel/caminoethvm/params"
 	"github.com/chain4travel/caminoethvm/rpc"
+	"github.com/chain4travel/caminogo/ids"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -1474,7 +1474,7 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 		to = crypto.CreateAddress(args.from(), uint64(*args.Nonce))
 	}
 	// Retrieve the precompiles since they don't need to be added to the access list
-	precompiles := vm.ActivePrecompiles(b.ChainConfig().AvalancheRules(header.Number, new(big.Int).SetUint64(header.Time)))
+	precompiles := vm.ActivePrecompiles(b.ChainConfig().CaminoRules(header.Number, new(big.Int).SetUint64(header.Time)))
 
 	// Create an initial tracer
 	prevTracer := logger.NewAccessListTracer(nil, args.from(), to, precompiles)

@@ -59,17 +59,17 @@ import (
 const (
 	// DefaultMaxCallBlockHistory is the number of blocks that can be fetched in
 	// a single call to eth_feeHistory.
-	DefaultMaxCallBlockHistory int = 2048
+	DefaultMaxCallBlockHistory int = 1024
 	// DefaultMaxBlockHistory is the number of blocks from the last accepted
 	// block that can be fetched in eth_feeHistory.
 	//
 	// DefaultMaxBlockHistory is chosen to be a value larger than the required
 	// fee lookback window that MetaMask uses (20k blocks).
-	DefaultMaxBlockHistory int = 25_000
+	DefaultMaxBlockHistory int = 1024
 	// DefaultFeeHistoryCacheSize is chosen to be some value larger than
 	// [DefaultMaxBlockHistory] to ensure all block lookups can be cached when
 	// serving a fee history query.
-	DefaultFeeHistoryCacheSize int = 30_000
+	DefaultFeeHistoryCacheSize int = 8192
 )
 
 var (
