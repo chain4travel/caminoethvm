@@ -50,7 +50,7 @@ jobs:
     strategy:
       matrix:
         go: ['1.17']
-        os: [macos-11.0, ubuntu-18.04, windows-latest]
+        os: [macos-11.0, ubuntu-18.04]
     steps:
     - uses: actions/checkout@v2
     - name: check out ${{ github.event.inputs.caminogoRepo }} ${{ github.event.inputs.caminogoBranch }}
