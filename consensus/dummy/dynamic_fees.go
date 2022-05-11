@@ -19,9 +19,11 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/chain4travel/caminogo/utils/wrappers"
+
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/params"
-	"github.com/chain4travel/caminogo/utils/wrappers"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 )

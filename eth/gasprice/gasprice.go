@@ -44,11 +44,13 @@ import (
 	"sync"
 
 	"github.com/chain4travel/caminogo/utils/timer/mockable"
+
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/core"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/params"
 	"github.com/chain4travel/caminoethvm/rpc"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/event"

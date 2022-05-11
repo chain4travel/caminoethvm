@@ -26,6 +26,7 @@ import (
 	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminogo/snow"
 	"github.com/chain4travel/caminogo/utils/wrappers"
+
 	"github.com/chain4travel/caminoethvm/core/state"
 	"github.com/chain4travel/caminoethvm/params"
 )

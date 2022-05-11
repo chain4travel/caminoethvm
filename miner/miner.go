@@ -40,10 +40,12 @@ package miner
 
 import (
 	"github.com/chain4travel/caminogo/utils/timer/mockable"
+
 	"github.com/chain4travel/caminoethvm/consensus"
 	"github.com/chain4travel/caminoethvm/core"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/params"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/event"
 )

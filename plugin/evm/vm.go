@@ -28,7 +28,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chain4travel/caminoethvm/plugin/evm/message"
+	caminogoMetrics "github.com/chain4travel/caminogo/api/metrics"
 
 	coreth "github.com/chain4travel/caminoethvm/chain"
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
@@ -40,8 +40,8 @@ import (
 	"github.com/chain4travel/caminoethvm/node"
 	"github.com/chain4travel/caminoethvm/params"
 	"github.com/chain4travel/caminoethvm/peer"
+	"github.com/chain4travel/caminoethvm/plugin/evm/message"
 	"github.com/chain4travel/caminoethvm/rpc"
-	caminogoMetrics "github.com/chain4travel/caminogo/api/metrics"
 
 	"github.com/prometheus/client_golang/prometheus"
 	// Force-load tracer engine to trigger registration

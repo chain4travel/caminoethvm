@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 
 	"github.com/chain4travel/caminogo/utils/formatting"
+
 	"github.com/chain4travel/caminoethvm/core"
 )
 

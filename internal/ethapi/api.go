@@ -45,6 +45,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chain4travel/caminogo/ids"
+
 	"github.com/chain4travel/caminoethvm/accounts"
 	"github.com/chain4travel/caminoethvm/accounts/keystore"
 	"github.com/chain4travel/caminoethvm/accounts/scwallet"
@@ -55,8 +57,8 @@ import (
 	"github.com/chain4travel/caminoethvm/eth/tracers/logger"
 	"github.com/chain4travel/caminoethvm/params"
 	"github.com/chain4travel/caminoethvm/rpc"
-	"github.com/chain4travel/caminogo/ids"
 	"github.com/davecgh/go-spew/spew"
+
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"

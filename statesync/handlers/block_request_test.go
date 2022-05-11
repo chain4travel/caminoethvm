@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/chain4travel/caminogo/ids"
+
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/core"
 	"github.com/chain4travel/caminoethvm/core/types"
@@ -26,6 +27,7 @@ import (
 	"github.com/chain4travel/caminoethvm/params"
 	"github.com/chain4travel/caminoethvm/plugin/evm/message"
 	"github.com/chain4travel/caminoethvm/statesync/handlers/stats"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/stretchr/testify/assert"

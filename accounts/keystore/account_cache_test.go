@@ -48,8 +48,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/chain4travel/caminoethvm/accounts"
 	"github.com/cespare/cp"
+	"github.com/chain4travel/caminoethvm/accounts"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common"
 )

@@ -2,18 +2,18 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - chain4travel
   pull_request:
   workflow_dispatch:
     inputs:
-      avalanchegoRepo:
-        description: 'avalanchego github repository'
+      caminogoRepo:
+        description: 'caminogo github repository'
         required: true
-        default: 'ava-labs/avalanchego'
-      avalanchegoBranch:
-        description: 'avalanchego branch'
+        default: 'chain4travel/caminogo'
+      caminogoBranch:
+        description: 'caminogo branch'
         required: true
-        default: 'master'
+        default: 'chain4travel'
 
 jobs:
   lint:
@@ -21,21 +21,21 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-      - name: check out ${{ github.event.inputs.avalanchegoRepo }} ${{ github.event.inputs.avalanchegoBranch }}
+      - name: check out ${{ github.event.inputs.caminogoRepo }} ${{ github.event.inputs.caminogoBranch }}
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/checkout@v2
         with:
-          repository: ${{ github.event.inputs.avalanchegoRepo }}
-          ref: ${{ github.event.inputs.avalanchegoBranch }}
-          path: avalanchego
-          token: ${{ secrets.AVALANCHE_PAT }}
+          repository: ${{ github.event.inputs.caminogoRepo }}
+          ref: ${{ github.event.inputs.caminogoBranch }}
+          path: caminogo
+          token: ${{ secrets.CAMINO_PAT }}
       - uses: actions/setup-go@v1
         with:
           go-version: 1.17
-      - name: change avalanchego dep
+      - name: change caminogo dep
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
-          go mod edit -replace github.com/ava-labs/avalanchego=./avalanchego
+          go mod edit -replace github.com/chain4travel/caminogo=./caminogo
           go mod tidy
           go clean -modcache # avoid conflicts with the golangci-lint-action cache
       - name: golangci-lint
@@ -53,21 +53,21 @@ jobs:
         os: [macos-11.0, ubuntu-18.04, windows-latest]
     steps:
     - uses: actions/checkout@v2
-    - name: check out ${{ github.event.inputs.avalanchegoRepo }} ${{ github.event.inputs.avalanchegoBranch }}
+    - name: check out ${{ github.event.inputs.caminogoRepo }} ${{ github.event.inputs.caminogoBranch }}
       if: ${{ github.event_name == 'workflow_dispatch' }}
       uses: actions/checkout@v2
       with:
-        repository: ${{ github.event.inputs.avalanchegoRepo }}
-        ref: ${{ github.event.inputs.avalanchegoBranch }}
-        path: avalanchego
-        token: ${{ secrets.AVALANCHE_PAT }}
+        repository: ${{ github.event.inputs.caminogoRepo }}
+        ref: ${{ github.event.inputs.caminogoBranch }}
+        path: caminogo
+        token: ${{ secrets.CAMINO_PAT }}
     - uses: actions/setup-go@v1
       with:
         go-version: ${{ matrix.go }}
-    - name: change avalanchego dep
+    - name: change caminogo dep
       if: ${{ github.event_name == 'workflow_dispatch' }}
       run: |
-        go mod edit -replace github.com/ava-labs/avalanchego=./avalanchego
+        go mod edit -replace github.com/chain4travel/caminogo=./caminogo
         go mod tidy
     - run: go mod download
       shell: bash
@@ -86,21 +86,21 @@ jobs:
         os: [ubuntu-20.04]
     steps:
     - uses: actions/checkout@v2
-    - name: check out ${{ github.event.inputs.avalanchegoRepo }} ${{ github.event.inputs.avalanchegoBranch }}
+    - name: check out ${{ github.event.inputs.caminogoRepo }} ${{ github.event.inputs.caminogoBranch }}
       if: ${{ github.event_name == 'workflow_dispatch' }}
       uses: actions/checkout@v2
       with:
-        repository: ${{ github.event.inputs.avalanchegoRepo }}
-        ref: ${{ github.event.inputs.avalanchegoBranch }}
-        path: avalanchego
-        token: ${{ secrets.AVALANCHE_PAT }}
+        repository: ${{ github.event.inputs.caminogoRepo }}
+        ref: ${{ github.event.inputs.caminogoBranch }}
+        path: caminogo
+        token: ${{ secrets.CAMINO_PAT }}
     - uses: actions/setup-go@v1
       with:
         go-version: ${{ matrix.go }}
-    - name: change avalanchego dep
+    - name: change caminogo dep
       if: ${{ github.event_name == 'workflow_dispatch' }}
       run: |
-        go mod edit -replace github.com/ava-labs/avalanchego=./avalanchego
+        go mod edit -replace github.com/chain4travel/caminogo=./caminogo
         go mod tidy
     - run: go mod download
       shell: bash
@@ -117,27 +117,27 @@ jobs:
         os: [ ubuntu-20.04 ]
     steps:
     - uses: actions/checkout@v2
-    - name: check out ${{ github.event.inputs.avalanchegoRepo }} ${{ github.event.inputs.avalanchegoBranch }}
+    - name: check out ${{ github.event.inputs.caminogoRepo }} ${{ github.event.inputs.caminogoBranch }}
       if: ${{ github.event_name == 'workflow_dispatch' }}
       uses: actions/checkout@v2
       with:
-        repository: ${{ github.event.inputs.avalanchegoRepo }}
-        ref: ${{ github.event.inputs.avalanchegoBranch }}
-        path: avalanchego
-        token: ${{ secrets.AVALANCHE_PAT }}
+        repository: ${{ github.event.inputs.caminogoRepo }}
+        ref: ${{ github.event.inputs.caminogoBranch }}
+        path: caminogo
+        token: ${{ secrets.CAMINO_PAT }}
     - uses: actions/setup-go@v1
       with:
         go-version: ${{ matrix.go }}
-    - name: change avalanchego dep
+    - name: change caminogo dep
       if: ${{ github.event_name == 'workflow_dispatch' }}
       run: |
-        go mod edit -replace github.com/ava-labs/avalanchego=./avalanchego
+        go mod edit -replace github.com/chain4travel/caminogo=./caminogo
         go mod tidy
-    - name: prepare avalanchego directory for docker copy
+    - name: prepare caminogo directory for docker copy
       if: ${{ github.event_name == 'workflow_dispatch' }}
-      # mv avalanchego/ to nested dir avalanchego/avalanchego/
+      # mv caminogo/ to nested dir caminogo/caminogo/
       # required because docker instruction "COPY dir ." copies dir/* to .
-      run: mkdir avalanchego_tmp && mv avalanchego avalanchego_tmp && mv avalanchego_tmp avalanchego
+      run: mkdir caminogo_tmp && mv caminogo caminogo_tmp && mv caminogo_tmp caminogo
     - run: .github/workflows/run_e2e_tests.sh --parallelism 1 --client-id $KURTOSIS_CLIENT_ID --client-secret $KURTOSIS_CLIENT_SECRET
       shell: bash
       env:

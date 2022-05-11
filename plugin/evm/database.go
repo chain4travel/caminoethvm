@@ -16,6 +16,7 @@ package evm
 
 import (
 	"github.com/chain4travel/caminogo/database"
+
 	"github.com/chain4travel/caminoethvm/ethdb"
 )
 

@@ -20,13 +20,14 @@ import (
 	"crypto/rand"
 	"testing"
 
-	"github.com/chain4travel/caminoethvm/params"
-
 	"github.com/chain4travel/caminogo/ids"
+
 	"github.com/chain4travel/caminoethvm/core/rawdb"
 	"github.com/chain4travel/caminoethvm/ethdb/memorydb"
+	"github.com/chain4travel/caminoethvm/params"
 	"github.com/chain4travel/caminoethvm/plugin/evm/message"
 	"github.com/chain4travel/caminoethvm/statesync/handlers/stats"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/stretchr/testify/assert"

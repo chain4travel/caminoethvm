@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/chain4travel/caminogo/utils/timer/mockable"
+
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/core"
 	"github.com/chain4travel/caminoethvm/core/state"
@@ -27,6 +28,7 @@ import (
 	"github.com/chain4travel/caminoethvm/ethdb"
 	"github.com/chain4travel/caminoethvm/node"
 	"github.com/chain4travel/caminoethvm/rpc"
+
 	"github.com/ethereum/go-ethereum/common"
 )
 
