@@ -49,6 +49,7 @@ import (
 
 	"github.com/chain4travel/caminogo/utils/timer/mockable"
 	"github.com/chain4travel/caminogo/utils/units"
+
 	"github.com/chain4travel/caminoethvm/consensus"
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/consensus/misc"
@@ -56,6 +57,7 @@ import (
 	"github.com/chain4travel/caminoethvm/core/state"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/params"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"

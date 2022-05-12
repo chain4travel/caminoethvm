@@ -28,9 +28,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chain4travel/caminoethvm/plugin/evm/message"
-
 	caminogoMetrics "github.com/chain4travel/caminogo/api/metrics"
+
 	coreth "github.com/chain4travel/caminoethvm/chain"
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/core"
@@ -41,6 +40,7 @@ import (
 	"github.com/chain4travel/caminoethvm/node"
 	"github.com/chain4travel/caminoethvm/params"
 	"github.com/chain4travel/caminoethvm/peer"
+	"github.com/chain4travel/caminoethvm/plugin/evm/message"
 	"github.com/chain4travel/caminoethvm/rpc"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -380,8 +380,12 @@ func (vm *VM) Initialize(
 	case g.Config.ChainID.Cmp(params.AvalancheFujiChainID) == 0:
 		g.Config = params.AvalancheFujiChainConfig
 		phase0BlockValidator.extDataHashes = fujiExtDataHashes
-	case g.Config.ChainID.Cmp(params.AvalancheLocalChainID) == 0:
-		g.Config = params.AvalancheLocalChainConfig
+	case g.Config.ChainID.Cmp(params.LocalChainID) == 0:
+		g.Config = params.LocalChainConfig
+	case g.Config.ChainID.Cmp(params.CaminoChainID) == 0:
+		g.Config = params.CaminoChainConfig
+	case g.Config.ChainID.Cmp(params.ColumbusChainID) == 0:
+		g.Config = params.ColumbusChainConfig
 	}
 
 	// Free the memory of the extDataHash map that is not used (i.e. if mainnet
@@ -612,7 +616,7 @@ func (vm *VM) preBatchOnFinalizeAndAssemble(header *types.Header, state *state.S
 		// Note: snapshot is taken inside the loop because you cannot revert to the same snapshot more than
 		// once.
 		snapshot := state.Snapshot()
-		rules := vm.chainConfig.AvalancheRules(header.Number, new(big.Int).SetUint64(header.Time))
+		rules := vm.chainConfig.CaminoRules(header.Number, new(big.Int).SetUint64(header.Time))
 		if err := vm.verifyTx(tx, header.ParentHash, header.BaseFee, state, rules); err != nil {
 			// Discard the transaction from the mempool on failed verification.
 			vm.mempool.DiscardCurrentTx(tx.ID())
@@ -652,7 +656,7 @@ func (vm *VM) postBatchOnFinalizeAndAssemble(header *types.Header, state *state.
 		batchAtomicUTXOs  ids.Set
 		batchContribution *big.Int = new(big.Int).Set(common.Big0)
 		batchGasUsed      *big.Int = new(big.Int).Set(common.Big0)
-		rules                      = vm.chainConfig.AvalancheRules(header.Number, new(big.Int).SetUint64(header.Time))
+		rules                      = vm.chainConfig.CaminoRules(header.Number, new(big.Int).SetUint64(header.Time))
 		size              int
 	)
 
@@ -1458,13 +1462,15 @@ func (vm *VM) GetCurrentNonce(address common.Address) (uint64, error) {
 // currentRules returns the chain rules for the current block.
 func (vm *VM) currentRules() params.Rules {
 	header := vm.chain.APIBackend().CurrentHeader()
-	return vm.chainConfig.AvalancheRules(header.Number, big.NewInt(int64(header.Time)))
+	return vm.chainConfig.CaminoRules(header.Number, big.NewInt(int64(header.Time)))
 }
 
 // getBlockValidator returns the block validator that should be used for a block that
 // follows the ruleset defined by [rules]
 func (vm *VM) getBlockValidator(rules params.Rules) BlockValidator {
 	switch {
+	case rules.IsSunrisePhase0:
+		return sunrisePhase0BlockValidator
 	case rules.IsApricotPhase5:
 		return phase5BlockValidator
 	case rules.IsApricotPhase4:

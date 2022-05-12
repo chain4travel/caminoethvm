@@ -26,6 +26,7 @@ import (
 type mockGasPriceSetter struct {
 	lock          sync.Mutex
 	price, minFee *big.Int
+	fixedBaseFee  bool
 }
 
 func (m *mockGasPriceSetter) SetGasPrice(price *big.Int) {
@@ -40,6 +41,14 @@ func (m *mockGasPriceSetter) SetMinFee(minFee *big.Int) {
 	defer m.lock.Unlock()
 
 	m.minFee = minFee
+}
+
+func (m *mockGasPriceSetter) SetFixedFee(fixedFee *big.Int) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	m.minFee = fixedFee
+	m.fixedBaseFee = true
 }
 
 func (m *mockGasPriceSetter) GetStatus() (*big.Int, *big.Int) {
@@ -75,7 +84,7 @@ func TestUpdateGasPriceShutsDown(t *testing.T) {
 	// create a goroutine waiting for an hour before updating the gas price
 	config.ApricotPhase3BlockTimestamp = big.NewInt(time.Now().Add(time.Hour).Unix())
 	gpu := &gasPriceUpdater{
-		setter:       &mockGasPriceSetter{price: big.NewInt(1)},
+		setter:       &mockGasPriceSetter{price: big.NewInt(1), fixedBaseFee: false},
 		chainConfig:  &config,
 		shutdownChan: shutdownChan,
 		wg:           wg,
@@ -92,7 +101,7 @@ func TestUpdateGasPriceInitializesPrice(t *testing.T) {
 	shutdownChan := make(chan struct{})
 	wg := &sync.WaitGroup{}
 	gpu := &gasPriceUpdater{
-		setter:       &mockGasPriceSetter{price: big.NewInt(1)},
+		setter:       &mockGasPriceSetter{price: big.NewInt(1), fixedBaseFee: false},
 		chainConfig:  params.TestChainConfig,
 		shutdownChan: shutdownChan,
 		wg:           wg,
@@ -120,7 +129,7 @@ func TestUpdateGasPriceUpdatesPrice(t *testing.T) {
 	config.ApricotPhase3BlockTimestamp = big.NewInt(time.Now().Add(250 * time.Millisecond).Unix())
 	config.ApricotPhase4BlockTimestamp = big.NewInt(time.Now().Add(3 * time.Second).Unix())
 	gpu := &gasPriceUpdater{
-		setter:       &mockGasPriceSetter{price: big.NewInt(1)},
+		setter:       &mockGasPriceSetter{price: big.NewInt(1), fixedBaseFee: false},
 		chainConfig:  &config,
 		shutdownChan: shutdownChan,
 		wg:           wg,

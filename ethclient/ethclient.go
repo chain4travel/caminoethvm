@@ -46,10 +46,12 @@ import (
 	"math/big"
 
 	"github.com/chain4travel/caminogo/ids"
+
 	"github.com/chain4travel/caminoethvm/accounts/abi/bind"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/interfaces"
 	"github.com/chain4travel/caminoethvm/rpc"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )

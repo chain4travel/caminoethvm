@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"github.com/chain4travel/caminogo/ids"
+
 	"github.com/chain4travel/caminoethvm/plugin/evm/message"
 )
 

@@ -21,6 +21,7 @@ import (
 
 	"github.com/chain4travel/caminogo/chains/atomic"
 	"github.com/chain4travel/caminogo/snow"
+
 	"github.com/chain4travel/caminoethvm/params"
 )
 

@@ -273,6 +273,8 @@ type TxPool struct {
 	eip2718  bool // Fork indicator whether we are using EIP-2718 type transactions.
 	eip1559  bool // Fork indicator whether we are using EIP-1559 type transactions.
 
+	fixedBaseFee bool // Fork has introduced fixed base fee
+
 	currentHead *types.Header
 	// [currentState] is the state of the blockchain head. It is reset whenever
 	// head changes.
@@ -520,6 +522,14 @@ func (pool *TxPool) SetMinFee(minFee *big.Int) {
 	defer pool.mu.Unlock()
 
 	pool.minimumFee = minFee
+}
+
+func (pool *TxPool) SetFixedFee(fixedFee *big.Int) {
+	pool.mu.Lock()
+	defer pool.mu.Unlock()
+
+	pool.minimumFee = fixedFee
+	pool.fixedBaseFee = true
 }
 
 // Nonce returns the next nonce of an account, with all transactions executable
@@ -792,7 +802,7 @@ func (pool *TxPool) add(tx *types.Transaction, local bool) (replaced bool, err e
 	from, _ := types.Sender(pool.signer, tx) // already validated
 	if list := pool.pending[from]; list != nil && list.Overlaps(tx) {
 		// Nonce already pending, check if required price bump is met
-		inserted, old := list.Add(tx, pool.config.PriceBump)
+		inserted, old := list.Add(tx, pool.config.PriceBump, pool.fixedBaseFee)
 		if !inserted {
 			pendingDiscardMeter.Mark(1)
 			return false, ErrReplaceUnderpriced
@@ -842,7 +852,7 @@ func (pool *TxPool) enqueueTx(hash common.Hash, tx *types.Transaction, local boo
 	if pool.queue[from] == nil {
 		pool.queue[from] = newTxList(false)
 	}
-	inserted, old := pool.queue[from].Add(tx, pool.config.PriceBump)
+	inserted, old := pool.queue[from].Add(tx, pool.config.PriceBump, pool.fixedBaseFee)
 	if !inserted {
 		// An older transaction was better, discard this
 		queuedDiscardMeter.Mark(1)
@@ -896,7 +906,7 @@ func (pool *TxPool) promoteTx(addr common.Address, hash common.Hash, tx *types.T
 	}
 	list := pool.pending[addr]
 
-	inserted, old := list.Add(tx, pool.config.PriceBump)
+	inserted, old := list.Add(tx, pool.config.PriceBump, pool.fixedBaseFee)
 	if !inserted {
 		// An older transaction was better, discard this
 		pool.all.Remove(hash)
@@ -1403,6 +1413,7 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 	timestamp := new(big.Int).SetUint64(newHead.Time)
 	pool.eip2718 = pool.chainconfig.IsApricotPhase2(timestamp)
 	pool.eip1559 = pool.chainconfig.IsApricotPhase3(timestamp)
+	pool.fixedBaseFee = pool.chainconfig.IsSunrisePhase0(timestamp)
 }
 
 // promoteExecutables moves transactions that have become processable from the

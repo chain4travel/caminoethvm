@@ -41,8 +41,12 @@ var (
 	AvalancheMainnetChainID = big.NewInt(43114)
 	// AvalancheFujiChainID ...
 	AvalancheFujiChainID = big.NewInt(43113)
-	// AvalancheLocalChainID ...
-	AvalancheLocalChainID = big.NewInt(43112)
+	// LocalChainID ...
+	LocalChainID = big.NewInt(43112)
+	// CaminoChainID ...
+	CaminoChainID = big.NewInt(500)
+	// CaminoChainID ...
+	ColumbusChainID = big.NewInt(502)
 
 	errNonGenesisForkByHeight = errors.New("coreth only supports forking by height at the genesis block")
 )
@@ -50,78 +54,137 @@ var (
 var (
 	// AvalancheMainnetChainConfig is the configuration for Avalanche Main Network
 	AvalancheMainnetChainConfig = &ChainConfig{
-		ChainID:                     AvalancheMainnetChainID,
-		HomesteadBlock:              big.NewInt(0),
-		DAOForkBlock:                big.NewInt(0),
-		DAOForkSupport:              true,
-		EIP150Block:                 big.NewInt(0),
-		EIP150Hash:                  common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
-		EIP155Block:                 big.NewInt(0),
-		EIP158Block:                 big.NewInt(0),
-		ByzantiumBlock:              big.NewInt(0),
-		ConstantinopleBlock:         big.NewInt(0),
-		PetersburgBlock:             big.NewInt(0),
-		IstanbulBlock:               big.NewInt(0),
-		MuirGlacierBlock:            big.NewInt(0),
+		ChainID:             AvalancheMainnetChainID,
+		HomesteadBlock:      big.NewInt(0),
+		DAOForkBlock:        big.NewInt(0),
+		DAOForkSupport:      true,
+		EIP150Block:         big.NewInt(0),
+		EIP150Hash:          common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(0),
+		IstanbulBlock:       big.NewInt(0),
+		MuirGlacierBlock:    big.NewInt(0),
+		// Avalanche Network Upgrades
 		ApricotPhase1BlockTimestamp: big.NewInt(time.Date(2021, time.March, 31, 14, 0, 0, 0, time.UTC).Unix()),
 		ApricotPhase2BlockTimestamp: big.NewInt(time.Date(2021, time.May, 10, 11, 0, 0, 0, time.UTC).Unix()),
 		ApricotPhase3BlockTimestamp: big.NewInt(time.Date(2021, time.August, 24, 14, 0, 0, 0, time.UTC).Unix()),
 		ApricotPhase4BlockTimestamp: big.NewInt(time.Date(2021, time.September, 22, 21, 0, 0, 0, time.UTC).Unix()),
 		ApricotPhase5BlockTimestamp: big.NewInt(time.Date(2021, time.December, 2, 18, 0, 0, 0, time.UTC).Unix()),
+		// Camino Network Upgrades
+		SunrisePhase0BlockTimestamp: nil,
 	}
 
 	// AvalancheFujiChainConfig is the configuration for the Fuji Test Network
 	AvalancheFujiChainConfig = &ChainConfig{
-		ChainID:                     AvalancheFujiChainID,
-		HomesteadBlock:              big.NewInt(0),
-		DAOForkBlock:                big.NewInt(0),
-		DAOForkSupport:              true,
-		EIP150Block:                 big.NewInt(0),
-		EIP150Hash:                  common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
-		EIP155Block:                 big.NewInt(0),
-		EIP158Block:                 big.NewInt(0),
-		ByzantiumBlock:              big.NewInt(0),
-		ConstantinopleBlock:         big.NewInt(0),
-		PetersburgBlock:             big.NewInt(0),
-		IstanbulBlock:               big.NewInt(0),
-		MuirGlacierBlock:            big.NewInt(0),
+		ChainID:             AvalancheFujiChainID,
+		HomesteadBlock:      big.NewInt(0),
+		DAOForkBlock:        big.NewInt(0),
+		DAOForkSupport:      true,
+		EIP150Block:         big.NewInt(0),
+		EIP150Hash:          common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(0),
+		IstanbulBlock:       big.NewInt(0),
+		MuirGlacierBlock:    big.NewInt(0),
+		// Avalanche Network Upgrades
 		ApricotPhase1BlockTimestamp: big.NewInt(time.Date(2021, time.March, 26, 14, 0, 0, 0, time.UTC).Unix()),
 		ApricotPhase2BlockTimestamp: big.NewInt(time.Date(2021, time.May, 5, 14, 0, 0, 0, time.UTC).Unix()),
 		ApricotPhase3BlockTimestamp: big.NewInt(time.Date(2021, time.August, 16, 19, 0, 0, 0, time.UTC).Unix()),
 		ApricotPhase4BlockTimestamp: big.NewInt(time.Date(2021, time.September, 16, 21, 0, 0, 0, time.UTC).Unix()),
 		ApricotPhase5BlockTimestamp: big.NewInt(time.Date(2021, time.November, 24, 15, 0, 0, 0, time.UTC).Unix()),
+		// Camino Network Upgrades
+		SunrisePhase0BlockTimestamp: nil,
 	}
 
 	// AvalancheLocalChainConfig is the configuration for the Avalanche Local Network
-	AvalancheLocalChainConfig = &ChainConfig{
-		ChainID:                     AvalancheLocalChainID,
-		HomesteadBlock:              big.NewInt(0),
-		DAOForkBlock:                big.NewInt(0),
-		DAOForkSupport:              true,
-		EIP150Block:                 big.NewInt(0),
-		EIP150Hash:                  common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
-		EIP155Block:                 big.NewInt(0),
-		EIP158Block:                 big.NewInt(0),
-		ByzantiumBlock:              big.NewInt(0),
-		ConstantinopleBlock:         big.NewInt(0),
-		PetersburgBlock:             big.NewInt(0),
-		IstanbulBlock:               big.NewInt(0),
-		MuirGlacierBlock:            big.NewInt(0),
+	LocalChainConfig = &ChainConfig{
+		ChainID:             LocalChainID,
+		HomesteadBlock:      big.NewInt(0),
+		DAOForkBlock:        big.NewInt(0),
+		DAOForkSupport:      true,
+		EIP150Block:         big.NewInt(0),
+		EIP150Hash:          common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(0),
+		IstanbulBlock:       big.NewInt(0),
+		MuirGlacierBlock:    big.NewInt(0),
+		// Avalanche Network Upgrades
 		ApricotPhase1BlockTimestamp: big.NewInt(0),
 		ApricotPhase2BlockTimestamp: big.NewInt(0),
 		ApricotPhase3BlockTimestamp: big.NewInt(0),
 		ApricotPhase4BlockTimestamp: big.NewInt(0),
 		ApricotPhase5BlockTimestamp: big.NewInt(0),
+		// Camino Network Upgrades
+		SunrisePhase0BlockTimestamp: big.NewInt(0),
 	}
 
-	TestChainConfig         = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0)}
-	TestLaunchConfig        = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil, nil, nil}
-	TestApricotPhase1Config = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil, nil}
-	TestApricotPhase2Config = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil}
-	TestApricotPhase3Config = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil}
-	TestApricotPhase4Config = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil}
-	TestApricotPhase5Config = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0)}
-	TestRules               = TestChainConfig.AvalancheRules(new(big.Int), new(big.Int))
+	// ColumbusChainConfig is the configuration for the Columbus Test Network
+	ColumbusChainConfig = &ChainConfig{
+		ChainID:             ColumbusChainID,
+		HomesteadBlock:      big.NewInt(0),
+		DAOForkBlock:        big.NewInt(0),
+		DAOForkSupport:      true,
+		EIP150Block:         big.NewInt(0),
+		EIP150Hash:          common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(0),
+		IstanbulBlock:       big.NewInt(0),
+		MuirGlacierBlock:    big.NewInt(0),
+		// Avalanche Network Upgrades
+		ApricotPhase1BlockTimestamp: big.NewInt(0),
+		ApricotPhase2BlockTimestamp: big.NewInt(0),
+		ApricotPhase3BlockTimestamp: big.NewInt(0),
+		ApricotPhase4BlockTimestamp: big.NewInt(0),
+		ApricotPhase5BlockTimestamp: big.NewInt(0),
+		// Camino Network Upgrades
+		SunrisePhase0BlockTimestamp: big.NewInt(time.Date(2022, time.May, 16, 8, 0, 0, 0, time.UTC).Unix()),
+	}
+
+	// CaminoChainConfig is the configuration for the Camino Main Network
+	CaminoChainConfig = &ChainConfig{
+		ChainID:             CaminoChainID,
+		HomesteadBlock:      big.NewInt(0),
+		DAOForkBlock:        big.NewInt(0),
+		DAOForkSupport:      true,
+		EIP150Block:         big.NewInt(0),
+		EIP150Hash:          common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(0),
+		IstanbulBlock:       big.NewInt(0),
+		MuirGlacierBlock:    big.NewInt(0),
+		// Avalanche Network Upgrades
+		ApricotPhase1BlockTimestamp: big.NewInt(0),
+		ApricotPhase2BlockTimestamp: big.NewInt(0),
+		ApricotPhase3BlockTimestamp: big.NewInt(0),
+		ApricotPhase4BlockTimestamp: big.NewInt(0),
+		ApricotPhase5BlockTimestamp: big.NewInt(0),
+		// Camino Network Upgrades
+		SunrisePhase0BlockTimestamp: big.NewInt(0),
+	}
+
+	TestChainConfig         = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil}
+	TestLaunchConfig        = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil, nil, nil, nil}
+	TestApricotPhase1Config = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil, nil, nil}
+	TestApricotPhase2Config = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil, nil}
+	TestApricotPhase3Config = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil, nil}
+	TestApricotPhase4Config = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, nil}
+	TestApricotPhase5Config = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), nil}
+	TestRules               = TestChainConfig.CaminoRules(new(big.Int), new(big.Int))
 )
 
 // ChainConfig is the core config which determines the blockchain settings.
@@ -161,11 +224,15 @@ type ChainConfig struct {
 	ApricotPhase4BlockTimestamp *big.Int `json:"apricotPhase4BlockTimestamp,omitempty"`
 	// Apricot Phase 5 introduces a batch of atomic transactions with a maximum atomic gas limit per block. (nil = no fork, 0 = already activated)
 	ApricotPhase5BlockTimestamp *big.Int `json:"apricotPhase5BlockTimestamp,omitempty"`
+
+	// Camino Network Upgrades
+	// Sunrise Phase 0 introduces fixed 50nCAM BaseFee
+	SunrisePhase0BlockTimestamp *big.Int `json:"sunrisePhase0BlockTimestamp,omitempty"`
 }
 
 // String implements the fmt.Stringer interface.
 func (c *ChainConfig) String() string {
-	return fmt.Sprintf("{ChainID: %v Homestead: %v DAO: %v DAOSupport: %v EIP150: %v EIP155: %v EIP158: %v Byzantium: %v Constantinople: %v Petersburg: %v Istanbul: %v, Muir Glacier: %v, Apricot Phase 1: %v, Apricot Phase 2: %v, Apricot Phase 3: %v, Apricot Phase 4: %v, Apricot Phase 5: %v, Engine: Dummy Consensus Engine}",
+	return fmt.Sprintf("{ChainID: %v Homestead: %v DAO: %v DAOSupport: %v EIP150: %v EIP155: %v EIP158: %v Byzantium: %v Constantinople: %v Petersburg: %v Istanbul: %v, Muir Glacier: %v, Apricot Phase 1: %v, Apricot Phase 2: %v, Apricot Phase 3: %v, Apricot Phase 4: %v, Apricot Phase 5: %v, Sunrise Phase 0: %v, Engine: Dummy Consensus Engine}",
 		c.ChainID,
 		c.HomesteadBlock,
 		c.DAOForkBlock,
@@ -183,6 +250,7 @@ func (c *ChainConfig) String() string {
 		c.ApricotPhase3BlockTimestamp,
 		c.ApricotPhase4BlockTimestamp,
 		c.ApricotPhase5BlockTimestamp,
+		c.SunrisePhase0BlockTimestamp,
 	)
 }
 
@@ -268,6 +336,14 @@ func (c *ChainConfig) IsApricotPhase4(blockTimestamp *big.Int) bool {
 // with a timestamp after the Apricot Phase 5 upgrade time.
 func (c *ChainConfig) IsApricotPhase5(blockTimestamp *big.Int) bool {
 	return isForked(c.ApricotPhase5BlockTimestamp, blockTimestamp)
+}
+
+// Camino Upgrades:
+
+// IsSunrisePhase0 returns whether [blockTimestamp] represents a block
+// with a timestamp after the Sunrise Phase 0 upgrade time.
+func (c *ChainConfig) IsSunrisePhase0(blockTimestamp *big.Int) bool {
+	return isForked(c.SunrisePhase0BlockTimestamp, blockTimestamp)
 }
 
 // CheckCompatible checks whether scheduled fork transitions have been imported
@@ -363,7 +439,7 @@ func (c *ChainConfig) CheckConfigForkOrder() error {
 			lastFork = cur
 		}
 	}
-	// TODO(aaronbuchwald) check that camino block timestamps are at least possible with the other rule set changes
+	// TODO(aaronbuchwald) check that avalanche block timestamps are at least possible with the other rule set changes
 	// additional change: require that block number hard forks are either 0 or nil since they should not
 	// be enabled at a specific block number.
 
@@ -426,7 +502,9 @@ func (c *ChainConfig) checkCompatible(newcfg *ChainConfig, headHeight *big.Int, 
 	if isForkIncompatible(c.ApricotPhase5BlockTimestamp, newcfg.ApricotPhase5BlockTimestamp, headTimestamp) {
 		return newCompatError("ApricotPhase5 fork block timestamp", c.ApricotPhase5BlockTimestamp, newcfg.ApricotPhase5BlockTimestamp)
 	}
-
+	if isForkIncompatible(c.SunrisePhase0BlockTimestamp, newcfg.SunrisePhase0BlockTimestamp, headTimestamp) {
+		return newCompatError("SunrisePhase0 fork block timestamp", c.SunrisePhase0BlockTimestamp, newcfg.SunrisePhase0BlockTimestamp)
+	}
 	return nil
 }
 
@@ -497,6 +575,9 @@ type Rules struct {
 
 	// Rules for Avalanche releases
 	IsApricotPhase1, IsApricotPhase2, IsApricotPhase3, IsApricotPhase4, IsApricotPhase5 bool
+
+	// Rules for Camino releases
+	IsSunrisePhase0 bool
 }
 
 // Rules ensures c's ChainID is not nil.
@@ -528,5 +609,14 @@ func (c *ChainConfig) AvalancheRules(blockNum, blockTimestamp *big.Int) Rules {
 	rules.IsApricotPhase3 = c.IsApricotPhase3(blockTimestamp)
 	rules.IsApricotPhase4 = c.IsApricotPhase4(blockTimestamp)
 	rules.IsApricotPhase5 = c.IsApricotPhase5(blockTimestamp)
+	return rules
+}
+
+// CaminoRules returns the Camino modified rules to support Camino
+// network upgrades
+func (c *ChainConfig) CaminoRules(blockNum, blockTimestamp *big.Int) Rules {
+	rules := c.AvalancheRules(blockNum, blockTimestamp)
+
+	rules.IsSunrisePhase0 = c.IsSunrisePhase0(blockTimestamp)
 	return rules
 }
