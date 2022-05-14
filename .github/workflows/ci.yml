@@ -22,16 +22,16 @@ jobs:
     name: Lint
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: check out ${{ github.event.inputs.caminogoRepo }} ${{ github.event.inputs.caminogoBranch }}
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{ github.event.inputs.caminogoRepo }}
           ref: ${{ github.event.inputs.caminogoBranch }}
           path: caminogo
           token: ${{ secrets.CAMINO_PAT }}
-      - uses: actions/setup-go@v1
+      - uses: actions/setup-go@v2
         with:
           go-version: 1.17
       - name: change caminogo dep
@@ -54,16 +54,16 @@ jobs:
         go: ['1.17']
         os: [macos-11.0, ubuntu-18.04]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: check out ${{ github.event.inputs.caminogoRepo }} ${{ github.event.inputs.caminogoBranch }}
       if: ${{ github.event_name == 'workflow_dispatch' }}
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: ${{ github.event.inputs.caminogoRepo }}
         ref: ${{ github.event.inputs.caminogoBranch }}
         path: caminogo
         token: ${{ secrets.CAMINO_PAT }}
-    - uses: actions/setup-go@v1
+    - uses: actions/setup-go@v2
       with:
         go-version: ${{ matrix.go }}
     - name: change caminogo dep
@@ -87,16 +87,16 @@ jobs:
         go: ['1.17']
         os: [ubuntu-20.04]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: check out ${{ github.event.inputs.caminogoRepo }} ${{ github.event.inputs.caminogoBranch }}
       if: ${{ github.event_name == 'workflow_dispatch' }}
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: ${{ github.event.inputs.caminogoRepo }}
         ref: ${{ github.event.inputs.caminogoBranch }}
         path: caminogo
         token: ${{ secrets.CAMINO_PAT }}
-    - uses: actions/setup-go@v1
+    - uses: actions/setup-go@v2
       with:
         go-version: ${{ matrix.go }}
     - name: change caminogo dep

@@ -9,6 +9,8 @@ binary_path=${CAMINOETHVM_BINARY_PATH:-"$GOPATH/src/github.com/chain4travel/cami
 # Avalabs docker hub
 dockerhub_repo="c4tplatform/caminogo"
 
+CAMINOETHVM_TAG=${CAMINOETHVM_TAG:-${GITHUB_REF_NAME:-""}}
+
 # Image build id
 caminoethvm_commit=${CAMINOETHVM_COMMIT:-$( git rev-list -1 HEAD )}
 # Use an abbreviated version of the full commit to tag the image.
@@ -21,6 +23,6 @@ module=$(grep caminogo $CAMINOETHVM_PATH/go.mod)
 # trim leading
 module="${module#"${module%%[![:space:]]*}"}"
 t=(${module//\ / })
-caminogo_tag=${t[-1]}
+caminogo_tag=${t[1]}
 
 build_image_id=${BUILD_IMAGE_ID:-"$caminogo_tag-$caminoethvm_short_commit"}
