@@ -233,14 +233,20 @@ func (b *Block) Timestamp() time.Time {
 }
 
 // syntacticVerify verifies that a *Block is well-formed.
+// camino rules will be determined by parent block
 func (b *Block) syntacticVerify() (params.Rules, error) {
-	if b == nil || b.ethBlock == nil {
+	if b == nil {
 		return params.Rules{}, errInvalidBlock
 	}
+	if parentInf, err := b.vm.GetBlockInternal(b.Parent()); err == nil {
+		if parent, ok := parentInf.(*Block); ok && parent.ethBlock != nil {
+			header := parent.ethBlock.Header()
 
-	header := b.ethBlock.Header()
-	rules := b.vm.chainConfig.CaminoRules(header.Number, new(big.Int).SetUint64(header.Time))
-	return rules, b.vm.getBlockValidator(rules).SyntacticVerify(b)
+			rules := b.vm.chainConfig.CaminoRules(header.Number, new(big.Int).SetUint64(header.Time))
+			return rules, b.vm.getBlockValidator(rules).SyntacticVerify(b)
+		}
+	}
+	return params.Rules{}, errRejectedParent
 }
 
 // Verify implements the snowman.Block interface

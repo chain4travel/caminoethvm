@@ -58,7 +58,7 @@ func CalcBaseFee(config *params.ChainConfig, parent *types.Header, timestamp uin
 		isApricotPhase3 = config.IsApricotPhase3(bigTimestamp)
 		isApricotPhase4 = config.IsApricotPhase4(bigTimestamp)
 		isApricotPhase5 = config.IsApricotPhase5(bigTimestamp)
-		isSunrisePhase0 = config.IsSunrisePhase0(new(big.Int).SetUint64(timestamp))
+		isSunrisePhase0 = config.IsSunrisePhase0(bigTimestamp)
 	)
 	if !isSunrisePhase0 && (!isApricotPhase3 || parent.Number.Cmp(common.Big0) == 0) {
 		initialSlice := make([]byte, params.ApricotPhase3ExtraDataSize)

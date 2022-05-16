@@ -197,8 +197,9 @@ func (de *DummyEngine) verifyHeaderGasFields(config *params.ChainConfig, header 
 // modified from consensus.go
 func (de *DummyEngine) verifyHeader(chain consensus.ChainHeaderReader, header *types.Header, parent *types.Header, uncle bool) error {
 	var (
-		config    = chain.Config()
-		timestamp = new(big.Int).SetUint64(header.Time)
+		config          = chain.Config()
+		timestamp       = new(big.Int).SetUint64(header.Time)
+		parentTimestamp = new(big.Int).SetUint64(parent.Time)
 	)
 	// Ensure that we do not verify an uncle
 	if uncle {
@@ -209,7 +210,7 @@ func (de *DummyEngine) verifyHeader(chain consensus.ChainHeaderReader, header *t
 		if uint64(len(header.Extra)) > params.MaximumExtraDataSize {
 			return fmt.Errorf("extra-data too long: %d > %d", len(header.Extra), params.MaximumExtraDataSize)
 		}
-	} else if config.IsSunrisePhase0(timestamp) {
+	} else if config.IsSunrisePhase0(parentTimestamp) {
 		if len(header.Extra) != params.SunrisePhase0ExtraDataSize {
 			return fmt.Errorf("expected extra-data field to be: %d, but found %d", params.SunrisePhase0ExtraDataSize, len(header.Extra))
 		}

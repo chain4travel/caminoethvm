@@ -1459,7 +1459,7 @@ func (vm *VM) GetCurrentNonce(address common.Address) (uint64, error) {
 	return state.GetNonce(address), nil
 }
 
-// currentRules returns the chain rules for the current block.
+// currentRules returns the chain rules for the current (next) block.
 func (vm *VM) currentRules() params.Rules {
 	header := vm.chain.APIBackend().CurrentHeader()
 	return vm.chainConfig.CaminoRules(header.Number, big.NewInt(int64(header.Time)))
