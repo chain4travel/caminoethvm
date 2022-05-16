@@ -7,7 +7,7 @@ GOPATH="$(go env GOPATH)"
 binary_path=${CAMINOETHVM_BINARY_PATH:-"$GOPATH/src/github.com/chain4travel/camino-node/build/plugins/evm"}
 
 # Avalabs docker hub
-dockerhub_repo="c4tplatform/caminogo"
+dockerhub_repo="c4tplatform/caminoethvm"
 
 CAMINOETHVM_TAG=${CAMINOETHVM_TAG:-${GITHUB_REF_NAME:-""}}
 
