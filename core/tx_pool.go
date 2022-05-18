@@ -524,14 +524,6 @@ func (pool *TxPool) SetMinFee(minFee *big.Int) {
 	pool.minimumFee = minFee
 }
 
-func (pool *TxPool) SetFixedFee(fixedFee *big.Int) {
-	pool.mu.Lock()
-	defer pool.mu.Unlock()
-
-	pool.minimumFee = fixedFee
-	pool.fixedBaseFee = true
-}
-
 // Nonce returns the next nonce of an account, with all transactions executable
 // by the pool already applied on top.
 func (pool *TxPool) Nonce(addr common.Address) uint64 {
@@ -1413,7 +1405,10 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 	timestamp := new(big.Int).SetUint64(newHead.Time)
 	pool.eip2718 = pool.chainconfig.IsApricotPhase2(timestamp)
 	pool.eip1559 = pool.chainconfig.IsApricotPhase3(timestamp)
-	pool.fixedBaseFee = pool.chainconfig.IsSunrisePhase0(timestamp)
+	if pool.chainconfig.IsSunrisePhase0(timestamp) {
+		pool.fixedBaseFee = true
+		pool.minimumFee = new(big.Int).SetUint64(params.SunrisePhase0BaseFee)
+	}
 }
 
 // promoteExecutables moves transactions that have become processable from the

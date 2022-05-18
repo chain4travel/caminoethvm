@@ -33,7 +33,6 @@ type gasPriceUpdater struct {
 type gasPriceSetter interface {
 	SetGasPrice(price *big.Int)
 	SetMinFee(price *big.Int)
-	SetFixedFee(price *big.Int)
 }
 
 // handleGasPriceUpdates creates and runs an instance of
@@ -68,8 +67,7 @@ func (gpu *gasPriceUpdater) start() {
 	if disabled := gpu.handleUpdate(gpu.setter.SetMinFee, gpu.chainConfig.ApricotPhase4BlockTimestamp, big.NewInt(params.ApricotPhase4MinBaseFee)); disabled {
 		return
 	}
-	// Updates to the minimum gas price as of SunrisePhase0 if it's already in effect or starts a goroutine to enable it at the correct time
-	gpu.handleUpdate(gpu.setter.SetFixedFee, gpu.chainConfig.SunrisePhase0BlockTimestamp, big.NewInt(int64(params.SunrisePhase0BaseFee)))
+	// SunrisePhase0 GasLimit starts with the first postForkBlock. We Handle the update in TxPool (reset)
 }
 
 // handleUpdate handles calling update(price) at the appropriate time based on
