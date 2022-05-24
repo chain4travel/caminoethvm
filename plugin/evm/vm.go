@@ -835,6 +835,9 @@ func (vm *VM) SetState(state snow.State) error {
 		vm.bootstrapped = false
 		return vm.fx.Bootstrapping()
 	case snow.NormalOp:
+		if num := vm.DeferedChecks.Count(); num > 0 {
+			return fmt.Errorf("%d blocks has been verified", num)
+		}
 		vm.bootstrapped = true
 		return vm.fx.Bootstrapped()
 	default:

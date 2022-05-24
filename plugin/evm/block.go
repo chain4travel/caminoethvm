@@ -122,6 +122,10 @@ type DeferedChecks struct {
 	deferedChecks map[ids.ID]*Block
 }
 
+func (d *DeferedChecks) Count() int {
+	return len(d.deferedChecks)
+}
+
 func (d *DeferedChecks) Push(id ids.ID, b *Block) {
 	d.deferedChecks[id] = b
 }
