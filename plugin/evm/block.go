@@ -116,6 +116,33 @@ func init() {
 	}
 }
 
+// DeferedChecks holds Blocks which must be re-verified
+// when the parent of a possible postFork block arrives
+type DeferedChecks struct {
+	deferedChecks map[ids.ID]*Block
+}
+
+func (d *DeferedChecks) Push(id ids.ID, b *Block) {
+	d.deferedChecks[id] = b
+}
+
+func (d *DeferedChecks) Verify(b *Block, rules *params.Rules) error {
+	// Get rules for this block
+	anchestor, exists := d.deferedChecks[b.id]
+	if exists {
+		delete(d.deferedChecks, b.id)
+		// Verify that anchstor block verifies the parent rules
+		return b.vm.getBlockValidator(*rules).SyntacticVerify(anchestor)
+	}
+	return nil
+}
+
+func NewDeferedChecks() *DeferedChecks {
+	return &DeferedChecks{
+		deferedChecks: make(map[ids.ID]*Block, 1),
+	}
+}
+
 // Block implements the snowman.Block interface
 type Block struct {
 	id        ids.ID
@@ -233,22 +260,37 @@ func (b *Block) Timestamp() time.Time {
 }
 
 // syntacticVerify verifies that a *Block is well-formed.
-func (b *Block) syntacticVerify() (params.Rules, error) {
+func (b *Block) syntacticVerify() (*params.Rules, error) {
 	if b == nil || b.ethBlock == nil {
-		return params.Rules{}, errInvalidBlock
+		return nil, errInvalidBlock
 	}
-	// camino rules will be determined by parent block
-	if parentInf, err := b.vm.GetBlockInternal(b.Parent()); err == nil {
-		if parent, ok := parentInf.(*Block); ok && parent.ethBlock != nil {
-			header := parent.ethBlock.Header()
-			rules := b.vm.chainConfig.CaminoRules(header.Number, new(big.Int).SetUint64(header.Time))
-			return rules, b.vm.getBlockValidator(rules).SyntacticVerify(b)
-		}
-	}
-	// Fallback for genesis block
+
 	header := b.ethBlock.Header()
 	rules := b.vm.chainConfig.CaminoRules(header.Number, new(big.Int).SetUint64(header.Time))
-	return rules, b.vm.getBlockValidator(rules).SyntacticVerify(b)
+
+	if err := b.vm.DeferedChecks.Verify(b, &rules); err != nil {
+		return nil, err
+	}
+
+	err := b.vm.getBlockValidator(rules).SyntacticVerify(b)
+
+	if err != nil && b.ethBlock.Header().Number.Cmp(common.Big0) > 0 {
+		// camino rules will be determined by parent block
+		if parentInf, pErr := b.vm.GetBlockInternal(b.Parent()); pErr == nil {
+			if parent, ok := parentInf.(*Block); ok && parent.ethBlock != nil {
+				header := parent.ethBlock.Header()
+				rules = parent.vm.chainConfig.CaminoRules(header.Number, new(big.Int).SetUint64(header.Time))
+				err = b.vm.getBlockValidator(rules).SyntacticVerify(b)
+			} else {
+				err = fmt.Errorf("cannot extract block")
+			}
+		} else {
+			// We check the syntax later using the parent block
+			b.vm.DeferedChecks.Push(b.Parent(), b)
+			err = nil
+		}
+	}
+	return &rules, err
 }
 
 // Verify implements the snowman.Block interface
@@ -269,7 +311,7 @@ func (b *Block) verify(writes bool) error {
 	return b.vm.chain.BlockChain().InsertBlockManual(b.ethBlock, writes)
 }
 
-func (b *Block) verifyAtomicTxs(rules params.Rules) error {
+func (b *Block) verifyAtomicTxs(rules *params.Rules) error {
 	// Ensure that the parent was verified and inserted correctly.
 	ancestorID := b.Parent()
 	ancestorHash := common.Hash(ancestorID)
@@ -300,7 +342,7 @@ func (b *Block) verifyAtomicTxs(rules params.Rules) error {
 			log.Info("skipping atomic tx verification on bonus block", "block", b.id)
 		} else {
 			utx := atomicTx.UnsignedAtomicTx
-			if err := utx.SemanticVerify(b.vm, atomicTx, ancestor, b.ethBlock.BaseFee(), rules); err != nil {
+			if err := utx.SemanticVerify(b.vm, atomicTx, ancestor, b.ethBlock.BaseFee(), *rules); err != nil {
 				return fmt.Errorf("invalid block due to failed semanatic verify: %w at height %d", err, b.Height())
 			}
 			txInputs := utx.InputUTXOs()

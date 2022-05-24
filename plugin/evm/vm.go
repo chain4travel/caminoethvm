@@ -251,6 +251,9 @@ type VM struct {
 
 	bootstrapped bool
 	IsPlugin     bool
+
+	// Non verifiable blocks because of missing parent
+	DeferedChecks *DeferedChecks
 }
 
 // Codec implements the secp256k1fx interface
@@ -557,6 +560,8 @@ func (vm *VM) Initialize(
 	if err := ctx.Metrics.Register(vm.multiGatherer); err != nil {
 		return err
 	}
+	// Initialize the map used for re-syntactic checks
+	vm.DeferedChecks = NewDeferedChecks()
 
 	return vm.fx.Initialize(vm)
 }
@@ -617,7 +622,7 @@ func (vm *VM) preBatchOnFinalizeAndAssemble(header *types.Header, state *state.S
 		// once.
 		snapshot := state.Snapshot()
 		rules := vm.chainConfig.CaminoRules(header.Number, new(big.Int).SetUint64(header.Time))
-		if err := vm.verifyTx(tx, header.ParentHash, header.BaseFee, state, rules); err != nil {
+		if err := vm.verifyTx(tx, header.ParentHash, header.BaseFee, state, &rules); err != nil {
 			// Discard the transaction from the mempool on failed verification.
 			vm.mempool.DiscardCurrentTx(tx.ID())
 			state.RevertToSnapshot(snapshot)
@@ -704,7 +709,7 @@ func (vm *VM) postBatchOnFinalizeAndAssemble(header *types.Header, state *state.
 		}
 
 		snapshot := state.Snapshot()
-		if err := vm.verifyTx(tx, header.ParentHash, header.BaseFee, state, rules); err != nil {
+		if err := vm.verifyTx(tx, header.ParentHash, header.BaseFee, state, &rules); err != nil {
 			// Discard the transaction from the mempool and reset the state to [snapshot]
 			// if it fails verification here.
 			// Note: prior to this point, we have not modified [state] so there is no need to
@@ -1217,7 +1222,7 @@ func (vm *VM) verifyTxAtTip(tx *Tx) error {
 		}
 	}
 
-	return vm.verifyTx(tx, parentHeader.Hash(), nextBaseFee, preferredState, rules)
+	return vm.verifyTx(tx, parentHeader.Hash(), nextBaseFee, preferredState, &rules)
 }
 
 // verifyTx verifies that [tx] is valid to be issued into a block with parent block [parentHash]
@@ -1225,7 +1230,7 @@ func (vm *VM) verifyTxAtTip(tx *Tx) error {
 // Note: verifyTx may modify [state]. If [state] needs to be properly maintained, the caller is responsible
 // for reverting to the correct snapshot after calling this function. If this function is called with a
 // throwaway state, then this is not necessary.
-func (vm *VM) verifyTx(tx *Tx, parentHash common.Hash, baseFee *big.Int, state *state.StateDB, rules params.Rules) error {
+func (vm *VM) verifyTx(tx *Tx, parentHash common.Hash, baseFee *big.Int, state *state.StateDB, rules *params.Rules) error {
 	parentIntf, err := vm.GetBlockInternal(ids.ID(parentHash))
 	if err != nil {
 		return fmt.Errorf("failed to get parent block: %w", err)
@@ -1234,7 +1239,7 @@ func (vm *VM) verifyTx(tx *Tx, parentHash common.Hash, baseFee *big.Int, state *
 	if !ok {
 		return fmt.Errorf("parent block %s had unexpected type %T", parentIntf.ID(), parentIntf)
 	}
-	if err := tx.UnsignedAtomicTx.SemanticVerify(vm, tx, parent, baseFee, rules); err != nil {
+	if err := tx.UnsignedAtomicTx.SemanticVerify(vm, tx, parent, baseFee, *rules); err != nil {
 		return err
 	}
 	return tx.UnsignedAtomicTx.EVMStateTransfer(vm.ctx, state)
