@@ -350,7 +350,13 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		ret, st.gas, vmerr = st.evm.Call(sender, st.to(), st.data, st.gas, st.value)
 	}
 	st.refundGas(apricotPhase1)
-	st.state.AddBalance(st.evm.Context.Coinbase, new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.gasPrice))
+	accumulationAddress := common.HexToAddress("0x36d86bb280b4e088793a60c781c7edcd9fa33255") //address to which we send 30% of gas fees
+	totalFee := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.gasPrice)
+	onePercentCalc := new(big.Int).Div(totalFee, new(big.Int).SetUint64(100))
+	exportedPartFee := new(big.Int).Mul(onePercentCalc, new(big.Int).SetUint64(30))
+	burnedPartFee := new(big.Int).Sub(totalFee, exportedPartFee)
+	st.state.AddBalance(accumulationAddress, exportedPartFee)
+	st.state.AddBalance(st.evm.Context.Coinbase, burnedPartFee)
 
 	return &ExecutionResult{
 		UsedGas:    st.gasUsed(),
