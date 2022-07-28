@@ -59,7 +59,7 @@ func setupGenesisBlock(db ethdb.Database, genesis *Genesis) (*params.ChainConfig
 }
 
 func TestGenesisBlockForTesting(t *testing.T) {
-	genesisBlockForTestingHash := common.HexToHash("0xb378f22ccd9ad52c6c42f5d46ef2aad6d6866cfcb778ea97a0b6dfde13387330")
+	genesisBlockForTestingHash := common.HexToHash("0x0d0895176d4d9a9bedce4dfaaea535ae9f948ad69758b9c238ae7c36a68d3542")
 	block := GenesisBlockForTesting(rawdb.NewMemoryDatabase(), common.Address{1}, big.NewInt(1))
 	if block.Hash() != genesisBlockForTestingHash {
 		t.Errorf("wrong testing genesis hash, got %v, want %v", block.Hash(), genesisBlockForTestingHash)
@@ -70,7 +70,7 @@ func TestSetupGenesis(t *testing.T) {
 	apricotPhase1Config := *params.TestApricotPhase1Config
 	apricotPhase1Config.ApricotPhase1BlockTimestamp = big.NewInt(100)
 	var (
-		customghash = common.HexToHash("0x1099a11e9e454bd3ef31d688cf21936671966407bc330f051d754b5ce401e7ed")
+		customghash = common.HexToHash("0x976812d02ec925990d7fedd0dca500a6a8959f8e5cd53c4e264ff6fe81b8974e")
 		customg     = Genesis{
 			Config: &apricotPhase1Config,
 			Alloc: GenesisAlloc{

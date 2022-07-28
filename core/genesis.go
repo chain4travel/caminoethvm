@@ -73,7 +73,7 @@ type Genesis struct {
 	Difficulty          *big.Int            `json:"difficulty" gencodec:"required"`
 	Mixhash             common.Hash         `json:"mixHash"`
 	Coinbase            common.Address      `json:"coinbase"`
-	AccumulativeAddress string              `json:"accumulativeAddress"`
+	AccumulativeAddress common.Address      `json:"accumulativeAddress"`
 	Alloc               GenesisAlloc        `json:"alloc"      gencodec:"required"`
 
 	// These fields are used for consensus tests. Please don't use them
@@ -271,7 +271,7 @@ func (g *Genesis) ToBlock(db ethdb.Database) *types.Block {
 		Difficulty:          g.Difficulty,
 		MixDigest:           g.Mixhash,
 		Coinbase:            g.Coinbase,
-		AccumulativeAddress: common.HexToAddress(g.AccumulativeAddress),
+		AccumulativeAddress: g.AccumulativeAddress,
 		Root:                root,
 	}
 	if g.GasLimit == 0 {

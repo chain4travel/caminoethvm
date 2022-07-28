@@ -26,7 +26,7 @@ func (g Genesis) MarshalJSON() ([]byte, error) {
 		Difficulty          *math.HexOrDecimal256                       `json:"difficulty" gencodec:"required"`
 		Mixhash             common.Hash                                 `json:"mixHash"`
 		Coinbase            common.Address                              `json:"coinbase"`
-		AccumulativeAddress string                                      `json:"accumulativeAddress"`
+		AccumulativeAddress common.Address                              `json:"accumulativeAddress"`
 		Alloc               map[common.UnprefixedAddress]GenesisAccount `json:"alloc"      gencodec:"required"`
 		Number              math.HexOrDecimal64                         `json:"number"`
 		GasUsed             math.HexOrDecimal64                         `json:"gasUsed"`
@@ -67,7 +67,7 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 		Difficulty          *math.HexOrDecimal256                       `json:"difficulty" gencodec:"required"`
 		Mixhash             *common.Hash                                `json:"mixHash"`
 		Coinbase            *common.Address                             `json:"coinbase"`
-		AccumulativeAddress string                                      `json:"accumulativeAddress"`
+		AccumulativeAddress *common.Address                             `json:"accumulativeAddress"`
 		Alloc               map[common.UnprefixedAddress]GenesisAccount `json:"alloc"      gencodec:"required"`
 		Number              *math.HexOrDecimal64                        `json:"number"`
 		GasUsed             *math.HexOrDecimal64                        `json:"gasUsed"`
@@ -104,8 +104,8 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 	if dec.Coinbase != nil {
 		g.Coinbase = *dec.Coinbase
 	}
-	if dec.AccumulativeAddress != "" {
-		g.AccumulativeAddress = dec.AccumulativeAddress
+	if dec.AccumulativeAddress != nil {
+		g.AccumulativeAddress = *dec.AccumulativeAddress
 	}
 	if dec.Alloc == nil {
 		return errors.New("missing required field 'alloc' for Genesis")
