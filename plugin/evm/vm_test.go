@@ -94,8 +94,6 @@ var (
 	apricotRulesPhase3 = params.Rules{IsApricotPhase1: true, IsApricotPhase2: true, IsApricotPhase3: true}
 	apricotRulesPhase4 = params.Rules{IsApricotPhase1: true, IsApricotPhase2: true, IsApricotPhase3: true, IsApricotPhase4: true}
 	apricotRulesPhase5 = params.Rules{IsApricotPhase1: true, IsApricotPhase2: true, IsApricotPhase3: true, IsApricotPhase4: true, IsApricotPhase5: true}
-
-	apricotSunrisePhase0 = params.Rules{IsSunrisePhase0: true}
 )
 
 func init() {
@@ -2975,7 +2973,105 @@ func TestReissueAtomicTx(t *testing.T) {
 	}
 }
 
-func TestSunrisePhase0Block(t *testing.T) {
+// Regression test to ensure we can build blocks if we are starting with the
+// Apricot Phase 5 ruleset AND Sunrise Phase 0 in genesis.
+func TestSunrisePhase0AndApricotPhase5Block(t *testing.T) {
+	// Create two VMs with two different Genesis JSON and then
+	// build the two distinct preferred chains above
+	importAmount := uint64(1000000000)
+	issuer1, vm1, _, _, _ := GenesisVMWithUTXOs(t, true, genesisJSONApricotPhase5, "{\"pruning-enabled\":true}", "", map[ids.ShortID]uint64{
+		testShortIDAddrs[0]: importAmount,
+	})
+	issuer2, vm2, _, _, _ := GenesisVMWithUTXOs(t, true, genesisJSONSunrisePhase0, "{\"pruning-enabled\":true}", "", map[ids.ShortID]uint64{
+		testShortIDAddrs[0]: importAmount,
+	})
+
+	defer func() {
+		if err := vm1.Shutdown(); err != nil {
+			t.Fatal(err)
+		}
+
+		if err := vm2.Shutdown(); err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	newTxPoolHeadChan1 := make(chan core.NewTxPoolReorgEvent, 1)
+	vm1.chain.GetTxPool().SubscribeNewReorgEvent(newTxPoolHeadChan1)
+	newTxPoolHeadChan2 := make(chan core.NewTxPoolReorgEvent, 1)
+	vm2.chain.GetTxPool().SubscribeNewReorgEvent(newTxPoolHeadChan2)
+
+	importTx, err := vm1.newImportTx(vm1.ctx.XChainID, testEthAddrs[1], initialBaseFee, []*crypto.PrivateKeySECP256K1R{testKeys[0]})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := vm1.issueTx(importTx, true /*=local*/); err != nil {
+		t.Fatal(err)
+	}
+
+	<-issuer1
+
+	vm1BlkA, err := vm1.BuildBlock()
+	if err != nil {
+		t.Fatalf("Failed to build block with import transaction: %s", err)
+	}
+
+	if err := vm1BlkA.Verify(); err != nil {
+		t.Fatalf("Block failed verification on VM1: %s", err)
+	}
+
+	if status := vm1BlkA.Status(); status != choices.Processing {
+		t.Fatalf("Expected status of built block to be %s, but found %s", choices.Processing, status)
+	}
+
+	if err := vm1.SetPreference(vm1BlkA.ID()); err != nil {
+		t.Fatal(err)
+	}
+
+	blkAEthBlock := vm1BlkA.(*chain.BlockWrapper).Block.(*Block).ethBlock
+
+	//Assertion for BaseFee
+	assert.EqualValues(t, blkAEthBlock.BaseFee(), initialBaseFee, "Block's Base fee should be ApricotPhase5's Base Fee")
+
+	importTx2, err := vm2.newImportTx(vm2.ctx.XChainID, testEthAddrs[1], initialBaseFee, []*crypto.PrivateKeySECP256K1R{testKeys[0]})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := vm2.issueTx(importTx2, true /*=local*/); err != nil {
+		t.Fatal(err)
+	}
+
+	<-issuer2
+
+	vm2BlkB, err := vm2.BuildBlock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := vm2BlkB.Verify(); err != nil {
+		t.Fatal(err)
+	}
+
+	if status := vm2BlkB.Status(); status != choices.Processing {
+		t.Fatalf("Expected status of built block to be %s, but found %s", choices.Processing, status)
+	}
+
+	if err := vm2.SetPreference(vm2BlkB.ID()); err != nil {
+		t.Fatal(err)
+	}
+
+	blkBEthBlock := vm2BlkB.(*chain.BlockWrapper).Block.(*Block).ethBlock
+
+	//Assertion for BaseFee
+	assert.EqualValues(t, blkBEthBlock.BaseFee(), sunriseBaseFee, "Block's Base fee should be SunrisePhase0's Base Fee")
+}
+
+// Regression test to ensure a normally created Sunrise Phase 0 Block A will be validated,
+// a Sunrise Phase 0 Block B with empty body and Block A as a parent will not be validated and
+// a Sunrise Phase 0 Block C with a missing parent will be validated (as validation will wait for the missing parent)
+func TestSunrisePhase0OrphanBlock(t *testing.T) {
 	importAmount := uint64(1000000000)
 	issuer, vm, _, _, _ := GenesisVMWithUTXOs(t, true, genesisJSONSunrisePhase0, "", "", map[ids.ShortID]uint64{
 		testShortIDAddrs[0]: importAmount,
