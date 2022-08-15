@@ -3,8 +3,21 @@
 
 package params
 
+import (
+	"github.com/chain4travel/caminoethvm/core/state"
+)
+
 // Gas Price
 const (
-	SunrisePhase0ExtraDataSize        = 0
-	SunrisePhase0BaseFee       uint64 = 50_000_000_000
+	SunrisePhase0ExtraDataSize = 0
+
+//	SunrisePhase0BaseFee     uint64 = 50_000_000_000
 )
+
+func SunrisePhase0BaseFee() uint64 {
+	var s *state.StateDB
+
+	basefee := s.GetBaseFee().Uint64()
+	return basefee
+
+}

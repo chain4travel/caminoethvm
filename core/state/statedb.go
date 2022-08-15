@@ -106,6 +106,8 @@ type StateDB struct {
 	// by StateDB.Commit.
 	dbErr error
 
+	CurrentBaseFee *big.Int //TODO: remove this
+
 	// The refund counter, also used by state transitioning.
 	refund uint64
 
@@ -332,6 +334,10 @@ func (s *StateDB) GetCode(addr common.Address) []byte {
 	return nil
 }
 
+func (s *StateDB) GetBaseFee() *big.Int { // TODO: delete this
+	return s.CurrentBaseFee
+}
+
 func (s *StateDB) GetCodeSize(addr common.Address) int {
 	stateObject := s.getStateObject(addr)
 	if stateObject != nil {
@@ -480,6 +486,10 @@ func (s *StateDB) SetNonce(addr common.Address, nonce uint64) {
 	if stateObject != nil {
 		stateObject.SetNonce(nonce)
 	}
+}
+
+func (s *StateDB) SetBaseFee(newBaseFee *big.Int) { // TODO: delete this
+	s.CurrentBaseFee = newBaseFee
 }
 
 func (s *StateDB) SetCode(addr common.Address, code []byte) {
