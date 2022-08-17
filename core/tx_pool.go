@@ -1407,7 +1407,8 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 	pool.eip1559 = pool.chainconfig.IsApricotPhase3(timestamp)
 	if pool.chainconfig.IsSunrisePhase0(timestamp) {
 		pool.fixedBaseFee = true
-		pool.minimumFee = new(big.Int).SetUint64(params.SunrisePhase0BaseFee)
+		pool.minimumFee = new(big.Int).SetUint64(pool.currentState.SunrisePhase0BaseFee())
+		//		pool.minimumFee = new(big.Int).SetUint64(params.SunrisePhase0BaseFee)
 	}
 }
 

@@ -334,8 +334,16 @@ func (s *StateDB) GetCode(addr common.Address) []byte {
 	return nil
 }
 
-func (s *StateDB) GetBaseFee() *big.Int { // TODO: delete this
+func (s *StateDB) GetBaseFee() *big.Int { // TODO: delete this if not worked
+	if s.CurrentBaseFee == nil {
+		s.CurrentBaseFee = big.NewInt(225_000_000_000)
+	}
 	return s.CurrentBaseFee
+}
+
+func (s *StateDB) SunrisePhase0BaseFee() uint64 {
+	basefee := s.GetBaseFee().Uint64()
+	return basefee
 }
 
 func (s *StateDB) GetCodeSize(addr common.Address) int {

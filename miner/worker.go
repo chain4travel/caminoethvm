@@ -161,7 +161,9 @@ func (w *worker) commitNewWork() (*types.Block, error) {
 	bigTimestamp := big.NewInt(timestamp)
 	if w.chainConfig.IsApricotPhase3(bigTimestamp) {
 		var err error
-		header.Extra, header.BaseFee, err = dummy.CalcBaseFee(w.chainConfig, parent.Header(), uint64(timestamp))
+		header.Extra, _, err = dummy.CalcBaseFee(w.chainConfig, parent.Header(), uint64(timestamp))
+		state, _ := w.eth.BlockChain().State()
+		header.BaseFee = state.GetBaseFee()
 		if err != nil {
 			return nil, fmt.Errorf("failed to calculate new base fee: %w", err)
 		}
