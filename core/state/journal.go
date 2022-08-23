@@ -121,6 +121,10 @@ type (
 		account *common.Address
 		prev    uint64
 	}
+	baseFeeChange struct { //TODO: delete this
+		account *common.Address
+		prev    *big.Int
+	}
 	storageChange struct {
 		account       *common.Address
 		key, prevalue common.Hash
@@ -215,6 +219,14 @@ func (ch nonceChange) revert(s *StateDB) {
 }
 
 func (ch nonceChange) dirtied() *common.Address {
+	return ch.account
+}
+
+func (ch baseFeeChange) revert(s *StateDB) { //TODO: delete this
+	s.getStateObject(*ch.account).setBaseFee(ch.prev)
+}
+
+func (ch baseFeeChange) dirtied() *common.Address { //TODO: delete this
 	return ch.account
 }
 

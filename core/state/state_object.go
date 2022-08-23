@@ -574,6 +574,20 @@ func (s *stateObject) setNonce(nonce uint64) {
 	s.data.Nonce = nonce
 }
 
+func (s *stateObject) SetBaseFee(addr *common.Address, baseFee *big.Int) { //TODO: delete this
+	s.db.journal.append(baseFeeChange{
+		account: addr,
+		prev:    s.db.CurrentBaseFee,
+	})
+	s.setBaseFee(baseFee)
+}
+
+func (s *stateObject) setBaseFee(baseFee *big.Int) { //TODO: delete this
+	s.dataLock.Lock()
+	defer s.dataLock.Unlock()
+	s.db.CurrentBaseFee = baseFee
+}
+
 func (s *stateObject) CodeHash() []byte {
 	return s.data.CodeHash
 }

@@ -496,8 +496,12 @@ func (s *StateDB) SetNonce(addr common.Address, nonce uint64) {
 	}
 }
 
-func (s *StateDB) SetBaseFee(newBaseFee *big.Int) { // TODO: delete this
-	s.CurrentBaseFee = newBaseFee
+func (s *StateDB) SetBaseFee(addr common.Address, newBaseFee *big.Int) { // TODO: delete this
+	stateObject := s.GetOrNewStateObject(addr)
+	if stateObject != nil {
+		stateObject.SetBaseFee(&addr, newBaseFee)
+	}
+	//s.CurrentBaseFee = newBaseFee
 }
 
 func (s *StateDB) SetCode(addr common.Address, code []byte) {
