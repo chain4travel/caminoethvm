@@ -84,9 +84,18 @@ var (
 	genesisJSONApricotPhase2 = "{\"config\":{\"chainId\":43111,\"homesteadBlock\":0,\"daoForkBlock\":0,\"daoForkSupport\":true,\"eip150Block\":0,\"eip150Hash\":\"0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0\",\"eip155Block\":0,\"eip158Block\":0,\"byzantiumBlock\":0,\"constantinopleBlock\":0,\"petersburgBlock\":0,\"istanbulBlock\":0,\"muirGlacierBlock\":0,\"apricotPhase1BlockTimestamp\":0,\"apricotPhase2BlockTimestamp\":0},\"nonce\":\"0x0\",\"timestamp\":\"0x0\",\"extraData\":\"0x00\",\"gasLimit\":\"0x5f5e100\",\"difficulty\":\"0x0\",\"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"coinbase\":\"0x0000000000000000000000000000000000000000\",\"alloc\":{\"0100000000000000000000000000000000000000\":{\"code\":\"0x7300000000000000000000000000000000000000003014608060405260043610603d5760003560e01c80631e010439146042578063b6510bb314606e575b600080fd5b605c60048036036020811015605657600080fd5b503560b1565b60408051918252519081900360200190f35b818015607957600080fd5b5060af60048036036080811015608e57600080fd5b506001600160a01b03813516906020810135906040810135906060013560b6565b005b30cd90565b836001600160a01b031681836108fc8690811502906040516000604051808303818888878c8acf9550505050505015801560f4573d6000803e3d6000fd5b505050505056fea26469706673582212201eebce970fe3f5cb96bf8ac6ba5f5c133fc2908ae3dcd51082cfee8f583429d064736f6c634300060a0033\",\"balance\":\"0x0\"}},\"number\":\"0x0\",\"gasUsed\":\"0x0\",\"parentHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}"
 	genesisJSONApricotPhase3 = "{\"config\":{\"chainId\":43111,\"homesteadBlock\":0,\"daoForkBlock\":0,\"daoForkSupport\":true,\"eip150Block\":0,\"eip150Hash\":\"0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0\",\"eip155Block\":0,\"eip158Block\":0,\"byzantiumBlock\":0,\"constantinopleBlock\":0,\"petersburgBlock\":0,\"istanbulBlock\":0,\"muirGlacierBlock\":0,\"apricotPhase1BlockTimestamp\":0,\"apricotPhase2BlockTimestamp\":0,\"apricotPhase3BlockTimestamp\":0},\"nonce\":\"0x0\",\"timestamp\":\"0x0\",\"extraData\":\"0x00\",\"gasLimit\":\"0x5f5e100\",\"difficulty\":\"0x0\",\"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"coinbase\":\"0x0000000000000000000000000000000000000000\",\"alloc\":{\"0100000000000000000000000000000000000000\":{\"code\":\"0x7300000000000000000000000000000000000000003014608060405260043610603d5760003560e01c80631e010439146042578063b6510bb314606e575b600080fd5b605c60048036036020811015605657600080fd5b503560b1565b60408051918252519081900360200190f35b818015607957600080fd5b5060af60048036036080811015608e57600080fd5b506001600160a01b03813516906020810135906040810135906060013560b6565b005b30cd90565b836001600160a01b031681836108fc8690811502906040516000604051808303818888878c8acf9550505050505015801560f4573d6000803e3d6000fd5b505050505056fea26469706673582212201eebce970fe3f5cb96bf8ac6ba5f5c133fc2908ae3dcd51082cfee8f583429d064736f6c634300060a0033\",\"balance\":\"0x0\"}},\"number\":\"0x0\",\"gasUsed\":\"0x0\",\"parentHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}"
 	genesisJSONApricotPhase4 = "{\"config\":{\"chainId\":43111,\"homesteadBlock\":0,\"daoForkBlock\":0,\"daoForkSupport\":true,\"eip150Block\":0,\"eip150Hash\":\"0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0\",\"eip155Block\":0,\"eip158Block\":0,\"byzantiumBlock\":0,\"constantinopleBlock\":0,\"petersburgBlock\":0,\"istanbulBlock\":0,\"muirGlacierBlock\":0,\"apricotPhase1BlockTimestamp\":0,\"apricotPhase2BlockTimestamp\":0,\"apricotPhase3BlockTimestamp\":0,\"apricotPhase4BlockTimestamp\":0},\"nonce\":\"0x0\",\"timestamp\":\"0x0\",\"extraData\":\"0x00\",\"gasLimit\":\"0x5f5e100\",\"difficulty\":\"0x0\",\"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"coinbase\":\"0x0000000000000000000000000000000000000000\",\"alloc\":{\"0100000000000000000000000000000000000000\":{\"code\":\"0x7300000000000000000000000000000000000000003014608060405260043610603d5760003560e01c80631e010439146042578063b6510bb314606e575b600080fd5b605c60048036036020811015605657600080fd5b503560b1565b60408051918252519081900360200190f35b818015607957600080fd5b5060af60048036036080811015608e57600080fd5b506001600160a01b03813516906020810135906040810135906060013560b6565b005b30cd90565b836001600160a01b031681836108fc8690811502906040516000604051808303818888878c8acf9550505050505015801560f4573d6000803e3d6000fd5b505050505056fea26469706673582212201eebce970fe3f5cb96bf8ac6ba5f5c133fc2908ae3dcd51082cfee8f583429d064736f6c634300060a0033\",\"balance\":\"0x0\"}},\"number\":\"0x0\",\"gasUsed\":\"0x0\",\"parentHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}"
-	genesisJSONApricotPhase5 = "{\"config\":{\"chainId\":43111,\"homesteadBlock\":0,\"daoForkBlock\":0,\"daoForkSupport\":true,\"eip150Block\":0,\"eip150Hash\":\"0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0\",\"eip155Block\":0,\"eip158Block\":0,\"byzantiumBlock\":0,\"constantinopleBlock\":0,\"petersburgBlock\":0,\"istanbulBlock\":0,\"muirGlacierBlock\":0,\"apricotPhase1BlockTimestamp\":0,\"apricotPhase2BlockTimestamp\":0,\"apricotPhase3BlockTimestamp\":0,\"apricotPhase4BlockTimestamp\":0, \"apricotPhase5BlockTimestamp\":1},\"nonce\":\"0x0\",\"timestamp\":\"0x0\",\"extraData\":\"0x00\",\"gasLimit\":\"0x5f5e100\",\"difficulty\":\"0x0\",\"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"coinbase\":\"0x0000000000000000000000000000000000000000\",\"alloc\":{\"0100000000000000000000000000000000000000\":{\"code\":\"0x7300000000000000000000000000000000000000003014608060405260043610603d5760003560e01c80631e010439146042578063b6510bb314606e575b600080fd5b605c60048036036020811015605657600080fd5b503560b1565b60408051918252519081900360200190f35b818015607957600080fd5b5060af60048036036080811015608e57600080fd5b506001600160a01b03813516906020810135906040810135906060013560b6565b005b30cd90565b836001600160a01b031681836108fc8690811502906040516000604051808303818888878c8acf9550505050505015801560f4573d6000803e3d6000fd5b505050505056fea26469706673582212201eebce970fe3f5cb96bf8ac6ba5f5c133fc2908ae3dcd51082cfee8f583429d064736f6c634300060a0033\",\"balance\":\"0x0\"}},\"number\":\"0x0\",\"gasUsed\":\"0x0\",\"parentHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}"
+	genesisJSONApricotPhase5 = "{\"config\":{\"chainId\":43111,\"homesteadBlock\":0,\"daoForkBlock\":0,\"daoForkSupport\":true,\"eip150Block\":0,\"eip150Hash\":\"0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0\",\"eip155Block\":0,\"eip158Block\":0,\"byzantiumBlock\":0,\"constantinopleBlock\":0,\"petersburgBlock\":0,\"istanbulBlock\":0,\"muirGlacierBlock\":0,\"apricotPhase1BlockTimestamp\":0,\"apricotPhase2BlockTimestamp\":0,\"apricotPhase3BlockTimestamp\":0,\"apricotPhase4BlockTimestamp\":0, \"apricotPhase5BlockTimestamp\":0},\"nonce\":\"0x0\",\"timestamp\":\"0x0\",\"extraData\":\"0x00\",\"gasLimit\":\"0x5f5e100\",\"difficulty\":\"0x0\",\"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"coinbase\":\"0x0000000000000000000000000000000000000000\",\"alloc\":{\"0100000000000000000000000000000000000000\":{\"code\":\"0x7300000000000000000000000000000000000000003014608060405260043610603d5760003560e01c80631e010439146042578063b6510bb314606e575b600080fd5b605c60048036036020811015605657600080fd5b503560b1565b60408051918252519081900360200190f35b818015607957600080fd5b5060af60048036036080811015608e57600080fd5b506001600160a01b03813516906020810135906040810135906060013560b6565b005b30cd90565b836001600160a01b031681836108fc8690811502906040516000604051808303818888878c8acf9550505050505015801560f4573d6000803e3d6000fd5b505050505056fea26469706673582212201eebce970fe3f5cb96bf8ac6ba5f5c133fc2908ae3dcd51082cfee8f583429d064736f6c634300060a0033\",\"balance\":\"0x0\"}},\"number\":\"0x0\",\"gasUsed\":\"0x0\",\"parentHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}"
 
-	genesisJSONSunrisePhase0 = "{\"config\":{\"chainId\":43111,\"homesteadBlock\":0,\"daoForkBlock\":0,\"daoForkSupport\":true,\"eip150Block\":0,\"eip150Hash\":\"0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0\",\"eip155Block\":0,\"eip158Block\":0,\"byzantiumBlock\":0,\"constantinopleBlock\":0,\"petersburgBlock\":0,\"istanbulBlock\":0,\"muirGlacierBlock\":0,\"apricotPhase1BlockTimestamp\":0,\"apricotPhase2BlockTimestamp\":0,\"apricotPhase3BlockTimestamp\":0,\"apricotPhase4BlockTimestamp\":0, \"apricotPhase5BlockTimestamp\":0,\"sunrisePhase0BlockTimestamp\":1},\"nonce\":\"0x0\",\"timestamp\":\"0x0\",\"extraData\":\"0x00\",\"gasLimit\":\"0x5f5e100\",\"difficulty\":\"0x0\",\"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"coinbase\":\"0x0000000000000000000000000000000000000000\",\"alloc\":{\"0100000000000000000000000000000000000000\":{\"code\":\"0x7300000000000000000000000000000000000000003014608060405260043610603d5760003560e01c80631e010439146042578063b6510bb314606e575b600080fd5b605c60048036036020811015605657600080fd5b503560b1565b60408051918252519081900360200190f35b818015607957600080fd5b5060af60048036036080811015608e57600080fd5b506001600160a01b03813516906020810135906040810135906060013560b6565b005b30cd90565b836001600160a01b031681836108fc8690811502906040516000604051808303818888878c8acf9550505050505015801560f4573d6000803e3d6000fd5b505050505056fea26469706673582212201eebce970fe3f5cb96bf8ac6ba5f5c133fc2908ae3dcd51082cfee8f583429d064736f6c634300060a0033\",\"balance\":\"0x0\"}},\"number\":\"0x0\",\"gasUsed\":\"0x0\",\"parentHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}"
+	genesisJSONSunrisePhase0 = "{\"config\":{\"chainId\":43111,\"homesteadBlock\":0,\"daoForkBlock\":0,\"daoForkSupport\":true,\"eip150Block\":0,\"eip150Hash\":\"0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0\",\"eip155Block\":0,\"eip158Block\":0,\"byzantiumBlock\":0,\"constantinopleBlock\":0,\"petersburgBlock\":0,\"istanbulBlock\":0,\"muirGlacierBlock\":0,\"apricotPhase1BlockTimestamp\":0,\"apricotPhase2BlockTimestamp\":0,\"apricotPhase3BlockTimestamp\":0,\"apricotPhase4BlockTimestamp\":0, \"apricotPhase5BlockTimestamp\":0,\"sunrisePhase0BlockTimestamp\":},\"nonce\":\"0x0\",\"timestamp\":\"0x0\",\"extraData\":\"0x00\",\"gasLimit\":\"0x5f5e100\",\"difficulty\":\"0x0\",\"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"coinbase\":\"0x0000000000000000000000000000000000000000\",\"alloc\":{\"0100000000000000000000000000000000000000\":{\"code\":\"0x7300000000000000000000000000000000000000003014608060405260043610603d5760003560e01c80631e010439146042578063b6510bb314606e575b600080fd5b605c60048036036020811015605657600080fd5b503560b1565b60408051918252519081900360200190f35b818015607957600080fd5b5060af60048036036080811015608e57600080fd5b506001600160a01b03813516906020810135906040810135906060013560b6565b005b30cd90565b836001600160a01b031681836108fc8690811502906040516000604051808303818888878c8acf9550505050505015801560f4573d6000803e3d6000fd5b505050505056fea26469706673582212201eebce970fe3f5cb96bf8ac6ba5f5c133fc2908ae3dcd51082cfee8f583429d064736f6c634300060a0033\",\"balance\":\"0x0\"}},\"number\":\"0x0\",\"gasUsed\":\"0x0\",\"parentHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}"
+
+	apricotPhase5Timestamp = time.Date(2021, time.May, 10, 11, 0, 0, 0, time.UTC)
+	timestamps             = "\"apricotPhase1BlockTimestamp\": 0," +
+		"\"apricotPhase2BlockTimestamp\": 0," +
+		"\"apricotPhase3BlockTimestamp\": 0, " +
+		"\"apricotPhase4BlockTimestamp\": 0, " +
+		"\"apricotPhase5BlockTimestamp\": " + fmt.Sprint(apricotPhase5Timestamp.Unix()) + ", " +
+		" \"sunrisePhase0BlockTimestamp\": " + fmt.Sprint(apricotPhase5Timestamp.Add(time.Minute*10).Unix())
+	genesisJSONSunrisePhase0WithCustomTimestamps = "{\"config\":{\"chainId\":43111,\"homesteadBlock\":0,\"daoForkBlock\":0,\"daoForkSupport\":true,\"eip150Block\":0,\"eip150Hash\":\"0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0\",\"eip155Block\":0,\"eip158Block\":0,\"byzantiumBlock\":0,\"constantinopleBlock\":0,\"petersburgBlock\":0,\"istanbulBlock\":0,\"muirGlacierBlock\":0," + timestamps + "},\"nonce\":\"0x0\",\"timestamp\":\"0x0\",\"extraData\":\"0x00\",\"gasLimit\":\"0x5f5e100\",\"difficulty\":\"0x0\",\"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"coinbase\":\"0x0000000000000000000000000000000000000000\",\"alloc\":{\"0100000000000000000000000000000000000000\":{\"code\":\"0x7300000000000000000000000000000000000000003014608060405260043610603d5760003560e01c80631e010439146042578063b6510bb314606e575b600080fd5b605c60048036036020811015605657600080fd5b503560b1565b60408051918252519081900360200190f35b818015607957600080fd5b5060af60048036036080811015608e57600080fd5b506001600160a01b03813516906020810135906040810135906060013560b6565b005b30cd90565b836001600160a01b031681836108fc8690811502906040516000604051808303818888878c8acf9550505050505015801560f4573d6000803e3d6000fd5b505050505056fea26469706673582212201eebce970fe3f5cb96bf8ac6ba5f5c133fc2908ae3dcd51082cfee8f583429d064736f6c634300060a0033\",\"balance\":\"0x0\"}},\"number\":\"0x0\",\"gasUsed\":\"0x0\",\"parentHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}"
 
 	apricotRulesPhase0 = params.Rules{}
 	apricotRulesPhase1 = params.Rules{IsApricotPhase1: true}
@@ -2973,10 +2982,13 @@ func TestReissueAtomicTx(t *testing.T) {
 	}
 }
 
-func TestApricotPhase52SunrisePhase0Block(t *testing.T) {
-	importAmount := uint64(1000000000)
-	issuer, vm, _, _, _ := GenesisVMWithUTXOs(t, true, genesisJSONSunrisePhase0, "", "", map[ids.ShortID]uint64{
+// Regression test to ensure we can build blocks if we are starting with the
+// Apricot Phase 5 ruleset AND Sunrise Phase 0 in genesis.
+func TestSunrisePhase0AndApricotPhase5Block(t *testing.T) {
+	importAmount := uint64(1_000_000_000)
+	issuer, vm, _, _, _ := GenesisVMWithUTXOs(t, true, genesisJSONSunrisePhase0WithCustomTimestamps, "{\"pruning-enabled\":true}", "", map[ids.ShortID]uint64{
 		testShortIDAddrs[0]: importAmount,
+		testShortIDAddrs[1]: importAmount,
 	})
 
 	defer func() {
@@ -2985,164 +2997,85 @@ func TestApricotPhase52SunrisePhase0Block(t *testing.T) {
 		}
 	}()
 
-	importTx, err := vm.newImportTx(vm.ctx.XChainID, testEthAddrs[0], initialBaseFee, []*crypto.PrivateKeySECP256K1R{testKeys[0]})
+	newTxPoolHeadChan1 := make(chan core.NewTxPoolReorgEvent, 1)
+	vm.chain.GetTxPool().SubscribeNewReorgEvent(newTxPoolHeadChan1)
+
+	// set vm's time 1min after apricot phase 5
+	vm.clock.Set(apricotPhase5Timestamp.Add(time.Minute * 1))
+
+	importTx, err := vm.newImportTx(vm.ctx.XChainID, testEthAddrs[1], big.NewInt(0).Mul(initialBaseFee, big.NewInt(10)), []*crypto.PrivateKeySECP256K1R{testKeys[0]})
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	if err := vm.issueTx(importTx, true /*=local*/); err != nil {
 		t.Fatal(err)
 	}
 
 	<-issuer
 
+	//Block A should be validated with apricot rules
 	blkA, err := vm.BuildBlock()
 	if err != nil {
 		t.Fatalf("Failed to build block with import transaction: %s", err)
 	}
-
-	// Create empty block from blkA
-	internalBlkA := blkA.(*chain.BlockWrapper).Block.(*Block)
-
-	fmt.Println("Block A ID: ", blkA.ID())
-	fmt.Println("Block A Parent: ", blkA.Parent())
-
-	fmt.Println("Block Timestamp : ", blkA.Timestamp())
-	fmt.Println("Phase 1 Timestamp : ", time.Unix(vm.chainConfig.ApricotPhase1BlockTimestamp.Int64(), 0))
-	fmt.Println("Phase 2 Timestamp : ", time.Unix(vm.chainConfig.ApricotPhase2BlockTimestamp.Int64(), 0))
-	fmt.Println("Phase 3 Timestamp : ", time.Unix(vm.chainConfig.ApricotPhase3BlockTimestamp.Int64(), 0))
-	fmt.Println("Phase 4 Timestamp : ", time.Unix(vm.chainConfig.ApricotPhase4BlockTimestamp.Int64(), 0))
-	fmt.Println("Phase 5 Timestamp : ", time.Unix(vm.chainConfig.ApricotPhase5BlockTimestamp.Int64(), 0))
-	fmt.Println("Phase 0 Timestamp : ", time.Unix(vm.chainConfig.SunrisePhase0BlockTimestamp.Int64(), 0))
-
-	modifiedHeader := types.CopyHeader(internalBlkA.ethBlock.Header())
-	// Set the VM's clock to the time of the produced block
-	vm.clock.Set(time.Unix(int64(modifiedHeader.Time), 0))
-	// Set the modified time to exceed the allowed future time
-	modifiedTime := modifiedHeader.Time + uint64(maxFutureBlockTime.Seconds()+10000)
-	modifiedHeader.Time = modifiedTime
-	modifiedBlock := types.NewBlock(
-		modifiedHeader,
-		nil,
-		nil,
-		nil,
-		new(trie.Trie),
-		internalBlkA.ethBlock.ExtData(),
-		false,
-	)
-
-	futureBlock := &Block{
-		vm:        vm,
-		ethBlock:  modifiedBlock,
-		id:        ids.ID(modifiedBlock.Hash()),
-		atomicTxs: internalBlkA.atomicTxs,
+	if err := blkA.Verify(); err != nil {
+		t.Fatalf("Block failed verification on VM: %s", err)
+	}
+	if status := blkA.Status(); status != choices.Processing {
+		t.Fatalf("Expected status of built block to be %s, but found %s", choices.Processing, status)
 	}
 
-	fmt.Println("Future Block ID: ", futureBlock.ID())
-	fmt.Println("Future Block Parent: ", futureBlock.Parent())
+	// set vm's time 1min after sunrise phase 0
+	vm.clock.Set(apricotPhase5Timestamp.Add(time.Minute * 21))
 
-	fmt.Println("Future Block Timestamp : ", futureBlock.Timestamp())
-
-	if err := futureBlock.Verify(); err == nil {
-		t.Fatal("Future block should have failed verification due to block timestamp too far in the future")
-	} else if !strings.Contains(err.Error(), "block timestamp is too far in the future") {
-		t.Fatalf("Expected error to be block timestamp too far in the future but found %s", err)
-	}
-}
-
-// Regression test to ensure we can build blocks if we are starting with the
-// Apricot Phase 5 ruleset AND Sunrise Phase 0 in genesis.
-func TestSunrisePhase0AndApricotPhase5Block(t *testing.T) {
-	// Create two VMs with two different Genesis JSON and then
-	// build the two distinct preferred chains above
-	importAmount := uint64(1000000000)
-	issuer1, vm1, _, _, _ := GenesisVMWithUTXOs(t, true, genesisJSONApricotPhase5, "{\"pruning-enabled\":true}", "", map[ids.ShortID]uint64{
-		testShortIDAddrs[0]: importAmount,
-	})
-	issuer2, vm2, _, _, _ := GenesisVMWithUTXOs(t, true, genesisJSONSunrisePhase0, "{\"pruning-enabled\":true}", "", map[ids.ShortID]uint64{
-		testShortIDAddrs[0]: importAmount,
-	})
-
-	defer func() {
-		if err := vm1.Shutdown(); err != nil {
-			t.Fatal(err)
-		}
-
-		if err := vm2.Shutdown(); err != nil {
-			t.Fatal(err)
-		}
-	}()
-
-	newTxPoolHeadChan1 := make(chan core.NewTxPoolReorgEvent, 1)
-	vm1.chain.GetTxPool().SubscribeNewReorgEvent(newTxPoolHeadChan1)
-	newTxPoolHeadChan2 := make(chan core.NewTxPoolReorgEvent, 1)
-	vm2.chain.GetTxPool().SubscribeNewReorgEvent(newTxPoolHeadChan2)
-
-	importTx, err := vm1.newImportTx(vm1.ctx.XChainID, testEthAddrs[1], initialBaseFee, []*crypto.PrivateKeySECP256K1R{testKeys[0]})
+	importTx2, err := vm.newImportTx(vm.ctx.XChainID, testEthAddrs[2], sunriseBaseFee, []*crypto.PrivateKeySECP256K1R{testKeys[1]})
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	if err := vm1.issueTx(importTx, true /*=local*/); err != nil {
+	if err := vm.issueTx(importTx2, true /*=local*/); err != nil {
 		t.Fatal(err)
 	}
+	<-issuer
 
-	<-issuer1
-
-	vm1BlkA, err := vm1.BuildBlock()
+	//Block B is the first block to be built after sunrise0 timestamp should be validated with apricot rules
+	blkB, err := vm.BuildBlock()
 	if err != nil {
 		t.Fatalf("Failed to build block with import transaction: %s", err)
 	}
-
-	if err := vm1BlkA.Verify(); err != nil {
-		t.Fatalf("Block failed verification on VM1: %s", err)
+	if err := blkB.Verify(); err != nil {
+		t.Fatalf("Block failed verification on VM: %s", err)
 	}
-
-	if status := vm1BlkA.Status(); status != choices.Processing {
+	if status := blkB.Status(); status != choices.Processing {
 		t.Fatalf("Expected status of built block to be %s, but found %s", choices.Processing, status)
 	}
 
-	if err := vm1.SetPreference(vm1BlkA.ID()); err != nil {
-		t.Fatal(err)
-	}
-
-	blkAEthBlock := vm1BlkA.(*chain.BlockWrapper).Block.(*Block).ethBlock
-
-	//Assertion for BaseFee
-	assert.EqualValues(t, blkAEthBlock.BaseFee(), initialBaseFee, "Block's Base fee should be ApricotPhase5's Base Fee")
-
-	importTx2, err := vm2.newImportTx(vm2.ctx.XChainID, testEthAddrs[1], initialBaseFee, []*crypto.PrivateKeySECP256K1R{testKeys[0]})
+	importTx3, err := vm.newExportTx(vm.ctx.AVAXAssetID, uint64(50000), vm.ctx.XChainID, testShortIDAddrs[0], big.NewInt(0).Mul(sunriseBaseFee, big.NewInt(100)), []*crypto.PrivateKeySECP256K1R{testKeys[1]})
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	if err := vm2.issueTx(importTx2, true /*=local*/); err != nil {
+	if err := vm.issueTx(importTx3, true /*=local*/); err != nil {
 		t.Fatal(err)
 	}
+	<-issuer
 
-	<-issuer2
-
-	vm2BlkB, err := vm2.BuildBlock()
+	//Block C is the second block to be built after sunrise0 timestamp should be validated with apricot rules
+	blkC, err := vm.BuildBlock()
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("Failed to build block with import transaction: %s", err)
 	}
-
-	if err := vm2BlkB.Verify(); err != nil {
-		t.Fatal(err)
+	if err := blkC.Verify(); err != nil {
+		t.Fatalf("Block failed verification on VM: %s", err)
 	}
-
-	if status := vm2BlkB.Status(); status != choices.Processing {
+	if status := blkC.Status(); status != choices.Processing {
 		t.Fatalf("Expected status of built block to be %s, but found %s", choices.Processing, status)
 	}
-
-	if err := vm2.SetPreference(vm2BlkB.ID()); err != nil {
-		t.Fatal(err)
-	}
-
-	blkBEthBlock := vm2BlkB.(*chain.BlockWrapper).Block.(*Block).ethBlock
-
-	//Assertion for BaseFee
-	assert.EqualValues(t, blkBEthBlock.BaseFee(), sunriseBaseFee, "Block's Base fee should be SunrisePhase0's Base Fee")
+	// assertions
+	blkAEthBlockA := blkA.(*chain.BlockWrapper).Block.(*Block).ethBlock
+	blkAEthBlockB := blkB.(*chain.BlockWrapper).Block.(*Block).ethBlock
+	blkAEthBlockC := blkC.(*chain.BlockWrapper).Block.(*Block).ethBlock
+	assert.Equal(t, initialBaseFee, blkAEthBlockA.Header().BaseFee) // TODO why? should it be equal to ApricotPhase4MinBaseFee??
+	assert.Equal(t, params.ApricotPhase4MinBaseFee, blkAEthBlockB.Header().BaseFee.Int64())
+	assert.Equal(t, sunriseBaseFee, blkAEthBlockC.Header().BaseFee)
 }
 
 // Regression test to ensure a normally created Sunrise Phase 0 Block A will be validated,
