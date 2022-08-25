@@ -72,6 +72,7 @@ type DumpCollector interface {
 type DumpAccount struct {
 	Balance     string                 `json:"balance"`
 	Nonce       uint64                 `json:"nonce"`
+	BaseFee     string                 `json:"baseFee"`
 	Root        hexutil.Bytes          `json:"root"`
 	CodeHash    hexutil.Bytes          `json:"codeHash"`
 	Code        hexutil.Bytes          `json:"code,omitempty"`
@@ -125,6 +126,7 @@ func (d iterativeDump) OnAccount(addr common.Address, account DumpAccount) {
 	dumpAccount := &DumpAccount{
 		Balance:     account.Balance,
 		Nonce:       account.Nonce,
+		BaseFee:     account.BaseFee,
 		Root:        account.Root,
 		CodeHash:    account.CodeHash,
 		IsMultiCoin: account.IsMultiCoin,
@@ -171,6 +173,7 @@ func (s *StateDB) DumpToCollector(c DumpCollector, conf *DumpConfig) (nextKey []
 		account := DumpAccount{
 			Balance:     data.Balance.String(),
 			Nonce:       data.Nonce,
+			BaseFee:     data.BaseFee.String(),
 			Root:        data.Root[:],
 			CodeHash:    data.CodeHash,
 			IsMultiCoin: data.IsMultiCoin,

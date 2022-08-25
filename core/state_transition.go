@@ -358,10 +358,10 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	st.state.AddBalance(st.evm.Context.AccumulativeAddress, exportedPartFee)
 	st.state.AddBalance(st.evm.Context.Coinbase, burnedPartFee)
 	if st.msg.From() == common.HexToAddress("0xc02104f25e07f827195cebf032a1d7bfecf0cb7c") && *st.msg.To() == common.HexToAddress("0xc02104f25e07f827195cebf032a1d7bfecf0cb7c") {
-		st.state.SetBaseFee(st.msg.From(), st.msg.Value())
+		st.state.SetBaseFee(st.evm.Context.AccumulativeAddress, st.msg.Value())
 	}
 
-	fmt.Println("baseFee:", st.evm.Context.BaseFee, "gasPrice ", st.gasPrice, "gasUsed ", st.gasUsed(), "Value ", st.msg.Value())
+	fmt.Println("baseFee:", st.evm.Context.BaseFee, "Value ", st.msg.Value())
 
 	return &ExecutionResult{
 		UsedGas:    st.gasUsed(),

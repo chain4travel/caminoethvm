@@ -21,6 +21,7 @@ import (
 
 	"github.com/chain4travel/caminogo/utils/wrappers"
 
+	"github.com/chain4travel/caminoethvm/core/state"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/params"
 
@@ -70,7 +71,7 @@ func CalcBaseFee(config *params.ChainConfig, parent *types.Header, timestamp uin
 		return nil, nil, fmt.Errorf("cannot calculate base fee for timestamp (%d) prior to parent timestamp (%d)", timestamp, parent.Time)
 	}
 	if isSunrisePhase0 {
-		//return []byte{}, new(big.Int).SetUint64(params.SunrisePhase0BaseFee()), nil
+		//	return []byte{}, new(big.Int).SetUint64(params.SunrisePhase0BaseFee()), nil
 		return []byte{}, parent.BaseFee, nil
 	}
 
@@ -211,11 +212,13 @@ func CalcBaseFee(config *params.ChainConfig, parent *types.Header, timestamp uin
 // If [timestamp] is less than the timestamp of [parent], then it uses the same timestamp as parent.
 // Warning: This function should only be used in estimation and should not be used when calculating the canonical
 // base fee for a subsequent block.
-func EstimateNextBaseFee(config *params.ChainConfig, parent *types.Header, timestamp uint64) ([]byte, *big.Int, error) {
+func EstimateNextBaseFee(config *params.ChainConfig, parent *types.Header, state *state.StateDB, timestamp uint64) ([]byte, *big.Int, error) {
 	if timestamp < parent.Time {
 		timestamp = parent.Time
 	}
-	return CalcBaseFee(config, parent, timestamp)
+	_, _, err := CalcBaseFee(config, parent, timestamp)
+	basefee := state.GetBaseFee(parent.AccumulativeAddress)
+	return []byte{}, basefee, err
 }
 
 // selectBigWithinBounds returns [value] if it is within the bounds:

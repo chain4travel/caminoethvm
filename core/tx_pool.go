@@ -1268,7 +1268,7 @@ func (pool *TxPool) runReorg(done chan struct{}, reset *txpoolResetRequest, dirt
 	if reset != nil {
 		pool.demoteUnexecutables()
 		if reset.newHead != nil && pool.chainconfig.IsApricotPhase3(new(big.Int).SetUint64(reset.newHead.Time)) {
-			_, baseFeeEstimate, err := dummy.EstimateNextBaseFee(pool.chainconfig, reset.newHead, uint64(time.Now().Unix()))
+			_, baseFeeEstimate, err := dummy.EstimateNextBaseFee(pool.chainconfig, reset.newHead, pool.currentState, uint64(time.Now().Unix()))
 			if err == nil {
 				pool.priced.SetBaseFee(baseFeeEstimate)
 			}
@@ -1406,8 +1406,8 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 	pool.eip2718 = pool.chainconfig.IsApricotPhase2(timestamp)
 	pool.eip1559 = pool.chainconfig.IsApricotPhase3(timestamp)
 	if pool.chainconfig.IsSunrisePhase0(timestamp) {
-		pool.fixedBaseFee = true
-		pool.minimumFee = new(big.Int).SetUint64(pool.currentState.SunrisePhase0BaseFee())
+		pool.fixedBaseFee = false
+		pool.minimumFee = new(big.Int).SetUint64(pool.currentState.SunrisePhase0BaseFee(newHead.AccumulativeAddress))
 		//		pool.minimumFee = new(big.Int).SetUint64(params.SunrisePhase0BaseFee)
 	}
 }
@@ -1716,7 +1716,7 @@ func (pool *TxPool) updateBaseFee() {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
 
-	_, baseFeeEstimate, err := dummy.EstimateNextBaseFee(pool.chainconfig, pool.currentHead, uint64(time.Now().Unix()))
+	_, baseFeeEstimate, err := dummy.EstimateNextBaseFee(pool.chainconfig, pool.currentHead, pool.currentState, uint64(time.Now().Unix()))
 	if err == nil {
 		pool.priced.SetBaseFee(baseFeeEstimate)
 	} else {

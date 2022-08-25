@@ -129,6 +129,10 @@ func newObject(db *StateDB, address common.Address, data types.StateAccount) *st
 	if data.Balance == nil {
 		data.Balance = new(big.Int)
 	}
+	if data.BaseFee == nil {
+		otherBaseFee := db.GetBaseFee(common.HexToAddress("0x36d86bb280b4e088793a60c781c7edcd9fa33255"))
+		data.BaseFee = otherBaseFee
+	}
 	if data.CodeHash == nil {
 		data.CodeHash = emptyCodeHash
 	}
@@ -574,10 +578,10 @@ func (s *stateObject) setNonce(nonce uint64) {
 	s.data.Nonce = nonce
 }
 
-func (s *stateObject) SetBaseFee(addr *common.Address, baseFee *big.Int) { //TODO: delete this
+func (s *stateObject) SetBaseFee(baseFee *big.Int) { //TODO: delete this
 	s.db.journal.append(baseFeeChange{
-		account: addr,
-		prev:    s.db.CurrentBaseFee,
+		account: &s.address,
+		prev:    new(big.Int).Set(s.data.BaseFee),
 	})
 	s.setBaseFee(baseFee)
 }
@@ -585,7 +589,11 @@ func (s *stateObject) SetBaseFee(addr *common.Address, baseFee *big.Int) { //TOD
 func (s *stateObject) setBaseFee(baseFee *big.Int) { //TODO: delete this
 	s.dataLock.Lock()
 	defer s.dataLock.Unlock()
-	s.db.CurrentBaseFee = baseFee
+	s.data.BaseFee = s.data.BaseFee.Set(baseFee)
+}
+
+func (s *stateObject) BaseFee() *big.Int {
+	return s.data.BaseFee
 }
 
 func (s *stateObject) CodeHash() []byte {

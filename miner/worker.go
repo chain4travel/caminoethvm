@@ -163,7 +163,7 @@ func (w *worker) commitNewWork() (*types.Block, error) {
 		var err error
 		header.Extra, _, err = dummy.CalcBaseFee(w.chainConfig, parent.Header(), uint64(timestamp))
 		state, _ := w.eth.BlockChain().State()
-		header.BaseFee = state.GetBaseFee()
+		header.BaseFee = state.GetBaseFee(parent.Header().AccumulativeAddress)
 		if err != nil {
 			return nil, fmt.Errorf("failed to calculate new base fee: %w", err)
 		}

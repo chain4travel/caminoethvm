@@ -106,8 +106,6 @@ type StateDB struct {
 	// by StateDB.Commit.
 	dbErr error
 
-	CurrentBaseFee *big.Int //TODO: remove this
-
 	// The refund counter, also used by state transitioning.
 	refund uint64
 
@@ -334,15 +332,21 @@ func (s *StateDB) GetCode(addr common.Address) []byte {
 	return nil
 }
 
-func (s *StateDB) GetBaseFee() *big.Int { // TODO: delete this if not worked
-	if s.CurrentBaseFee == nil {
-		s.CurrentBaseFee = big.NewInt(225_000_000_000)
+func (s *StateDB) GetBaseFee(addr common.Address) *big.Int { // TODO: delete this if not worked
+	stateObject := s.getStateObject(addr)
+	if stateObject != nil && stateObject.BaseFee() != nil {
+		return stateObject.BaseFee()
 	}
-	return s.CurrentBaseFee
+	return big.NewInt(225_000_000_000)
 }
 
-func (s *StateDB) SunrisePhase0BaseFee() uint64 {
-	basefee := s.GetBaseFee().Uint64()
+//if s.CurrentBaseFee == nil {
+//	s.CurrentBaseFee = big.NewInt(225_000_000_000)
+//}
+//return s.CurrentBaseFee
+
+func (s *StateDB) SunrisePhase0BaseFee(addr common.Address) uint64 {
+	basefee := s.GetBaseFee(addr).Uint64()
 	return basefee
 }
 
@@ -499,7 +503,7 @@ func (s *StateDB) SetNonce(addr common.Address, nonce uint64) {
 func (s *StateDB) SetBaseFee(addr common.Address, newBaseFee *big.Int) { // TODO: delete this
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
-		stateObject.SetBaseFee(&addr, newBaseFee)
+		stateObject.SetBaseFee(newBaseFee)
 	}
 	//s.CurrentBaseFee = newBaseFee
 }
@@ -570,7 +574,7 @@ func (s *StateDB) updateStateObject(obj *stateObject) {
 	// enough to track account updates at commit time, deletions need tracking
 	// at transaction boundary level to ensure we capture state clearing.
 	if s.snap != nil {
-		s.snapAccounts[obj.addrHash] = snapshot.SlimAccountRLP(obj.data.Nonce, obj.data.Balance, obj.data.Root, obj.data.CodeHash, obj.data.IsMultiCoin)
+		s.snapAccounts[obj.addrHash] = snapshot.SlimAccountRLP(obj.data.Nonce, obj.data.Balance, obj.data.BaseFee, obj.data.Root, obj.data.CodeHash, obj.data.IsMultiCoin)
 	}
 }
 
@@ -621,6 +625,7 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 			data = &types.StateAccount{
 				Nonce:       acc.Nonce,
 				Balance:     acc.Balance,
+				BaseFee:     acc.BaseFee,
 				CodeHash:    acc.CodeHash,
 				IsMultiCoin: acc.IsMultiCoin,
 				Root:        common.BytesToHash(acc.Root),

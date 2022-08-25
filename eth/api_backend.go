@@ -361,11 +361,19 @@ func (b *EthAPIBackend) SubscribeNewTxsEvent(ch chan<- core.NewTxsEvent) event.S
 }
 
 func (b *EthAPIBackend) EstimateBaseFee(ctx context.Context) (*big.Int, error) {
-	return b.gpo.EstimateBaseFee(ctx)
+	state, err := b.eth.blockchain.State()
+	if err != nil {
+		return nil, err
+	}
+	return b.gpo.EstimateBaseFee(ctx, state)
 }
 
 func (b *EthAPIBackend) SuggestPrice(ctx context.Context) (*big.Int, error) {
-	return b.gpo.SuggestPrice(ctx)
+	state, err := b.eth.blockchain.State()
+	if err != nil {
+		return nil, err
+	}
+	return b.gpo.SuggestPrice(ctx, state)
 }
 
 func (b *EthAPIBackend) SuggestGasTipCap(ctx context.Context) (*big.Int, error) {

@@ -47,6 +47,7 @@ import (
 
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/core"
+	"github.com/chain4travel/caminoethvm/core/state"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/params"
 	"github.com/chain4travel/caminoethvm/rpc"
@@ -208,7 +209,7 @@ func NewOracle(backend OracleBackend, config Config) *Oracle {
 // EstiamteBaseFee returns an estimate of what the base fee will be on a block
 // produced at the current time. If ApricotPhase3 has not been activated, it may
 // return a nil value and a nil error.
-func (oracle *Oracle) EstimateBaseFee(ctx context.Context) (*big.Int, error) {
+func (oracle *Oracle) EstimateBaseFee(ctx context.Context, state *state.StateDB) (*big.Int, error) {
 	_, baseFee, err := oracle.suggestDynamicFees(ctx)
 	if err != nil {
 		return nil, err
@@ -217,7 +218,7 @@ func (oracle *Oracle) EstimateBaseFee(ctx context.Context) (*big.Int, error) {
 	// We calculate the [nextBaseFee] if a block were to be produced immediately.
 	// If [nextBaseFee] is lower than the estimate from sampling, then we return it
 	// to prevent returning an incorrectly high fee when the network is quiescent.
-	nextBaseFee, err := oracle.estimateNextBaseFee(ctx)
+	nextBaseFee, err := oracle.estimateNextBaseFee(ctx, state)
 	if err != nil {
 		log.Warn("failed to estimate next base fee", "err", err)
 		return baseFee, nil
@@ -236,7 +237,7 @@ func (oracle *Oracle) EstimateBaseFee(ctx context.Context) (*big.Int, error) {
 // block, this esimtate uses the timestamp of the latest block instead.
 // If the latest block has a nil base fee, this function will return nil as the base fee
 // of the next block.
-func (oracle *Oracle) estimateNextBaseFee(ctx context.Context) (*big.Int, error) {
+func (oracle *Oracle) estimateNextBaseFee(ctx context.Context, state *state.StateDB) (*big.Int, error) {
 	// Fetch the most recent block by number
 	block, err := oracle.backend.BlockByNumber(ctx, rpc.LatestBlockNumber)
 	if err != nil {
@@ -250,12 +251,12 @@ func (oracle *Oracle) estimateNextBaseFee(ctx context.Context) (*big.Int, error)
 	// If the block does have a baseFee, calculate the next base fee
 	// based on the current time and add it to the tip to estimate the
 	// total gas price estimate.
-	_, nextBaseFee, err := dummy.EstimateNextBaseFee(oracle.backend.ChainConfig(), block.Header(), oracle.clock.Unix())
+	_, nextBaseFee, err := dummy.EstimateNextBaseFee(oracle.backend.ChainConfig(), block.Header(), state, oracle.clock.Unix())
 	return nextBaseFee, err
 }
 
 // SuggestPrice returns an estimated price for legacy transactions.
-func (oracle *Oracle) SuggestPrice(ctx context.Context) (*big.Int, error) {
+func (oracle *Oracle) SuggestPrice(ctx context.Context, state *state.StateDB) (*big.Int, error) {
 	// Estimate the effective tip based on recent blocks.
 	tip, baseFee, err := oracle.suggestDynamicFees(ctx)
 	if err != nil {
@@ -265,7 +266,7 @@ func (oracle *Oracle) SuggestPrice(ctx context.Context) (*big.Int, error) {
 	// We calculate the [nextBaseFee] if a block were to be produced immediately.
 	// If [nextBaseFee] is lower than the estimate from sampling, then we return it
 	// to prevent returning an incorrectly high fee when the network is quiescent.
-	nextBaseFee, err := oracle.estimateNextBaseFee(ctx)
+	nextBaseFee, err := oracle.estimateNextBaseFee(ctx, state)
 	if err != nil {
 		log.Warn("failed to estimate next base fee", "err", err)
 	}
