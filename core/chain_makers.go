@@ -314,7 +314,8 @@ func makeHeader(chain consensus.ChainReader, config *params.ChainConfig, parent 
 	}
 	if chain.Config().IsApricotPhase3(timestamp) {
 		var err error
-		header.Extra, header.BaseFee, err = dummy.CalcBaseFee(chain.Config(), parent.Header(), time)
+		header.Extra, _, err = dummy.CalcBaseFee(chain.Config(), parent.Header(), time)
+		header.BaseFee = state.GetBaseFee(parent.AccumulativeAddress())
 		if err != nil {
 			panic(err)
 		}
@@ -336,3 +337,4 @@ func (cr *fakeChainReader) GetHeaderByNumber(number uint64) *types.Header       
 func (cr *fakeChainReader) GetHeaderByHash(hash common.Hash) *types.Header          { return nil }
 func (cr *fakeChainReader) GetHeader(hash common.Hash, number uint64) *types.Header { return nil }
 func (cr *fakeChainReader) GetBlock(hash common.Hash, number uint64) *types.Block   { return nil }
+func (cr *fakeChainReader) State() (*state.StateDB, error)                          { return nil, nil } //TODO: check if this correct

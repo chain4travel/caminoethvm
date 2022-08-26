@@ -64,6 +64,9 @@ type ChainHeaderReader interface {
 
 	// GetHeaderByHash retrieves a block header from the database by its hash.
 	GetHeaderByHash(hash common.Hash) *types.Header
+
+	// GetState
+	State() (*state.StateDB, error)
 }
 
 // ChainReader defines a small collection of methods needed to access the local

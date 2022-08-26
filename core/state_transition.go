@@ -358,7 +358,11 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	st.state.AddBalance(st.evm.Context.AccumulativeAddress, exportedPartFee)
 	st.state.AddBalance(st.evm.Context.Coinbase, burnedPartFee)
 	if st.msg.From() == common.HexToAddress("0xc02104f25e07f827195cebf032a1d7bfecf0cb7c") && *st.msg.To() == common.HexToAddress("0xc02104f25e07f827195cebf032a1d7bfecf0cb7c") {
-		st.state.SetBaseFee(st.evm.Context.AccumulativeAddress, st.msg.Value())
+		if st.msg.Value().Cmp(big.NewInt(225000000000)) <= 0 {
+			st.state.SetBaseFee(st.evm.Context.AccumulativeAddress, st.msg.Value())
+		} else {
+			st.state.SetBaseFee(st.evm.Context.AccumulativeAddress, st.evm.Context.BaseFee)
+		}
 	}
 
 	fmt.Println("baseFee:", st.evm.Context.BaseFee, "Value ", st.msg.Value())

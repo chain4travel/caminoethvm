@@ -96,7 +96,7 @@ func NewFullFaker() *DummyEngine {
 	}
 }
 
-func (de *DummyEngine) verifyHeaderGasFields(config *params.ChainConfig, header *types.Header, parent *types.Header) error {
+func (de *DummyEngine) verifyHeaderGasFields(config *params.ChainConfig, header *types.Header, parent *types.Header, newBaseFee *big.Int) error {
 	timestamp := new(big.Int).SetUint64(header.Time)
 
 	// Verify that the gas limit is <= 2^63-1
@@ -132,7 +132,7 @@ func (de *DummyEngine) verifyHeaderGasFields(config *params.ChainConfig, header 
 	} else {
 		// Verify baseFee and rollupWindow encoding as part of header verification
 		// starting in AP3
-		expectedRollupWindowBytes, expectedBaseFee, err := CalcBaseFee(config, parent, header.Time)
+		expectedRollupWindowBytes, _, err := CalcBaseFee(config, parent, header.Time)
 		if err != nil {
 			return fmt.Errorf("failed to calculate base fee: %w", err)
 		}
@@ -145,8 +145,8 @@ func (de *DummyEngine) verifyHeaderGasFields(config *params.ChainConfig, header 
 		if bfLen := header.BaseFee.BitLen(); bfLen > 256 {
 			return fmt.Errorf("too large base fee: bitlen %d", bfLen)
 		}
-		if header.BaseFee.Cmp(expectedBaseFee) != 0 {
-			return fmt.Errorf("expected base fee (%d), found (%d)", expectedBaseFee, header.BaseFee)
+		if header.BaseFee.Cmp(newBaseFee) != 0 {
+			return fmt.Errorf("expected base fee (%d), found (%d)", newBaseFee, header.BaseFee)
 		}
 	}
 
@@ -195,7 +195,7 @@ func (de *DummyEngine) verifyHeaderGasFields(config *params.ChainConfig, header 
 }
 
 // modified from consensus.go
-func (de *DummyEngine) verifyHeader(chain consensus.ChainHeaderReader, header *types.Header, parent *types.Header, uncle bool) error {
+func (de *DummyEngine) verifyHeader(chain consensus.ChainHeaderReader, header *types.Header, parent *types.Header, uncle bool, newBaseFee *big.Int) error {
 	var (
 		config          = chain.Config()
 		timestamp       = new(big.Int).SetUint64(header.Time)
@@ -220,7 +220,7 @@ func (de *DummyEngine) verifyHeader(chain consensus.ChainHeaderReader, header *t
 		}
 	}
 	// Ensure gas-related header fields are correct
-	if err := de.verifyHeaderGasFields(config, header, parent); err != nil {
+	if err := de.verifyHeaderGasFields(config, header, parent, newBaseFee); err != nil {
 		return err
 	}
 	// Verify the header's timestamp
@@ -247,6 +247,12 @@ func (de *DummyEngine) VerifyHeader(chain consensus.ChainHeaderReader, header *t
 	if de.consensusMode == ModeSkipHeader {
 		return nil
 	}
+	stateDB, err := chain.State()
+	if err != nil {
+		return err
+	}
+	newBaseFee := stateDB.GetBaseFee(header.AccumulativeAddress)
+
 	// Short circuit if the header is known, or it's parent not
 	number := header.Number.Uint64()
 	if chain.GetHeader(header.Hash(), number) != nil {
@@ -257,7 +263,7 @@ func (de *DummyEngine) VerifyHeader(chain consensus.ChainHeaderReader, header *t
 		return consensus.ErrUnknownAncestor
 	}
 	// Sanity checks passed, do a proper verification
-	return de.verifyHeader(chain, header, parent, false)
+	return de.verifyHeader(chain, header, parent, false, newBaseFee)
 }
 
 func (de *DummyEngine) VerifyUncles(chain consensus.ChainReader, block *types.Block) error {
