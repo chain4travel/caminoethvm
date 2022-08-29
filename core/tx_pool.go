@@ -1408,7 +1408,6 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 	if pool.chainconfig.IsSunrisePhase0(timestamp) {
 		pool.fixedBaseFee = false
 		pool.minimumFee = new(big.Int).SetUint64(pool.currentState.SunrisePhase0BaseFee(newHead.AccumulativeAddress))
-		//		pool.minimumFee = new(big.Int).SetUint64(params.SunrisePhase0BaseFee)
 	}
 }
 

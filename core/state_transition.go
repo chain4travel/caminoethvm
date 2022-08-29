@@ -365,8 +365,6 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		}
 	}
 
-	fmt.Println("baseFee:", st.evm.Context.BaseFee, "Value ", st.msg.Value())
-
 	return &ExecutionResult{
 		UsedGas:    st.gasUsed(),
 		Err:        vmerr,

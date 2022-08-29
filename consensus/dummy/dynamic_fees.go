@@ -71,7 +71,6 @@ func CalcBaseFee(config *params.ChainConfig, parent *types.Header, timestamp uin
 		return nil, nil, fmt.Errorf("cannot calculate base fee for timestamp (%d) prior to parent timestamp (%d)", timestamp, parent.Time)
 	}
 	if isSunrisePhase0 {
-		//	return []byte{}, new(big.Int).SetUint64(params.SunrisePhase0BaseFee()), nil
 		return []byte{}, parent.BaseFee, nil
 	}
 

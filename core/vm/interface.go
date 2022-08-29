@@ -59,7 +59,7 @@ type StateDB interface {
 	GetNonce(common.Address) uint64
 	SetNonce(common.Address, uint64)
 
-	SetBaseFee(common.Address, *big.Int) // TODO: delete this
+	SetBaseFee(common.Address, *big.Int)
 
 	GetCodeHash(common.Address) common.Hash
 	GetCode(common.Address) []byte

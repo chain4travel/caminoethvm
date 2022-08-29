@@ -332,7 +332,7 @@ func (s *StateDB) GetCode(addr common.Address) []byte {
 	return nil
 }
 
-func (s *StateDB) GetBaseFee(addr common.Address) *big.Int { // TODO: delete this if not worked
+func (s *StateDB) GetBaseFee(addr common.Address) *big.Int {
 	stateObject := s.getStateObject(addr)
 	if stateObject != nil && stateObject.BaseFee() != nil {
 		return stateObject.BaseFee()
@@ -340,14 +340,9 @@ func (s *StateDB) GetBaseFee(addr common.Address) *big.Int { // TODO: delete thi
 	return big.NewInt(225_000_000_000)
 }
 
-//if s.CurrentBaseFee == nil {
-//	s.CurrentBaseFee = big.NewInt(225_000_000_000)
-//}
-//return s.CurrentBaseFee
-
 func (s *StateDB) SunrisePhase0BaseFee(addr common.Address) uint64 {
-	basefee := s.GetBaseFee(addr).Uint64()
-	return basefee
+	baseFee := s.GetBaseFee(addr).Uint64()
+	return baseFee
 }
 
 func (s *StateDB) GetCodeSize(addr common.Address) int {
@@ -500,12 +495,11 @@ func (s *StateDB) SetNonce(addr common.Address, nonce uint64) {
 	}
 }
 
-func (s *StateDB) SetBaseFee(addr common.Address, newBaseFee *big.Int) { // TODO: delete this
+func (s *StateDB) SetBaseFee(addr common.Address, newBaseFee *big.Int) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
 		stateObject.SetBaseFee(newBaseFee)
 	}
-	//s.CurrentBaseFee = newBaseFee
 }
 
 func (s *StateDB) SetCode(addr common.Address, code []byte) {

@@ -578,7 +578,7 @@ func (s *stateObject) setNonce(nonce uint64) {
 	s.data.Nonce = nonce
 }
 
-func (s *stateObject) SetBaseFee(baseFee *big.Int) { //TODO: delete this
+func (s *stateObject) SetBaseFee(baseFee *big.Int) {
 	s.db.journal.append(baseFeeChange{
 		account: &s.address,
 		prev:    new(big.Int).Set(s.data.BaseFee),
@@ -586,7 +586,7 @@ func (s *stateObject) SetBaseFee(baseFee *big.Int) { //TODO: delete this
 	s.setBaseFee(baseFee)
 }
 
-func (s *stateObject) setBaseFee(baseFee *big.Int) { //TODO: delete this
+func (s *stateObject) setBaseFee(baseFee *big.Int) {
 	s.dataLock.Lock()
 	defer s.dataLock.Unlock()
 	s.data.BaseFee = s.data.BaseFee.Set(baseFee)

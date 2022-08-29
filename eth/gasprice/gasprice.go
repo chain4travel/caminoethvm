@@ -358,7 +358,6 @@ func (oracle *Oracle) suggestDynamicFees(ctx context.Context) (*big.Int, *big.In
 
 	if oracle.backend.ChainConfig().IsSunrisePhase0(new(big.Int).SetUint64(head.Time)) {
 		baseFee = oracle.lastBaseFee
-		//		baseFee = new(big.Int).SetUint64(50_000_000_000)
 
 	} else if len(baseFeeResults) > 0 {
 		sort.Sort(bigIntArray(baseFeeResults))

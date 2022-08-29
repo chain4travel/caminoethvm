@@ -121,7 +121,7 @@ type (
 		account *common.Address
 		prev    uint64
 	}
-	baseFeeChange struct { //TODO: delete this
+	baseFeeChange struct {
 		account *common.Address
 		prev    *big.Int
 	}
@@ -222,11 +222,11 @@ func (ch nonceChange) dirtied() *common.Address {
 	return ch.account
 }
 
-func (ch baseFeeChange) revert(s *StateDB) { //TODO: delete this
+func (ch baseFeeChange) revert(s *StateDB) {
 	s.getStateObject(*ch.account).setBaseFee(ch.prev)
 }
 
-func (ch baseFeeChange) dirtied() *common.Address { //TODO: delete this
+func (ch baseFeeChange) dirtied() *common.Address {
 	return ch.account
 }
 
