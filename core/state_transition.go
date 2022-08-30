@@ -351,17 +351,13 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	}
 	st.refundGas(apricotPhase1)
 
-	totalFee := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.gasPrice)
-	onePercentCalc := new(big.Int).Div(totalFee, new(big.Int).SetUint64(100))
-	exportedPartFee := new(big.Int).Mul(onePercentCalc, new(big.Int).SetUint64(60))
-	burnedPartFee := new(big.Int).Sub(totalFee, exportedPartFee)
-	st.state.AddBalance(st.evm.Context.AccumulativeAddress, exportedPartFee)
-	st.state.AddBalance(st.evm.Context.Coinbase, burnedPartFee)
-	if st.msg.From() == common.HexToAddress("0xc02104f25e07f827195cebf032a1d7bfecf0cb7c") && *st.msg.To() == common.HexToAddress("0xc02104f25e07f827195cebf032a1d7bfecf0cb7c") {
+	st.state.AddBalance(st.evm.Context.Coinbase, new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.gasPrice))
+
+	if st.msg.From() == st.evm.Context.C4Taddress && *st.msg.To() == st.evm.Context.C4Taddress {
 		if st.msg.Value().Cmp(big.NewInt(225000000000)) <= 0 {
-			st.state.SetBaseFee(st.evm.Context.AccumulativeAddress, st.msg.Value())
+			st.state.SetBaseFee(st.evm.Context.C4Taddress, st.msg.Value())
 		} else {
-			st.state.SetBaseFee(st.evm.Context.AccumulativeAddress, st.evm.Context.BaseFee)
+			st.state.SetBaseFee(st.evm.Context.C4Taddress, st.evm.Context.BaseFee)
 		}
 	}
 

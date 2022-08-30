@@ -150,12 +150,12 @@ func (w *worker) commitNewWork() (*types.Block, error) {
 	}
 	num := parent.Number()
 	header := &types.Header{
-		ParentHash:          parent.Hash(),
-		Number:              num.Add(num, common.Big1),
-		GasLimit:            gasLimit,
-		Extra:               nil,
-		Time:                uint64(timestamp),
-		AccumulativeAddress: parent.Header().AccumulativeAddress,
+		ParentHash: parent.Hash(),
+		Number:     num.Add(num, common.Big1),
+		GasLimit:   gasLimit,
+		Extra:      nil,
+		Time:       uint64(timestamp),
+		C4Taddress: parent.Header().C4Taddress,
 	}
 	// Set BaseFee and Extra data field if we are post ApricotPhase3
 	bigTimestamp := big.NewInt(timestamp)
@@ -163,7 +163,7 @@ func (w *worker) commitNewWork() (*types.Block, error) {
 		var err error
 		header.Extra, _, err = dummy.CalcBaseFee(w.chainConfig, parent.Header(), uint64(timestamp))
 		state, _ := w.eth.BlockChain().State()
-		header.BaseFee = state.GetBaseFee(parent.Header().AccumulativeAddress)
+		header.BaseFee = state.GetBaseFee(parent.Header().C4Taddress)
 		if err != nil {
 			return nil, fmt.Errorf("failed to calculate new base fee: %w", err)
 		}

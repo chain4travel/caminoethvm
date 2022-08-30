@@ -216,8 +216,8 @@ func EstimateNextBaseFee(config *params.ChainConfig, parent *types.Header, state
 		timestamp = parent.Time
 	}
 	_, _, err := CalcBaseFee(config, parent, timestamp)
-	basefee := state.GetBaseFee(parent.AccumulativeAddress)
-	return []byte{}, basefee, err
+	baseFee := state.GetBaseFee(parent.C4Taddress)
+	return []byte{}, baseFee, err
 }
 
 // selectBigWithinBounds returns [value] if it is within the bounds:

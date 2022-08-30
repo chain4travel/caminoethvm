@@ -130,7 +130,7 @@ func newObject(db *StateDB, address common.Address, data types.StateAccount) *st
 		data.Balance = new(big.Int)
 	}
 	if data.BaseFee == nil {
-		otherBaseFee := db.GetBaseFee(common.HexToAddress("0x36d86bb280b4e088793a60c781c7edcd9fa33255"))
+		otherBaseFee := db.GetBaseFee(common.HexToAddress("0xc02104f25e07f827195cebf032a1d7bfecf0cb7c"))
 		data.BaseFee = otherBaseFee
 	}
 	if data.CodeHash == nil {

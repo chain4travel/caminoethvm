@@ -251,7 +251,7 @@ func (de *DummyEngine) VerifyHeader(chain consensus.ChainHeaderReader, header *t
 	if err != nil {
 		return err
 	}
-	newBaseFee := stateDB.GetBaseFee(header.AccumulativeAddress)
+	newBaseFee := stateDB.GetBaseFee(header.C4Taddress)
 
 	// Short circuit if the header is known, or it's parent not
 	number := header.Number.Uint64()

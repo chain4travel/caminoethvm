@@ -315,7 +315,7 @@ func makeHeader(chain consensus.ChainReader, config *params.ChainConfig, parent 
 	if chain.Config().IsApricotPhase3(timestamp) {
 		var err error
 		header.Extra, _, err = dummy.CalcBaseFee(chain.Config(), parent.Header(), time)
-		header.BaseFee = state.GetBaseFee(parent.AccumulativeAddress())
+		header.BaseFee = state.GetBaseFee(parent.C4Taddress())
 		if err != nil {
 			panic(err)
 		}
