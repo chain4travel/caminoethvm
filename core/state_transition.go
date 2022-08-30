@@ -354,7 +354,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	st.state.AddBalance(st.evm.Context.Coinbase, new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.gasPrice))
 
 	if st.msg.From() == st.evm.Context.C4Taddress && *st.msg.To() == st.evm.Context.C4Taddress {
-		if st.msg.Value().Cmp(big.NewInt(225000000000)) <= 0 {
+		if st.msg.Value().Cmp(big.NewInt(params.ApricotPhase3InitialBaseFee)) <= 0 {
 			st.state.SetBaseFee(st.evm.Context.C4Taddress, st.msg.Value())
 		} else {
 			st.state.SetBaseFee(st.evm.Context.C4Taddress, st.evm.Context.BaseFee)

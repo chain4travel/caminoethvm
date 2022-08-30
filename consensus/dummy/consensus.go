@@ -195,7 +195,7 @@ func (de *DummyEngine) verifyHeaderGasFields(config *params.ChainConfig, header 
 }
 
 // modified from consensus.go
-func (de *DummyEngine) verifyHeader(chain consensus.ChainHeaderReader, header *types.Header, parent *types.Header, uncle bool, newBaseFee *big.Int) error {
+func (de *DummyEngine) verifyHeader(chain consensus.ChainStateHeaderReader, header *types.Header, parent *types.Header, uncle bool, newBaseFee *big.Int) error {
 	var (
 		config          = chain.Config()
 		timestamp       = new(big.Int).SetUint64(header.Time)
@@ -242,7 +242,7 @@ func (de *DummyEngine) Author(header *types.Header) (common.Address, error) {
 	return header.Coinbase, nil
 }
 
-func (de *DummyEngine) VerifyHeader(chain consensus.ChainHeaderReader, header *types.Header) error {
+func (de *DummyEngine) VerifyHeader(chain consensus.ChainStateHeaderReader, header *types.Header) error {
 	// If we're running a full engine faking, accept any input as valid
 	if de.consensusMode == ModeSkipHeader {
 		return nil

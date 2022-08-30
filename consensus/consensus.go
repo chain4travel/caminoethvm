@@ -64,7 +64,10 @@ type ChainHeaderReader interface {
 
 	// GetHeaderByHash retrieves a block header from the database by its hash.
 	GetHeaderByHash(hash common.Hash) *types.Header
+}
 
+type ChainStateHeaderReader interface {
+	ChainHeaderReader
 	// GetState
 	State() (*state.StateDB, error)
 }
@@ -91,7 +94,7 @@ type Engine interface {
 	// NOTE: VerifyHeader does not validate the correctness of fields that rely
 	// on the contents of the block (as opposed to the current and/or parent
 	// header).
-	VerifyHeader(chain ChainHeaderReader, header *types.Header) error
+	VerifyHeader(chain ChainStateHeaderReader, header *types.Header) error
 
 	// VerifyUncles verifies that the given block's uncles conform to the consensus
 	// rules of a given engine.

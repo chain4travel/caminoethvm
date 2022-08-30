@@ -48,6 +48,7 @@ import (
 	"github.com/chain4travel/caminoethvm/core/rawdb"
 	"github.com/chain4travel/caminoethvm/core/state/snapshot"
 	"github.com/chain4travel/caminoethvm/core/types"
+	"github.com/chain4travel/caminoethvm/params"
 	"github.com/chain4travel/caminoethvm/trie"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -337,7 +338,7 @@ func (s *StateDB) GetBaseFee(addr common.Address) *big.Int {
 	if stateObject != nil && stateObject.BaseFee() != nil {
 		return stateObject.BaseFee()
 	}
-	return big.NewInt(225_000_000_000)
+	return big.NewInt(params.ApricotPhase3InitialBaseFee)
 }
 
 func (s *StateDB) SunrisePhase0BaseFee(addr common.Address) uint64 {
