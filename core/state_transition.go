@@ -42,12 +42,12 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/crypto"
-
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/core/vm"
 	"github.com/chain4travel/caminoethvm/params"
 	"github.com/ethereum/go-ethereum/common"
+
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 var emptyCodeHash = crypto.Keccak256Hash(nil)
