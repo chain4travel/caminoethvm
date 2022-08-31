@@ -1500,10 +1500,10 @@ func TestBonusBlocksTxs(t *testing.T) {
 // from another VM (which have a common ancestor under the finalized
 // frontier).
 //
-//	 A
-//	/ \
+//		 A
+//		/ \
 //
-// B   C
+//	   B   C
 //
 // verifies block B and C, then Accepts block B. Then we test to ensure
 // that the VM defends against any attempt to set the preference or to
