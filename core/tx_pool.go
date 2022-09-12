@@ -1407,6 +1407,12 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 	pool.eip1559 = pool.chainconfig.IsApricotPhase3(timestamp)
 	if pool.chainconfig.IsSunrisePhase0(timestamp) {
 		pool.fixedBaseFee = true
+
+		// This could be the place we update baseFees set in contract
+		state := statedb.GetState(common.HexToAddress("0x010000000000000000000000000000000000000a"), common.HexToHash("0x0000000000000000000000000000000000000000000000000000000000000001"))
+		newBaseFee := state.Big()
+		fmt.Println("BaseFee fetched from AdminContract", "BaseFee ", newBaseFee)
+
 		pool.minimumFee = new(big.Int).SetUint64(params.SunrisePhase0BaseFee)
 	}
 }

@@ -116,11 +116,27 @@ var PrecompiledContractsApricotPhase2 = map[common.Address]StatefulPrecompiledCo
 	NativeAssetCallAddr:              &nativeAssetCall{gasCost: params.AssetCallApricot},
 }
 
+// PrecompiledContractsSunrisePhase0 contains the default set of pre-compiled Ethereum
+// contracts used in the SunrisePhase0  release.
+var PrecompiledContractsSunrisePhase0 = map[common.Address]StatefulPrecompiledContract{
+	common.BytesToAddress([]byte{1}): newWrappedPrecompiledContract(&ecrecover{}),
+	common.BytesToAddress([]byte{2}): newWrappedPrecompiledContract(&sha256hash{}),
+	common.BytesToAddress([]byte{3}): newWrappedPrecompiledContract(&ripemd160hash{}),
+	common.BytesToAddress([]byte{4}): newWrappedPrecompiledContract(&dataCopy{}),
+	common.BytesToAddress([]byte{5}): newWrappedPrecompiledContract(&bigModExp{eip2565: true}),
+	common.BytesToAddress([]byte{6}): newWrappedPrecompiledContract(&bn256AddIstanbul{}),
+	common.BytesToAddress([]byte{7}): newWrappedPrecompiledContract(&bn256ScalarMulIstanbul{}),
+	common.BytesToAddress([]byte{8}): newWrappedPrecompiledContract(&bn256PairingIstanbul{}),
+	common.BytesToAddress([]byte{9}): newWrappedPrecompiledContract(&blake2F{}),
+	NativeBaseFeeAddr:                &nativeBaseFee{gasCost: params.AssetCallApricot},
+}
+
 var (
 	PrecompiledAddressesApricotPhase2 []common.Address
 	PrecompiledAddressesIstanbul      []common.Address
 	PrecompiledAddressesByzantium     []common.Address
 	PrecompiledAddressesHomestead     []common.Address
+	PrecompiledAddressesSunrisePhase0 []common.Address
 )
 
 func init() {
@@ -136,6 +152,9 @@ func init() {
 	for k := range PrecompiledContractsApricotPhase2 {
 		PrecompiledAddressesApricotPhase2 = append(PrecompiledAddressesApricotPhase2, k)
 	}
+	for k := range PrecompiledContractsSunrisePhase0 {
+		PrecompiledAddressesSunrisePhase0 = append(PrecompiledAddressesSunrisePhase0, k)
+	}
 }
 
 // ActivePrecompiles returns the precompiles enabled with the current configuration.
@@ -147,6 +166,8 @@ func ActivePrecompiles(rules params.Rules) []common.Address {
 		return PrecompiledAddressesIstanbul
 	case rules.IsByzantium:
 		return PrecompiledAddressesByzantium
+	case rules.IsSunrisePhase0:
+		return PrecompiledAddressesSunrisePhase0
 	default:
 		return PrecompiledAddressesHomestead
 	}

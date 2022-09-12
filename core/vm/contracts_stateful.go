@@ -33,6 +33,7 @@ var (
 	genesisContractAddr    = common.HexToAddress("0x0100000000000000000000000000000000000000")
 	NativeAssetBalanceAddr = common.HexToAddress("0x0100000000000000000000000000000000000001")
 	NativeAssetCallAddr    = common.HexToAddress("0x0100000000000000000000000000000000000002")
+	NativeBaseFeeAddr      = common.HexToAddress("0x010000000000000000000000000000000000000a")
 )
 
 // StatefulPrecompiledContract is the interface for executing a precompiled contract
@@ -175,6 +176,87 @@ func (c *nativeAssetCall) Run(evm *EVM, caller ContractRef, addr common.Address,
 	// Send [assetAmount] of [assetID] to [to] address
 	evm.Context.TransferMultiCoin(evm.StateDB, caller.Address(), to, assetID, assetAmount)
 	ret, remainingGas, err = evm.Call(caller, to, callData, remainingGas, big.NewInt(0))
+
+	// When an error was returned by the EVM or when setting the creation code
+	// above we revert to the snapshot and consume any gas remaining. Additionally
+	// when we're in homestead this also counts for code storage gas errors.
+	if err != nil {
+		evm.StateDB.RevertToSnapshot(snapshot)
+		if err != ErrExecutionReverted {
+			remainingGas = 0
+		}
+		// TODO: consider clearing up unused snapshots:
+		//} else {
+		//	evm.StateDB.DiscardSnapshot(snapshot)
+	}
+	return ret, remainingGas, err
+}
+
+type nativeBaseFee struct {
+	gasCost uint64
+}
+
+// PackNativeBaseFee packs the arguments into the required input data for a transaction to be passed into
+// the native asset balance precompile.
+func PackNativeBaseFee(address common.Address, assetID common.Hash, assetAmount *big.Int) []byte {
+	input := make([]byte, 84)
+	copy(input[0:20], address.Bytes())
+	copy(input[20:52], assetID.Bytes())
+	assetAmount.FillBytes(input[52:84])
+	return input
+}
+
+// UnpackNativeBaseFee attempts to unpack [input] into the arguments to the native asset balance precompile
+func UnpackNativeBaseFee(input []byte) (common.Address, common.Hash, *big.Int, error) {
+	if len(input) != 84 {
+		return common.Address{}, common.Hash{}, nil, fmt.Errorf("native asset call input had unexpected length %d", len(input))
+	}
+	to := common.BytesToAddress(input[:20])
+	assetID := common.BytesToHash(input[20:52])
+	assetAmount := new(big.Int).SetBytes(input[52:84])
+	return to, assetID, assetAmount, nil
+}
+
+// Run implements StatefulPrecompiledContract
+func (f *nativeBaseFee) Run(evm *EVM, caller ContractRef, addr common.Address, input []byte, suppliedGas uint64, readOnly bool) (ret []byte, remainingGas uint64, err error) {
+	// input: encodePacked(address 20 bytes, assetID 32 bytes, assetAmount 32 bytes, callData variable length bytes)
+	if suppliedGas < f.gasCost {
+		return nil, 0, ErrOutOfGas
+	}
+	remainingGas = suppliedGas - f.gasCost
+
+	if readOnly {
+		return nil, remainingGas, ErrExecutionReverted
+	}
+
+	to, assetID, assetAmount, err := UnpackNativeBaseFee(input)
+	if err != nil {
+		return nil, remainingGas, ErrExecutionReverted
+	}
+
+	// Note: it is not possible for a negative assetAmount to be passed in here due to the fact that decoding a
+	// byte slice into a *big.Int type will always return a positive value.
+	if assetAmount.Sign() < 0 && !evm.Context.CanTransferMC(evm.StateDB, caller.Address(), to, assetID, assetAmount) {
+		return nil, remainingGas, ErrInsufficientBalance
+	}
+
+	snapshot := evm.StateDB.Snapshot()
+
+	if !evm.StateDB.Exist(to) {
+		if remainingGas < params.CallNewAccountGas {
+			return nil, 0, ErrOutOfGas
+		}
+		remainingGas -= params.CallNewAccountGas
+		evm.StateDB.CreateAccount(to)
+	}
+
+	// Increment the call depth which is restricted to 1024
+	evm.depth++
+	defer func() { evm.depth-- }()
+
+	// Send [assetAmount] of [assetID] to [to] address
+	evm.Context.TransferMultiCoin(evm.StateDB, caller.Address(), to, assetID, assetAmount)
+	//ret, remainingGas, err = evm.Call(caller, to, callData, remainingGas, big.NewInt(0))
 
 	// When an error was returned by the EVM or when setting the creation code
 	// above we revert to the snapshot and consume any gas remaining. Additionally

@@ -149,7 +149,8 @@ var (
 		ApricotPhase4BlockTimestamp: big.NewInt(0),
 		ApricotPhase5BlockTimestamp: big.NewInt(0),
 		// Camino Network Upgrades
-		SunrisePhase0BlockTimestamp: big.NewInt(time.Date(2022, time.May, 16, 8, 0, 0, 0, time.UTC).Unix()),
+		//SunrisePhase0BlockTimestamp: big.NewInt(time.Date(2022, time.May, 16, 8, 0, 0, 0, time.UTC).Unix()),
+		SunrisePhase0BlockTimestamp: big.NewInt(0),
 	}
 
 	// CaminoChainConfig is the configuration for the Camino Main Network
