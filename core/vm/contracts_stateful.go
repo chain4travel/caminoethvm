@@ -254,8 +254,9 @@ func (f *nativeBaseFee) Run(evm *EVM, caller ContractRef, addr common.Address, i
 	evm.depth++
 	defer func() { evm.depth-- }()
 
-	// Send [assetAmount] of [assetID] to [to] address
-	evm.Context.TransferMultiCoin(evm.StateDB, caller.Address(), to, assetID, assetAmount)
+	// Set new state BaseFee
+	newBaseFee := common.BigToHash(assetAmount)
+	evm.StateDB.SetState(to, assetID, newBaseFee)
 	//ret, remainingGas, err = evm.Call(caller, to, callData, remainingGas, big.NewInt(0))
 
 	// When an error was returned by the EVM or when setting the creation code
