@@ -41,6 +41,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"math/big"
 
 	"github.com/chain4travel/caminoethvm/params"
@@ -119,16 +120,16 @@ var PrecompiledContractsApricotPhase2 = map[common.Address]StatefulPrecompiledCo
 // PrecompiledContractsSunrisePhase0 contains the default set of pre-compiled Ethereum
 // contracts used in the SunrisePhase0  release.
 var PrecompiledContractsSunrisePhase0 = map[common.Address]StatefulPrecompiledContract{
-	common.BytesToAddress([]byte{1}): newWrappedPrecompiledContract(&ecrecover{}),
-	common.BytesToAddress([]byte{2}): newWrappedPrecompiledContract(&sha256hash{}),
-	common.BytesToAddress([]byte{3}): newWrappedPrecompiledContract(&ripemd160hash{}),
-	common.BytesToAddress([]byte{4}): newWrappedPrecompiledContract(&dataCopy{}),
-	common.BytesToAddress([]byte{5}): newWrappedPrecompiledContract(&bigModExp{eip2565: true}),
-	common.BytesToAddress([]byte{6}): newWrappedPrecompiledContract(&bn256AddIstanbul{}),
-	common.BytesToAddress([]byte{7}): newWrappedPrecompiledContract(&bn256ScalarMulIstanbul{}),
-	common.BytesToAddress([]byte{8}): newWrappedPrecompiledContract(&bn256PairingIstanbul{}),
-	common.BytesToAddress([]byte{9}): newWrappedPrecompiledContract(&blake2F{}),
-	NativeBaseFeeAddr:                &nativeBaseFee{gasCost: params.AssetCallApricot},
+	common.BytesToAddress([]byte{1}):                                  newWrappedPrecompiledContract(&ecrecover{}),
+	common.BytesToAddress([]byte{2}):                                  newWrappedPrecompiledContract(&sha256hash{}),
+	common.BytesToAddress([]byte{3}):                                  newWrappedPrecompiledContract(&ripemd160hash{}),
+	common.BytesToAddress([]byte{4}):                                  newWrappedPrecompiledContract(&dataCopy{}),
+	common.BytesToAddress([]byte{5}):                                  newWrappedPrecompiledContract(&bigModExp{eip2565: true}),
+	common.BytesToAddress([]byte{6}):                                  newWrappedPrecompiledContract(&bn256AddIstanbul{}),
+	common.BytesToAddress([]byte{7}):                                  newWrappedPrecompiledContract(&bn256ScalarMulIstanbul{}),
+	common.BytesToAddress([]byte{8}):                                  newWrappedPrecompiledContract(&bn256PairingIstanbul{}),
+	common.BytesToAddress([]byte{9}):                                  newWrappedPrecompiledContract(&blake2F{}),
+	common.HexToAddress("0x010000000000000000000000000000000000000a"): newWrappedPrecompiledContract(&baseFee{}),
 }
 
 var (
@@ -224,6 +225,33 @@ func (c *ecrecover) Run(input []byte) ([]byte, error) {
 
 	// the first byte of pubkey is bitcoin heritage
 	return common.LeftPadBytes(crypto.Keccak256(pubKey[1:])[12:], 32), nil
+}
+
+var data = make(map[common.Address][]byte)
+
+type baseFee struct {
+}
+
+func (b *baseFee) RequiredGas(input []byte) uint64 {
+	return params.EcrecoverGas
+}
+
+func (b *baseFee) Run(input []byte) ([]byte, error) {
+	if len(input) < 20 {
+		return nil, fmt.Errorf("input had unexpcted length %d", len(input))
+	}
+	index := common.BytesToAddress(input[:20])
+	switch index {
+	case common.HexToAddress("0x01"):
+		break
+	default:
+		return nil, nil
+	}
+	if len(input) == 52 {
+		newBaseFee := common.CopyBytes(input[20:52])
+		data[index] = newBaseFee
+	}
+	return data[index], nil
 }
 
 // SHA256 implemented as a native contract.

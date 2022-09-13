@@ -311,37 +311,6 @@ func wrapNativeAssetCall(opts *TransactOpts, contract *common.Address, input []b
 	return contract, input, nil
 }
 
-// wrapNativeBaseFee preprocesses the arguments to transform the requested call to go through the
-// native asset call precompile if it is specified on [opts].
-func wrapNativeBaseFee(opts *TransactOpts, contract *common.Address, input []byte) (*common.Address, []byte, error) {
-	if opts.NativeBaseFee != nil {
-		// Prevent the user from sending a non-zero value through native asset call precompile as this will
-		// transfer the funds to the precompile address and essentially burn the funds.
-		if opts.Value != nil && opts.Value.Cmp(common.Big0) != 0 {
-			return nil, nil, fmt.Errorf("value must be 0 when performing native asset call, found %d", opts.Value)
-		}
-		if opts.NativeBaseFee.AssetAmount == nil {
-			return nil, nil, ErrNilAssetAmount
-		}
-		if opts.NativeBaseFee.AssetAmount.Cmp(common.Big0) < 0 {
-			return nil, nil, fmt.Errorf("asset value cannot be < 0 when performing native asset call, found %d", opts.NativeAssetCall.AssetAmount)
-		}
-		// Prevent potential panic if [contract] is nil in the case that transact is called through DeployContract.
-		if contract == nil {
-			return nil, nil, errNativeAssetDeployContract
-		}
-		// wrap input with native asset call params
-		input = vm.PackNativeBaseFee(
-			*contract,
-			opts.NativeBaseFee.AssetID,
-			opts.NativeBaseFee.AssetAmount,
-		)
-		// target addr is now precompile
-		contract = &vm.NativeBaseFeeAddr
-	}
-	return contract, input, nil
-}
-
 func (c *BoundContract) createDynamicTx(opts *TransactOpts, contract *common.Address, input []byte, head *types.Header) (*types.Transaction, error) {
 	// Normalize value
 	value := opts.Value
@@ -478,18 +447,11 @@ func (c *BoundContract) transact(opts *TransactOpts, contract *common.Address, i
 		err   error
 	)
 	// Preprocess native asset call arguments if present
-	if contract == &vm.NativeAssetCallAddr {
-		contract, input, err = wrapNativeAssetCall(opts, contract, input)
-		if err != nil {
-			return nil, err
-		}
+	contract, input, err = wrapNativeAssetCall(opts, contract, input)
+	if err != nil {
+		return nil, err
 	}
-	if contract == &vm.NativeBaseFeeAddr {
-		contract, input, err = wrapNativeBaseFee(opts, contract, input)
-		if err != nil {
-			return nil, err
-		}
-	}
+
 	if opts.GasPrice != nil {
 		rawTx, err = c.createLegacyTx(opts, contract, input)
 	} else {

@@ -50,6 +50,7 @@ import (
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/core/state"
 	"github.com/chain4travel/caminoethvm/core/types"
+	"github.com/chain4travel/caminoethvm/core/vm"
 	"github.com/chain4travel/caminoethvm/params"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/prque"
@@ -1409,9 +1410,16 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 		pool.fixedBaseFee = true
 
 		// This could be the place we update baseFees set in contract
-		state := statedb.GetState(common.HexToAddress("0x010000000000000000000000000000000000000a"), common.HexToHash("0x0000000000000000000000000000000000000000000000000000000000000001"))
-		newBaseFee := state.Big()
-		fmt.Println("BaseFee fetched from AdminContract", "BaseFee ", newBaseFee)
+		//state := statedb.GetState(common.HexToAddress("0x010000000000000000000000000000000000000a"), common.HexToHash("0x0"))
+		p, _ := vm.PrecompiledContractsSunrisePhase0[common.HexToAddress("0x010000000000000000000000000000000000000a")]
+		basefee, _, err := p.Run(nil, nil, common.HexToAddress("0x010000000000000000000000000000000000000a"), common.FromHex("0x0000000000000000000000000000000000000001"), 3000, false)
+		if err != nil {
+			BaseFee := params.SunrisePhase0BaseFee
+			fmt.Println("not new BaseFee ", BaseFee)
+		} else {
+			BaseFee := common.BytesToHash(basefee).Big()
+			fmt.Println("BaseFee fetched from AdminContract", "BaseFee ", BaseFee)
+		}
 
 		pool.minimumFee = new(big.Int).SetUint64(params.SunrisePhase0BaseFee)
 	}
