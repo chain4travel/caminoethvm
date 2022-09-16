@@ -45,6 +45,8 @@ jobs:
         with:
           version: latest
           skip-go-installation: true
+          skip-pkg-cache: true
+          skip-build-cache: true
           working-directory: .
           args: --timeout 3m
   test:
