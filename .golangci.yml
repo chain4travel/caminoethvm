@@ -12,15 +12,13 @@ run:
 linters:
   disable-all: true
   enable:
-    - deadcode
     - goconst
-    - goimports
+    - gofmt
     - gosimple
     - govet
     - ineffassign
     - misspell
     - unconvert
-    - varcheck
 
 linters-settings:
   gofmt:
@@ -31,18 +29,6 @@ linters-settings:
 
 issues:
   exclude-rules:
-    - path: crypto/blake2b/
-      linters:
-        - deadcode
-    - path: crypto/bn256/cloudflare
-      linters:
-        - deadcode
-    - path: p2p/discv5/
-      linters:
-        - deadcode
     - path: core/vm/instructions_test.go
       linters:
         - goconst
-    - path: cmd/faucet/
-      linters:
-        - deadcode
