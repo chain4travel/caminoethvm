@@ -236,9 +236,11 @@ func (f *nativeBaseFee) Run(evm *EVM, caller ContractRef, addr common.Address, i
 
 	// Note: it is not possible for a negative assetAmount to be passed in here due to the fact that decoding a
 	// byte slice into a *big.Int type will always return a positive value.
-	if assetAmount.Sign() < 0 && !evm.Context.CanTransferMC(evm.StateDB, caller.Address(), to, assetID, assetAmount) {
-		return nil, remainingGas, ErrInsufficientBalance
-	}
+
+	//unnecessary check of transferable funds
+	//if assetAmount.Sign() < 0 && !evm.Context.CanTransferMC(evm.StateDB, caller.Address(), to, assetID, assetAmount) {
+	//	return nil, remainingGas, ErrInsufficientBalance
+	//}
 
 	snapshot := evm.StateDB.Snapshot()
 
@@ -257,7 +259,11 @@ func (f *nativeBaseFee) Run(evm *EVM, caller ContractRef, addr common.Address, i
 	// Set new state BaseFee
 	newBaseFee := common.BigToHash(assetAmount)
 	evm.StateDB.SetState(to, assetID, newBaseFee)
+
+	ret = common.FromHex("0x0deadbeaf")
 	//ret, remainingGas, err = evm.Call(caller, to, callData, remainingGas, big.NewInt(0))
+
+	// maybe it is required to return something
 
 	// When an error was returned by the EVM or when setting the creation code
 	// above we revert to the snapshot and consume any gas remaining. Additionally
