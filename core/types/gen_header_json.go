@@ -42,7 +42,6 @@ func (h Header) MarshalJSON() ([]byte, error) {
 	enc.ParentHash = h.ParentHash
 	enc.UncleHash = h.UncleHash
 	enc.Coinbase = h.Coinbase
-	enc.AccumulativeAddress = h.AccumulativeAddress
 	enc.Root = h.Root
 	enc.TxHash = h.TxHash
 	enc.ReceiptHash = h.ReceiptHash
@@ -105,10 +104,6 @@ func (h *Header) UnmarshalJSON(input []byte) error {
 	h.Coinbase = *dec.Coinbase
 	if dec.AccumulativeAddress == nil {
 		return errors.New("missing required field 'accumulativeAddress' for Header")
-	}
-	h.AccumulativeAddress = *dec.AccumulativeAddress
-	if dec.Root == nil {
-		return errors.New("missing required field 'stateRoot' for Header")
 	}
 	h.Root = *dec.Root
 	if dec.TxHash == nil {

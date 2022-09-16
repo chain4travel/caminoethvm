@@ -42,7 +42,6 @@ func (g Genesis) MarshalJSON() ([]byte, error) {
 	enc.Difficulty = (*math.HexOrDecimal256)(g.Difficulty)
 	enc.Mixhash = g.Mixhash
 	enc.Coinbase = g.Coinbase
-	enc.AccumulativeAddress = g.AccumulativeAddress
 	if g.Alloc != nil {
 		enc.Alloc = make(map[common.UnprefixedAddress]GenesisAccount, len(g.Alloc))
 		for k, v := range g.Alloc {
@@ -103,9 +102,6 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 	}
 	if dec.Coinbase != nil {
 		g.Coinbase = *dec.Coinbase
-	}
-	if dec.AccumulativeAddress != nil {
-		g.AccumulativeAddress = *dec.AccumulativeAddress
 	}
 	if dec.Alloc == nil {
 		return errors.New("missing required field 'alloc' for Genesis")

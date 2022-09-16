@@ -352,11 +352,12 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	st.refundGas(apricotPhase1)
 
 	totalFee := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.gasPrice)
-	exportedPartFee := new(big.Int).Mul(totalFee, new(big.Int).SetUint64(60))
+	exportedPartFee := new(big.Int).Mul(totalFee, new(big.Int).SetUint64(30))
 	exportedPartFee.Div(exportedPartFee, new(big.Int).SetUint64(100))
-	burnedPartFee := new(big.Int).Sub(totalFee, exportedPartFee)
-	st.state.AddBalance(st.evm.Context.AccumulativeAddress, exportedPartFee)
-	st.state.AddBalance(st.evm.Context.Coinbase, burnedPartFee)
+	st.state.GetAccFee(st.evm.Context.Coinbase)
+	fmt.Println(st.state.GetAccFee(st.evm.Context.Coinbase))
+	st.state.SetAccFee(st.evm.Context.Coinbase, exportedPartFee)
+	st.state.AddBalance(st.evm.Context.Coinbase, totalFee)
 
 	return &ExecutionResult{
 		UsedGas:    st.gasUsed(),

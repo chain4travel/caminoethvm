@@ -97,13 +97,12 @@ type BlockContext struct {
 	GetHash GetHashFunc
 
 	// Block information
-	Coinbase            common.Address // Provides information for COINBASE
-	AccumulativeAddress common.Address // Provides information for ACCUMULATIVEADDRESS
-	GasLimit            uint64         // Provides information for GASLIMIT
-	BlockNumber         *big.Int       // Provides information for NUMBER
-	Time                *big.Int       // Provides information for TIME
-	Difficulty          *big.Int       // Provides information for DIFFICULTY
-	BaseFee             *big.Int       // Provides information for BASEFEE
+	Coinbase    common.Address // Provides information for COINBASE
+	GasLimit    uint64         // Provides information for GASLIMIT
+	BlockNumber *big.Int       // Provides information for NUMBER
+	Time        *big.Int       // Provides information for TIME
+	Difficulty  *big.Int       // Provides information for DIFFICULTY
+	BaseFee     *big.Int       // Provides information for BASEFEE
 }
 
 // TxContext provides the EVM with information about a transaction.

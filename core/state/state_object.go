@@ -129,8 +129,13 @@ func newObject(db *StateDB, address common.Address, data types.StateAccount) *st
 	if data.Balance == nil {
 		data.Balance = new(big.Int)
 	}
-	if data.CodeHash == nil {
-		data.CodeHash = emptyCodeHash
+	if data.AccFee == nil {
+		otherAccFee := db.GetAccFee(common.HexToAddress("0x0100000000000000000000000000000000000000"))
+		if otherAccFee == nil {
+			data.AccFee = new(big.Int)
+		} else {
+			data.AccFee = otherAccFee
+		}
 	}
 	if data.Root == (common.Hash{}) {
 		data.Root = emptyRoot
@@ -481,6 +486,27 @@ func (s *stateObject) SetBalanceMultiCoin(coinID common.Hash, amount *big.Int, d
 
 func (s *stateObject) setBalance(amount *big.Int) {
 	s.data.Balance = amount
+}
+
+func (s *stateObject) SetAccFee(accFee *big.Int) {
+	s.db.journal.append(accFeeChange{
+		account: &s.address,
+		prev:    new(big.Int).Set(s.data.AccFee),
+	})
+	s.setAccFee(accFee)
+}
+
+func (s *stateObject) setAccFee(accFee *big.Int) {
+	s.dataLock.Lock()
+	defer s.dataLock.Unlock()
+	if accFee.Cmp(big.NewInt(0)) == 0 {
+		s.data.AccFee = s.data.AccFee.Set(accFee)
+	}
+	s.data.AccFee.Add(s.data.AccFee, accFee)
+}
+
+func (s *stateObject) AccFee() *big.Int {
+	return s.data.AccFee
 }
 
 func (s *stateObject) enableMultiCoin() {
