@@ -356,7 +356,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	exportedPartFee.Div(exportedPartFee, new(big.Int).SetUint64(100))
 	st.state.GetAccFee(st.evm.Context.Coinbase)
 	fmt.Println(st.state.GetAccFee(st.evm.Context.Coinbase))
-	st.state.SetAccFee(st.evm.Context.Coinbase, exportedPartFee)
+	st.state.AddAccFee(st.evm.Context.Coinbase, exportedPartFee)
 	st.state.AddBalance(st.evm.Context.Coinbase, totalFee)
 
 	return &ExecutionResult{

@@ -459,16 +459,16 @@ func (s *StateDB) SetBalance(addr common.Address, amount *big.Int) {
 	}
 }
 
-func (s *StateDB) SetAccFee(addr common.Address, newAccFee *big.Int) {
+func (s *StateDB) AddAccFee(addr common.Address, newAccFee *big.Int) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
-		stateObject.SetAccFee(newAccFee)
+		stateObject.AddAccFee(newAccFee)
 	}
 }
-func (s *StateDB) Set0AccFee(addr common.Address) {
+func (s *StateDB) SetAfterTransferAccFee(addr common.Address, newAccFee *big.Int) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
-		stateObject.SetAccFee(big.NewInt(0))
+		stateObject.SetAfterTransferAccFee(newAccFee)
 	}
 }
 
