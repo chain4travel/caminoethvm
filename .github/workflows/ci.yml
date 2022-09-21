@@ -33,7 +33,7 @@ jobs:
           token: ${{ secrets.CAMINO_PAT }}
       - uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: 1.17.9
       - name: change caminogo dep
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
@@ -43,9 +43,10 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
-          version: latest
+          version: v1.47.0
           working-directory: .
           args: --timeout 3m
+          skip-go-installation: true
   test:
     name: Golang Unit Tests v${{ matrix.go }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}

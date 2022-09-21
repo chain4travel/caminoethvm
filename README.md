@@ -46,7 +46,7 @@ The C-Chain is compatible with almost all Ethereum tooling, including [Remix](ht
 
 As a network composed of multiple blockchains, Camino uses *atomic transactions* to move assets between chains. CaminoEthVm modifies the Ethereum block format by adding an *ExtraData* field, which contains the atomic transactions.
 
-### Avalanche Native Tokens (ANTs)
+### Camino Native Tokens (CNTs)
 
 The C-Chain supports Camino Native Tokens, which are created on the X-Chain using precompiled contracts. These precompiled contracts *nativeAssetCall* and *nativeAssetBalance* support the same interface for CNTs as *CALL* and *BALANCE* do for CAM with the added parameter of *assetID* to specify the asset.
 
