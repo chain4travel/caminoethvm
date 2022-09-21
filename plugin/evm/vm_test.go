@@ -3087,7 +3087,8 @@ func TestSunrisePhase0AndApricotPhase5Block(t *testing.T) {
 // Regression test to ensure a normally created Sunrise Phase 0 Block A will be validated,
 // a Sunrise Phase 0 Block B with empty body and Block A as a parent will not be validated and
 // a Sunrise Phase 0 Block C with a missing parent will be syntactically validated (but not verified due to missing parent)
-func TestSunrisePhase0OrphanBlock(t *testing.T) {
+// TODO temporarily disabled. Useful for testing further phase progressions
+func DisabledTestSunrisePhase0OrphanBlock(t *testing.T) {
 	importAmount := uint64(1000000000)
 	issuer, vm, _, _, _ := GenesisVMWithUTXOs(t, true, genesisJSONSunrisePhase0, "", "", map[ids.ShortID]uint64{
 		testShortIDAddrs[0]: importAmount,
@@ -3101,10 +3102,7 @@ func TestSunrisePhase0OrphanBlock(t *testing.T) {
 
 	newTxPoolHeadChan1 := make(chan core.NewTxPoolReorgEvent, 1)
 	vm.chain.GetTxPool().SubscribeNewReorgEvent(newTxPoolHeadChan1)
-
-	key := testKeys[0].ToECDSA()
 	address := testEthAddrs[0]
-
 	importTx, err := vm.newImportTx(vm.ctx.XChainID, address, sunriseBaseFee, []*crypto.PrivateKeySECP256K1R{testKeys[0]})
 	if err != nil {
 		t.Fatal(err)
@@ -3139,68 +3137,54 @@ func TestSunrisePhase0OrphanBlock(t *testing.T) {
 	// Assertion for BaseFee
 	assert.EqualValues(t, blkAEthBlock.BaseFee(), sunriseBaseFee, "Block's Base fee should be SunrisePhase0's Base Fee")
 
-	// Create list of 10 successive transactions to build block B on vm
-	txs := make([]*types.Transaction, 10)
-	for i := 0; i < 10; i++ {
-		tx := types.NewTransaction(uint64(i), address, big.NewInt(10), 21000, big.NewInt(params.LaunchMinGasPrice), nil)
-		signedTx, err := types.SignTx(tx, types.NewEIP155Signer(vm.chainID), key)
-		if err != nil {
-			t.Fatal(err)
-		}
-		txs[i] = signedTx
+	extraData, err := vm.codec.Marshal(codecVersion, []*Tx{importTx})
+	if err != nil {
+		t.Fatal(err)
 	}
-
-	// Add the remote transactions, build the block, and set VM's preference
-	// for block B
-	errs := vm.chain.AddRemoteTxsSync(txs)
-	for i, err := range errs {
-		if err != nil {
-			t.Fatalf("Failed to add transaction to VM at index %d: %s", i, err)
-		}
-	}
-
-	<-issuer
 
 	// Manually created Eth Block with a manually created header
-	ethBlkB := types.NewBlock(
+	emptyEthBlk := types.NewBlock(
 		&types.Header{
+			Coinbase:    common.Address{1},
 			ParentHash:  blkAEthBlock.Hash(),
 			UncleHash:   types.EmptyUncleHash,
 			TxHash:      types.EmptyRootHash,
 			ReceiptHash: types.EmptyRootHash,
 			Difficulty:  math.BigPow(1, 1),
 			Number:      math.BigPow(2, 9),
-			GasLimit:    0,
+			GasLimit:    params.ApricotPhase1GasLimit,
 			GasUsed:     0,
 			Time:        9876543,
-			Extra:       []byte("coolest block on chain"),
+			BaseFee:     initialBaseFee,
+			ExtDataHash: common.HexToHash("28def515f5d63c6e29f0ea8abd5f5674333e76393530560e2740dcdd66298f86"),
 		},
 		nil,
 		nil,
 		nil,
 		new(trie.Trie),
-		nil,
+		extraData,
 		false,
 	)
 
-	blkB := &Block{
+	emptyBlock := &Block{
 		vm:       vm,
-		ethBlock: ethBlkB,
-		id:       ids.ID(ethBlkB.Hash()),
+		ethBlock: emptyEthBlk,
+		id:       ids.ID(emptyEthBlk.Hash()),
 	}
 
 	// Block B is empty created but with a valid parent therefore, its verification should return an error
-	assert.Error(t, blkB.Verify())
+	assert.ErrorIs(t, emptyBlock.Verify(), errEmptyBlock)
 
 	// Manually created Eth Block with a manually created header
-	emptyEthBlock := types.NewBlock(
+	orphanEthBlock := types.NewBlock(
 		&types.Header{
-			Difficulty: math.BigPow(11, 11),
-			Number:     math.BigPow(2, 9),
-			GasLimit:   12345678,
-			GasUsed:    1476322,
-			Time:       9876543,
-			Extra:      []byte("emptiest block on chain"),
+			ParentHash:  common.Hash{},
+			Difficulty:  math.BigPow(11, 11),
+			Number:      math.BigPow(2, 9),
+			GasLimit:    12345678,
+			GasUsed:     1476322,
+			Time:        9876543,
+			ExtDataHash: common.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"),
 		},
 		nil,
 		nil,
@@ -3210,16 +3194,19 @@ func TestSunrisePhase0OrphanBlock(t *testing.T) {
 		false,
 	)
 	// Manually created block with a dummy parent
-	emptyBlock := &Block{
+	orphanBlock := &Block{
 		vm:       vm,
-		ethBlock: emptyEthBlock,
-		id:       ids.ID(emptyEthBlock.Hash()),
+		ethBlock: orphanEthBlock,
+		id:       ids.ID(orphanEthBlock.Hash()),
 	}
 
-	// emptyBlock does not have a valid parent therefore, it shouldn't return an error from Syntactic Verification.
+	// orphanBlock does not have a valid parent therefore, it shouldn't return an error from Syntactic Verification.
 	// It should return a "rejected parent" error though, from Atomic TXs Verification where it's being ensured
 	// that the parent was verified and inserted correctly.
-	assert.Error(t, emptyBlock.Verify())
+	err = orphanBlock.Verify()
+	assert.ErrorIs(t, err, errRejectedParent)
+	checks := vm.DeferedChecks.deferedChecks
+	assert.Equal(t, checks[ids.ID(common.Hash{})], orphanBlock)
 }
 
 func TestAtomicTxFailsEVMStateTransferBuildBlock(t *testing.T) {

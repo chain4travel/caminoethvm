@@ -52,62 +52,62 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go: [ '1.17' ]
-        os: [ macos-11.0, ubuntu-18.04 ]
+        go: ['1.17']
+        os: [macos-11.0, ubuntu-18.04]
     steps:
-      - uses: actions/checkout@v3
-      - name: check out ${{ github.event.inputs.caminogoRepo }} ${{ github.event.inputs.caminogoBranch }}
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: actions/checkout@v3
-        with:
-          repository: ${{ github.event.inputs.caminogoRepo }}
-          ref: ${{ github.event.inputs.caminogoBranch }}
-          path: caminogo
-          token: ${{ secrets.CAMINO_PAT }}
-      - uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go }}
-      - name: change caminogo dep
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: |
-          go mod edit -replace github.com/chain4travel/caminogo=./caminogo
-          go mod tidy
-      - run: go mod download
-        shell: bash
-      - run: ./scripts/build.sh evm
-        shell: bash
-      - run: ./scripts/test.sh
-        shell: bash
-      - run: ./scripts/coverage.sh
-        shell: bash
+    - uses: actions/checkout@v3
+    - name: check out ${{ github.event.inputs.caminogoRepo }} ${{ github.event.inputs.caminogoBranch }}
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ github.event.inputs.caminogoRepo }}
+        ref: ${{ github.event.inputs.caminogoBranch }}
+        path: caminogo
+        token: ${{ secrets.CAMINO_PAT }}
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go }}
+    - name: change caminogo dep
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: |
+        go mod edit -replace github.com/chain4travel/caminogo=./caminogo
+        go mod tidy
+    - run: go mod download
+      shell: bash
+    - run: ./scripts/build.sh evm
+      shell: bash
+    - run: ./scripts/test.sh
+      shell: bash
+    - run: ./scripts/coverage.sh
+      shell: bash
   test-race:
     name: Golang Unit Tests Race Detection v${{ matrix.go }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go: [ '1.17' ]
-        os: [ ubuntu-20.04 ]
+        go: ['1.17']
+        os: [ubuntu-20.04]
     steps:
-      - uses: actions/checkout@v3
-      - name: check out ${{ github.event.inputs.caminogoRepo }} ${{ github.event.inputs.caminogoBranch }}
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: actions/checkout@v3
-        with:
-          repository: ${{ github.event.inputs.caminogoRepo }}
-          ref: ${{ github.event.inputs.caminogoBranch }}
-          path: caminogo
-          token: ${{ secrets.CAMINO_PAT }}
-      - uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go }}
-      - name: change caminogo dep
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: |
-          go mod edit -replace github.com/chain4travel/caminogo=./caminogo
-          go mod tidy
-      - run: go mod download
-        shell: bash
-      - run: ./scripts/build.sh evm
-        shell: bash
-      - run: ./scripts/test.sh -race
-        shell: bash
+    - uses: actions/checkout@v3
+    - name: check out ${{ github.event.inputs.caminogoRepo }} ${{ github.event.inputs.caminogoBranch }}
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ github.event.inputs.caminogoRepo }}
+        ref: ${{ github.event.inputs.caminogoBranch }}
+        path: caminogo
+        token: ${{ secrets.CAMINO_PAT }}
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go }}
+    - name: change caminogo dep
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: |
+        go mod edit -replace github.com/chain4travel/caminogo=./caminogo
+        go mod tidy
+    - run: go mod download
+      shell: bash
+    - run: ./scripts/build.sh evm
+      shell: bash
+    - run: ./scripts/test.sh -race
+      shell: bash
