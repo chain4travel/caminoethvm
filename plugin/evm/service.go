@@ -51,6 +51,8 @@ var (
 	errNilTxID       = errors.New("nil transaction ID")
 
 	initialBaseFee = big.NewInt(params.ApricotPhase3InitialBaseFee)
+
+	sunriseBaseFee = big.NewInt(int64(params.SunrisePhase0BaseFee))
 )
 
 // SnowmanAPI introduces snowman specific functionality to the evm
