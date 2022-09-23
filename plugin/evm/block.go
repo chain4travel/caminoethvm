@@ -192,6 +192,9 @@ func (b *Block) Accept() error {
 		vm.mempool.RemoveTx(tx)
 	}
 
+	// Is it the right place to check fee collection conditions and create a new ExportFeeTx?
+	// TODO: implement fee collection
+
 	isBonus := bonusBlocks.Contains(b.id)
 	if err := b.indexAtomics(vm, b.Height(), b.atomicTxs, batchChainsAndInputs, isBonus); err != nil {
 		return err

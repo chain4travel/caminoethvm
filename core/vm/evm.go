@@ -103,6 +103,9 @@ type BlockContext struct {
 	Time        *big.Int       // Provides information for TIME
 	Difficulty  *big.Int       // Provides information for DIFFICULTY
 	BaseFee     *big.Int       // Provides information for BASEFEE
+
+	// TODO: Add Fee Collection params to block context
+	// See: https://github.com/chain4travel/caminoethvm/pull/3/commits/28c10b88b510600c5ed4b9c2c73fbaaaa5a12788#diff-1272116434e5549f278a940767af52ed2d1abc91c44fa04ec48d8835a3774036
 }
 
 // TxContext provides the EVM with information about a transaction.
