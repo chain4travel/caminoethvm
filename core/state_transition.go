@@ -354,9 +354,16 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	totalFee := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.gasPrice)
 	exportedPartFee := new(big.Int).Mul(totalFee, new(big.Int).SetUint64(30))
 	exportedPartFee.Div(exportedPartFee, new(big.Int).SetUint64(100))
-	st.state.GetAccFee(st.evm.Context.Coinbase)
-	fmt.Println(st.state.GetAccFee(st.evm.Context.Coinbase))
-	st.state.AddAccFee(st.evm.Context.Coinbase, exportedPartFee)
+
+	amount := st.state.GetState(st.evm.Context.Coinbase, common.Hash{})
+	fmt.Println(amount.Big())
+	if amount.Big().Cmp(big.NewInt(0)) == 0 || amount.Big().Cmp(big.NewInt(500000000000000)) == -1 { //here we can set necessary minimum amount that we need to make normal transfer
+		newAmount := big.NewInt(0)
+		newAmount.Add(amount.Big(), exportedPartFee)
+		st.state.SetState(st.evm.Context.Coinbase, common.Hash{}, common.BigToHash(newAmount))
+	} else {
+		fmt.Println("transfer") //some transfer logic
+	}
 	st.state.AddBalance(st.evm.Context.Coinbase, totalFee)
 
 	return &ExecutionResult{

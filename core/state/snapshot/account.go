@@ -41,18 +41,16 @@ import (
 type Account struct {
 	Nonce       uint64
 	Balance     *big.Int
-	AccFee      *big.Int
 	Root        []byte
 	CodeHash    []byte
 	IsMultiCoin bool
 }
 
 // SlimAccount converts a state.Account content into a slim snapshot account
-func SlimAccount(nonce uint64, balance *big.Int, accFee *big.Int, root common.Hash, codehash []byte, isMultiCoin bool) Account {
+func SlimAccount(nonce uint64, balance *big.Int, root common.Hash, codehash []byte, isMultiCoin bool) Account {
 	slim := Account{
 		Nonce:       nonce,
 		Balance:     balance,
-		AccFee:      accFee,
 		IsMultiCoin: isMultiCoin,
 	}
 	if root != emptyRoot {
@@ -66,8 +64,8 @@ func SlimAccount(nonce uint64, balance *big.Int, accFee *big.Int, root common.Ha
 
 // SlimAccountRLP converts a state.Account content into a slim snapshot
 // version RLP encoded.
-func SlimAccountRLP(nonce uint64, balance *big.Int, accFee *big.Int, root common.Hash, codehash []byte, isMultiCoin bool) []byte {
-	data, err := rlp.EncodeToBytes(SlimAccount(nonce, balance, accFee, root, codehash, isMultiCoin))
+func SlimAccountRLP(nonce uint64, balance *big.Int, root common.Hash, codehash []byte, isMultiCoin bool) []byte {
+	data, err := rlp.EncodeToBytes(SlimAccount(nonce, balance, root, codehash, isMultiCoin))
 	if err != nil {
 		panic(err)
 	}

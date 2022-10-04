@@ -121,10 +121,6 @@ type (
 		account *common.Address
 		prev    uint64
 	}
-	accFeeChange struct {
-		account *common.Address
-		prev    *big.Int
-	}
 	storageChange struct {
 		account       *common.Address
 		key, prevalue common.Hash
@@ -175,13 +171,6 @@ func (ch resetObjectChange) revert(s *StateDB) {
 
 func (ch resetObjectChange) dirtied() *common.Address {
 	return nil
-}
-func (ch accFeeChange) revert(s *StateDB) {
-	s.getStateObject(*ch.account).setAccFee(ch.prev)
-}
-
-func (ch accFeeChange) dirtied() *common.Address {
-	return ch.account
 }
 
 func (ch suicideChange) revert(s *StateDB) {

@@ -357,13 +357,6 @@ func (s *StateDB) GetState(addr common.Address, hash common.Hash) common.Hash {
 	}
 	return common.Hash{}
 }
-func (s *StateDB) GetAccFee(addr common.Address) *big.Int {
-	stateObject := s.getStateObject(addr)
-	if stateObject != nil && stateObject.AccFee() != nil {
-		return stateObject.AccFee()
-	}
-	return big.NewInt(0)
-}
 
 // GetProof returns the Merkle proof for a given account.
 func (s *StateDB) GetProof(addr common.Address) ([][]byte, error) {
@@ -456,19 +449,6 @@ func (s *StateDB) SetBalance(addr common.Address, amount *big.Int) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
 		stateObject.SetBalance(amount)
-	}
-}
-
-func (s *StateDB) AddAccFee(addr common.Address, newAccFee *big.Int) {
-	stateObject := s.GetOrNewStateObject(addr)
-	if stateObject != nil {
-		stateObject.AddAccFee(newAccFee)
-	}
-}
-func (s *StateDB) SetAfterTransferAccFee(addr common.Address, newAccFee *big.Int) {
-	stateObject := s.GetOrNewStateObject(addr)
-	if stateObject != nil {
-		stateObject.SetAfterTransferAccFee(newAccFee)
 	}
 }
 
@@ -568,7 +548,7 @@ func (s *StateDB) updateStateObject(obj *stateObject) {
 	// enough to track account updates at commit time, deletions need tracking
 	// at transaction boundary level to ensure we capture state clearing.
 	if s.snap != nil {
-		s.snapAccounts[obj.addrHash] = snapshot.SlimAccountRLP(obj.data.Nonce, obj.data.Balance, obj.data.AccFee, obj.data.Root, obj.data.CodeHash, obj.data.IsMultiCoin)
+		s.snapAccounts[obj.addrHash] = snapshot.SlimAccountRLP(obj.data.Nonce, obj.data.Balance, obj.data.Root, obj.data.CodeHash, obj.data.IsMultiCoin)
 	}
 }
 
@@ -619,7 +599,6 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 			data = &types.StateAccount{
 				Nonce:       acc.Nonce,
 				Balance:     acc.Balance,
-				AccFee:      acc.AccFee,
 				CodeHash:    acc.CodeHash,
 				IsMultiCoin: acc.IsMultiCoin,
 				Root:        common.BytesToHash(acc.Root),

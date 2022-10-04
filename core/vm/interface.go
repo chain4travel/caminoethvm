@@ -73,10 +73,6 @@ type StateDB interface {
 	GetState(common.Address, common.Hash) common.Hash
 	SetState(common.Address, common.Hash, common.Hash)
 
-	AddAccFee(common.Address, *big.Int)
-	SetAfterTransferAccFee(common.Address, *big.Int)
-	GetAccFee(common.Address) *big.Int
-
 	Suicide(common.Address) bool
 	HasSuicided(common.Address) bool
 

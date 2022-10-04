@@ -37,7 +37,6 @@ import (
 type StateAccount struct {
 	Nonce       uint64
 	Balance     *big.Int
-	AccFee      *big.Int
 	Root        common.Hash // merkle root of the storage trie
 	CodeHash    []byte
 	IsMultiCoin bool
