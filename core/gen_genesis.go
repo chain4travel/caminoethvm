@@ -29,9 +29,9 @@ func (g Genesis) MarshalJSON() ([]byte, error) {
 		Alloc                          map[common.UnprefixedAddress]GenesisAccount `json:"alloc"      gencodec:"required"`
 		FeeRewardExportIntervalSeconds uint64                                      `json:"feeRewardExportIntervalSeconds"`
 		FeeRewardMinAmountToExport     uint64                                      `json:"feeRewardMinAmountToExport"`
-		FeeRewardRatio                 float32                                     `json:"feeRewardRatio"`
 		FeeRewardExportAddress         common.Address                              `json:"feeRewardExportAddress"`
-		IncentivePoolRewardRatio       float32                                     `json:"incentivePoolRewardRatio"`
+		FeeRewardRate                  uint64                                      `json:"feeRewardRate"`
+		IncentivePoolRewardRate        uint64                                      `json:"incentivePoolRewardRate"`
 		IncentivePoolRewardAddress     common.Address                              `json:"incentivePoolRewardAddress"`
 		Number                         math.HexOrDecimal64                         `json:"number"`
 		GasUsed                        math.HexOrDecimal64                         `json:"gasUsed"`
@@ -55,9 +55,9 @@ func (g Genesis) MarshalJSON() ([]byte, error) {
 	}
 	enc.FeeRewardExportIntervalSeconds = g.FeeRewardExportIntervalSeconds
 	enc.FeeRewardMinAmountToExport = g.FeeRewardMinAmountToExport
-	enc.FeeRewardRatio = g.FeeRewardRatio
 	enc.FeeRewardExportAddress = g.FeeRewardExportAddress
-	enc.IncentivePoolRewardRatio = g.IncentivePoolRewardRatio
+	enc.FeeRewardRate = g.FeeRewardRate
+	enc.IncentivePoolRewardRate = g.IncentivePoolRewardRate
 	enc.IncentivePoolRewardAddress = g.IncentivePoolRewardAddress
 	enc.Number = math.HexOrDecimal64(g.Number)
 	enc.GasUsed = math.HexOrDecimal64(g.GasUsed)
@@ -80,9 +80,9 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 		Alloc                          map[common.UnprefixedAddress]GenesisAccount `json:"alloc"      gencodec:"required"`
 		FeeRewardExportIntervalSeconds *uint64                                     `json:"feeRewardExportIntervalSeconds"`
 		FeeRewardMinAmountToExport     *uint64                                     `json:"feeRewardMinAmountToExport"`
-		FeeRewardRatio                 *float32                                    `json:"feeRewardRatio"`
 		FeeRewardExportAddress         *common.Address                             `json:"feeRewardExportAddress"`
-		IncentivePoolRewardRatio       *float32                                    `json:"incentivePoolRewardRatio"`
+		FeeRewardRate                  *uint64                                     `json:"feeRewardRate"`
+		IncentivePoolRewardRate        *uint64                                     `json:"incentivePoolRewardRate"`
 		IncentivePoolRewardAddress     *common.Address                             `json:"incentivePoolRewardAddress"`
 		Number                         *math.HexOrDecimal64                        `json:"number"`
 		GasUsed                        *math.HexOrDecimal64                        `json:"gasUsed"`
@@ -132,14 +132,14 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 	if dec.FeeRewardMinAmountToExport != nil {
 		g.FeeRewardMinAmountToExport = *dec.FeeRewardMinAmountToExport
 	}
-	if dec.FeeRewardRatio != nil {
-		g.FeeRewardRatio = *dec.FeeRewardRatio
-	}
 	if dec.FeeRewardExportAddress != nil {
 		g.FeeRewardExportAddress = *dec.FeeRewardExportAddress
 	}
-	if dec.IncentivePoolRewardRatio != nil {
-		g.IncentivePoolRewardRatio = *dec.IncentivePoolRewardRatio
+	if dec.FeeRewardRate != nil {
+		g.FeeRewardRate = *dec.FeeRewardRate
+	}
+	if dec.IncentivePoolRewardRate != nil {
+		g.IncentivePoolRewardRate = *dec.IncentivePoolRewardRate
 	}
 	if dec.IncentivePoolRewardAddress != nil {
 		g.IncentivePoolRewardAddress = *dec.IncentivePoolRewardAddress

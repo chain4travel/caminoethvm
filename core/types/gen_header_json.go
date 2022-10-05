@@ -37,9 +37,9 @@ func (h Header) MarshalJSON() ([]byte, error) {
 		BlockGasCost                   *hexutil.Big   `json:"blockGasCost" rlp:"optional"`
 		FeeRewardExportIntervalSeconds uint64         `json:"feeRewardExportIntervalSeconds"`
 		FeeRewardMinAmountToExport     uint64         `json:"feeRewardMinAmountToExport"`
-		FeeRewardRatio                 float32        `json:"feeRewardRatio"`
+		FeeRewardRate                  uint64         `json:"feeRewardRate"`
 		FeeRewardExportAddress         common.Address `json:"feeRewardExportAddress"`
-		IncentivePoolRewardRatio       float32        `json:"incentivePoolRewardRatio"`
+		IncentivePoolRewardRate        uint64         `json:"incentivePoolRewardRate"`
 		IncentivePoolRewardAddress     common.Address `json:"incentivePoolRewardAddress"`
 		Hash                           common.Hash    `json:"hash"`
 	}
@@ -65,9 +65,9 @@ func (h Header) MarshalJSON() ([]byte, error) {
 	enc.BlockGasCost = (*hexutil.Big)(h.BlockGasCost)
 	enc.FeeRewardExportIntervalSeconds = h.FeeRewardExportIntervalSeconds
 	enc.FeeRewardMinAmountToExport = h.FeeRewardMinAmountToExport
-	enc.FeeRewardRatio = h.FeeRewardRatio
+	enc.FeeRewardRate = h.FeeRewardRate
 	enc.FeeRewardExportAddress = h.FeeRewardExportAddress
-	enc.IncentivePoolRewardRatio = h.IncentivePoolRewardRatio
+	enc.IncentivePoolRewardRate = h.IncentivePoolRewardRate
 	enc.IncentivePoolRewardAddress = h.IncentivePoolRewardAddress
 	enc.Hash = h.Hash()
 	return json.Marshal(&enc)
@@ -97,9 +97,9 @@ func (h *Header) UnmarshalJSON(input []byte) error {
 		BlockGasCost                   *hexutil.Big    `json:"blockGasCost" rlp:"optional"`
 		FeeRewardExportIntervalSeconds *uint64         `json:"feeRewardExportIntervalSeconds"`
 		FeeRewardMinAmountToExport     *uint64         `json:"feeRewardMinAmountToExport"`
-		FeeRewardRatio                 *float32        `json:"feeRewardRatio"`
+		FeeRewardRate                  *uint64         `json:"feeRewardRate"`
 		FeeRewardExportAddress         *common.Address `json:"feeRewardExportAddress"`
-		IncentivePoolRewardRatio       *float32        `json:"incentivePoolRewardRatio"`
+		IncentivePoolRewardRate        *uint64         `json:"incentivePoolRewardRate"`
 		IncentivePoolRewardAddress     *common.Address `json:"incentivePoolRewardAddress"`
 	}
 	var dec Header
@@ -183,14 +183,14 @@ func (h *Header) UnmarshalJSON(input []byte) error {
 	if dec.FeeRewardMinAmountToExport != nil {
 		h.FeeRewardMinAmountToExport = *dec.FeeRewardMinAmountToExport
 	}
-	if dec.FeeRewardRatio != nil {
-		h.FeeRewardRatio = *dec.FeeRewardRatio
+	if dec.FeeRewardRate != nil {
+		h.FeeRewardRate = *dec.FeeRewardRate
 	}
 	if dec.FeeRewardExportAddress != nil {
 		h.FeeRewardExportAddress = *dec.FeeRewardExportAddress
 	}
-	if dec.IncentivePoolRewardRatio != nil {
-		h.IncentivePoolRewardRatio = *dec.IncentivePoolRewardRatio
+	if dec.IncentivePoolRewardRate != nil {
+		h.IncentivePoolRewardRate = *dec.IncentivePoolRewardRate
 	}
 	if dec.IncentivePoolRewardAddress != nil {
 		h.IncentivePoolRewardAddress = *dec.IncentivePoolRewardAddress

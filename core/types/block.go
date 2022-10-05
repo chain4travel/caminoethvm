@@ -113,9 +113,9 @@ type Header struct {
 	// Fee collection parameters
 	FeeRewardExportIntervalSeconds uint64         `json:"feeRewardExportIntervalSeconds"`
 	FeeRewardMinAmountToExport     uint64         `json:"feeRewardMinAmountToExport"`
-	FeeRewardRatio                 float32        `json:"feeRewardRatio"`
+	FeeRewardRate                  uint64         `json:"feeRewardRate"`
 	FeeRewardExportAddress         common.Address `json:"feeRewardExportAddress"`
-	IncentivePoolRewardRatio       float32        `json:"incentivePoolRewardRatio"`
+	IncentivePoolRewardRate        uint64         `json:"incentivePoolRewardRate"`
 	IncentivePoolRewardAddress     common.Address `json:"incentivePoolRewardAddress"`
 }
 

@@ -78,10 +78,14 @@ type Genesis struct {
 	// Fee collection parameters
 	FeeRewardExportIntervalSeconds uint64         `json:"feeRewardExportIntervalSeconds"`
 	FeeRewardMinAmountToExport     uint64         `json:"feeRewardMinAmountToExport"`
-	FeeRewardRatio                 float32        `json:"feeRewardRatio"`
 	FeeRewardExportAddress         common.Address `json:"feeRewardExportAddress"`
-	IncentivePoolRewardRatio       float32        `json:"incentivePoolRewardRatio"`
-	IncentivePoolRewardAddress     common.Address `json:"incentivePoolRewardAddress"`
+
+	// Assumption: `FeeRewardRate` is denominated to uint64 from floating point ratio (ratio * evm.percentDenominator)
+	FeeRewardRate uint64 `json:"feeRewardRate"`
+
+	// Assumption: `IncentivePoolRewardRate` is denominated to uint64 from floating point ratio (ratio * evm.percentDenominator)
+	IncentivePoolRewardRate    uint64         `json:"incentivePoolRewardRate"`
+	IncentivePoolRewardAddress common.Address `json:"incentivePoolRewardAddress"`
 
 	// These fields are used for consensus tests. Please don't use them
 	// in actual genesis blocks.
@@ -282,9 +286,9 @@ func (g *Genesis) ToBlock(db ethdb.Database) *types.Block {
 		FeeRewardExportIntervalSeconds: g.FeeRewardExportIntervalSeconds,
 		FeeRewardMinAmountToExport:     g.FeeRewardMinAmountToExport,
 		FeeRewardExportAddress:         g.FeeRewardExportAddress,
-		FeeRewardRatio:                 g.FeeRewardRatio,
+		FeeRewardRate:                  g.FeeRewardRate,
 		IncentivePoolRewardAddress:     g.IncentivePoolRewardAddress,
-		IncentivePoolRewardRatio:       g.IncentivePoolRewardRatio,
+		IncentivePoolRewardRate:        g.IncentivePoolRewardRate,
 	}
 	if g.GasLimit == 0 {
 		head.GasLimit = params.GenesisGasLimit

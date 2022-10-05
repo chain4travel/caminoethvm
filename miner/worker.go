@@ -157,10 +157,10 @@ func (w *worker) commitNewWork() (*types.Block, error) {
 		Time:                           uint64(timestamp),
 		FeeRewardExportIntervalSeconds: parent.Header().FeeRewardExportIntervalSeconds,
 		FeeRewardExportAddress:         parent.Header().FeeRewardExportAddress,
-		FeeRewardRatio:                 parent.Header().FeeRewardRatio,
+		FeeRewardRate:                  parent.Header().FeeRewardRate,
 		FeeRewardMinAmountToExport:     parent.Header().FeeRewardMinAmountToExport,
 		IncentivePoolRewardAddress:     parent.Header().IncentivePoolRewardAddress,
-		IncentivePoolRewardRatio:       parent.Header().IncentivePoolRewardRatio,
+		IncentivePoolRewardRate:        parent.Header().IncentivePoolRewardRate,
 	}
 	// Set BaseFee and Extra data field if we are post ApricotPhase3
 	bigTimestamp := big.NewInt(timestamp)
