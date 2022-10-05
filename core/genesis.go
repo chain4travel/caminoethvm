@@ -76,12 +76,12 @@ type Genesis struct {
 	Alloc      GenesisAlloc        `json:"alloc"      gencodec:"required"`
 
 	// Fee collection parameters
-	FeeExportIntervalSeconds uint64         `json:"feeExportIntervalSeconds"`
-	MinAmountToExport        uint64         `json:"minAmountToExport"`
-	FeeRewardRatio           float32        `json:"feeRewardRatio"`
-	FeeRewardAddress         common.Address `json:"feeRewardAddress"`
-	IncentivePoolRatio       float32        `json:"incentivePoolRatio"`
-	IncentivePoolAddress     common.Address `json:"incentivePoolAddress"`
+	FeeRewardExportIntervalSeconds uint64         `json:"feeRewardExportIntervalSeconds"`
+	FeeRewardMinAmountToExport     uint64         `json:"feeRewardMinAmountToExport"`
+	FeeRewardRatio                 float32        `json:"feeRewardRatio"`
+	FeeRewardExportAddress         common.Address `json:"feeRewardExportAddress"`
+	IncentivePoolRewardRatio       float32        `json:"incentivePoolRewardRatio"`
+	IncentivePoolRewardAddress     common.Address `json:"incentivePoolRewardAddress"`
 
 	// These fields are used for consensus tests. Please don't use them
 	// in actual genesis blocks.
@@ -267,18 +267,24 @@ func (g *Genesis) ToBlock(db ethdb.Database) *types.Block {
 	}
 	root := statedb.IntermediateRoot(false)
 	head := &types.Header{
-		Number:     new(big.Int).SetUint64(g.Number),
-		Nonce:      types.EncodeNonce(g.Nonce),
-		Time:       g.Timestamp,
-		ParentHash: g.ParentHash,
-		Extra:      g.ExtraData,
-		GasLimit:   g.GasLimit,
-		GasUsed:    g.GasUsed,
-		BaseFee:    g.BaseFee,
-		Difficulty: g.Difficulty,
-		MixDigest:  g.Mixhash,
-		Coinbase:   g.Coinbase,
-		Root:       root,
+		Number:                         new(big.Int).SetUint64(g.Number),
+		Nonce:                          types.EncodeNonce(g.Nonce),
+		Time:                           g.Timestamp,
+		ParentHash:                     g.ParentHash,
+		Extra:                          g.ExtraData,
+		GasLimit:                       g.GasLimit,
+		GasUsed:                        g.GasUsed,
+		BaseFee:                        g.BaseFee,
+		Difficulty:                     g.Difficulty,
+		MixDigest:                      g.Mixhash,
+		Coinbase:                       g.Coinbase,
+		Root:                           root,
+		FeeRewardExportIntervalSeconds: g.FeeRewardExportIntervalSeconds,
+		FeeRewardMinAmountToExport:     g.FeeRewardMinAmountToExport,
+		FeeRewardExportAddress:         g.FeeRewardExportAddress,
+		FeeRewardRatio:                 g.FeeRewardRatio,
+		IncentivePoolRewardAddress:     g.IncentivePoolRewardAddress,
+		IncentivePoolRewardRatio:       g.IncentivePoolRewardRatio,
 	}
 	if g.GasLimit == 0 {
 		head.GasLimit = params.GenesisGasLimit

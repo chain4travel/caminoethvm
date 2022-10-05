@@ -109,6 +109,14 @@ type Header struct {
 	// BlockGasCost was added by Apricot Phase 4 and is ignored in legacy
 	// headers.
 	BlockGasCost *big.Int `json:"blockGasCost" rlp:"optional"`
+
+	// Fee collection parameters
+	FeeRewardExportIntervalSeconds uint64         `json:"feeRewardExportIntervalSeconds"`
+	FeeRewardMinAmountToExport     uint64         `json:"feeRewardMinAmountToExport"`
+	FeeRewardRatio                 float32        `json:"feeRewardRatio"`
+	FeeRewardExportAddress         common.Address `json:"feeRewardExportAddress"`
+	IncentivePoolRewardRatio       float32        `json:"incentivePoolRewardRatio"`
+	IncentivePoolRewardAddress     common.Address `json:"incentivePoolRewardAddress"`
 }
 
 // field type overrides for gencodec

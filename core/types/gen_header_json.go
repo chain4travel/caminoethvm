@@ -16,26 +16,32 @@ var _ = (*headerMarshaling)(nil)
 // MarshalJSON marshals as JSON.
 func (h Header) MarshalJSON() ([]byte, error) {
 	type Header struct {
-		ParentHash     common.Hash    `json:"parentHash"       gencodec:"required"`
-		UncleHash      common.Hash    `json:"sha3Uncles"       gencodec:"required"`
-		Coinbase       common.Address `json:"miner"            gencodec:"required"`
-		Root           common.Hash    `json:"stateRoot"        gencodec:"required"`
-		TxHash         common.Hash    `json:"transactionsRoot" gencodec:"required"`
-		ReceiptHash    common.Hash    `json:"receiptsRoot"     gencodec:"required"`
-		Bloom          Bloom          `json:"logsBloom"        gencodec:"required"`
-		Difficulty     *hexutil.Big   `json:"difficulty"       gencodec:"required"`
-		Number         *hexutil.Big   `json:"number"           gencodec:"required"`
-		GasLimit       hexutil.Uint64 `json:"gasLimit"         gencodec:"required"`
-		GasUsed        hexutil.Uint64 `json:"gasUsed"          gencodec:"required"`
-		Time           hexutil.Uint64 `json:"timestamp"        gencodec:"required"`
-		Extra          hexutil.Bytes  `json:"extraData"        gencodec:"required"`
-		MixDigest      common.Hash    `json:"mixHash"`
-		Nonce          BlockNonce     `json:"nonce"`
-		ExtDataHash    common.Hash    `json:"extDataHash"      gencodec:"required"`
-		BaseFee        *hexutil.Big   `json:"baseFeePerGas" rlp:"optional"`
-		ExtDataGasUsed *hexutil.Big   `json:"extDataGasUsed" rlp:"optional"`
-		BlockGasCost   *hexutil.Big   `json:"blockGasCost" rlp:"optional"`
-		Hash           common.Hash    `json:"hash"`
+		ParentHash                     common.Hash    `json:"parentHash"       gencodec:"required"`
+		UncleHash                      common.Hash    `json:"sha3Uncles"       gencodec:"required"`
+		Coinbase                       common.Address `json:"miner"            gencodec:"required"`
+		Root                           common.Hash    `json:"stateRoot"        gencodec:"required"`
+		TxHash                         common.Hash    `json:"transactionsRoot" gencodec:"required"`
+		ReceiptHash                    common.Hash    `json:"receiptsRoot"     gencodec:"required"`
+		Bloom                          Bloom          `json:"logsBloom"        gencodec:"required"`
+		Difficulty                     *hexutil.Big   `json:"difficulty"       gencodec:"required"`
+		Number                         *hexutil.Big   `json:"number"           gencodec:"required"`
+		GasLimit                       hexutil.Uint64 `json:"gasLimit"         gencodec:"required"`
+		GasUsed                        hexutil.Uint64 `json:"gasUsed"          gencodec:"required"`
+		Time                           hexutil.Uint64 `json:"timestamp"        gencodec:"required"`
+		Extra                          hexutil.Bytes  `json:"extraData"        gencodec:"required"`
+		MixDigest                      common.Hash    `json:"mixHash"`
+		Nonce                          BlockNonce     `json:"nonce"`
+		ExtDataHash                    common.Hash    `json:"extDataHash"      gencodec:"required"`
+		BaseFee                        *hexutil.Big   `json:"baseFeePerGas" rlp:"optional"`
+		ExtDataGasUsed                 *hexutil.Big   `json:"extDataGasUsed" rlp:"optional"`
+		BlockGasCost                   *hexutil.Big   `json:"blockGasCost" rlp:"optional"`
+		FeeRewardExportIntervalSeconds uint64         `json:"feeRewardExportIntervalSeconds"`
+		FeeRewardMinAmountToExport     uint64         `json:"feeRewardMinAmountToExport"`
+		FeeRewardRatio                 float32        `json:"feeRewardRatio"`
+		FeeRewardExportAddress         common.Address `json:"feeRewardExportAddress"`
+		IncentivePoolRewardRatio       float32        `json:"incentivePoolRewardRatio"`
+		IncentivePoolRewardAddress     common.Address `json:"incentivePoolRewardAddress"`
+		Hash                           common.Hash    `json:"hash"`
 	}
 	var enc Header
 	enc.ParentHash = h.ParentHash
@@ -57,6 +63,12 @@ func (h Header) MarshalJSON() ([]byte, error) {
 	enc.BaseFee = (*hexutil.Big)(h.BaseFee)
 	enc.ExtDataGasUsed = (*hexutil.Big)(h.ExtDataGasUsed)
 	enc.BlockGasCost = (*hexutil.Big)(h.BlockGasCost)
+	enc.FeeRewardExportIntervalSeconds = h.FeeRewardExportIntervalSeconds
+	enc.FeeRewardMinAmountToExport = h.FeeRewardMinAmountToExport
+	enc.FeeRewardRatio = h.FeeRewardRatio
+	enc.FeeRewardExportAddress = h.FeeRewardExportAddress
+	enc.IncentivePoolRewardRatio = h.IncentivePoolRewardRatio
+	enc.IncentivePoolRewardAddress = h.IncentivePoolRewardAddress
 	enc.Hash = h.Hash()
 	return json.Marshal(&enc)
 }
@@ -64,25 +76,31 @@ func (h Header) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals from JSON.
 func (h *Header) UnmarshalJSON(input []byte) error {
 	type Header struct {
-		ParentHash     *common.Hash    `json:"parentHash"       gencodec:"required"`
-		UncleHash      *common.Hash    `json:"sha3Uncles"       gencodec:"required"`
-		Coinbase       *common.Address `json:"miner"            gencodec:"required"`
-		Root           *common.Hash    `json:"stateRoot"        gencodec:"required"`
-		TxHash         *common.Hash    `json:"transactionsRoot" gencodec:"required"`
-		ReceiptHash    *common.Hash    `json:"receiptsRoot"     gencodec:"required"`
-		Bloom          *Bloom          `json:"logsBloom"        gencodec:"required"`
-		Difficulty     *hexutil.Big    `json:"difficulty"       gencodec:"required"`
-		Number         *hexutil.Big    `json:"number"           gencodec:"required"`
-		GasLimit       *hexutil.Uint64 `json:"gasLimit"         gencodec:"required"`
-		GasUsed        *hexutil.Uint64 `json:"gasUsed"          gencodec:"required"`
-		Time           *hexutil.Uint64 `json:"timestamp"        gencodec:"required"`
-		Extra          *hexutil.Bytes  `json:"extraData"        gencodec:"required"`
-		MixDigest      *common.Hash    `json:"mixHash"`
-		Nonce          *BlockNonce     `json:"nonce"`
-		ExtDataHash    *common.Hash    `json:"extDataHash"      gencodec:"required"`
-		BaseFee        *hexutil.Big    `json:"baseFeePerGas" rlp:"optional"`
-		ExtDataGasUsed *hexutil.Big    `json:"extDataGasUsed" rlp:"optional"`
-		BlockGasCost   *hexutil.Big    `json:"blockGasCost" rlp:"optional"`
+		ParentHash                     *common.Hash    `json:"parentHash"       gencodec:"required"`
+		UncleHash                      *common.Hash    `json:"sha3Uncles"       gencodec:"required"`
+		Coinbase                       *common.Address `json:"miner"            gencodec:"required"`
+		Root                           *common.Hash    `json:"stateRoot"        gencodec:"required"`
+		TxHash                         *common.Hash    `json:"transactionsRoot" gencodec:"required"`
+		ReceiptHash                    *common.Hash    `json:"receiptsRoot"     gencodec:"required"`
+		Bloom                          *Bloom          `json:"logsBloom"        gencodec:"required"`
+		Difficulty                     *hexutil.Big    `json:"difficulty"       gencodec:"required"`
+		Number                         *hexutil.Big    `json:"number"           gencodec:"required"`
+		GasLimit                       *hexutil.Uint64 `json:"gasLimit"         gencodec:"required"`
+		GasUsed                        *hexutil.Uint64 `json:"gasUsed"          gencodec:"required"`
+		Time                           *hexutil.Uint64 `json:"timestamp"        gencodec:"required"`
+		Extra                          *hexutil.Bytes  `json:"extraData"        gencodec:"required"`
+		MixDigest                      *common.Hash    `json:"mixHash"`
+		Nonce                          *BlockNonce     `json:"nonce"`
+		ExtDataHash                    *common.Hash    `json:"extDataHash"      gencodec:"required"`
+		BaseFee                        *hexutil.Big    `json:"baseFeePerGas" rlp:"optional"`
+		ExtDataGasUsed                 *hexutil.Big    `json:"extDataGasUsed" rlp:"optional"`
+		BlockGasCost                   *hexutil.Big    `json:"blockGasCost" rlp:"optional"`
+		FeeRewardExportIntervalSeconds *uint64         `json:"feeRewardExportIntervalSeconds"`
+		FeeRewardMinAmountToExport     *uint64         `json:"feeRewardMinAmountToExport"`
+		FeeRewardRatio                 *float32        `json:"feeRewardRatio"`
+		FeeRewardExportAddress         *common.Address `json:"feeRewardExportAddress"`
+		IncentivePoolRewardRatio       *float32        `json:"incentivePoolRewardRatio"`
+		IncentivePoolRewardAddress     *common.Address `json:"incentivePoolRewardAddress"`
 	}
 	var dec Header
 	if err := json.Unmarshal(input, &dec); err != nil {
@@ -158,6 +176,24 @@ func (h *Header) UnmarshalJSON(input []byte) error {
 	}
 	if dec.BlockGasCost != nil {
 		h.BlockGasCost = (*big.Int)(dec.BlockGasCost)
+	}
+	if dec.FeeRewardExportIntervalSeconds != nil {
+		h.FeeRewardExportIntervalSeconds = *dec.FeeRewardExportIntervalSeconds
+	}
+	if dec.FeeRewardMinAmountToExport != nil {
+		h.FeeRewardMinAmountToExport = *dec.FeeRewardMinAmountToExport
+	}
+	if dec.FeeRewardRatio != nil {
+		h.FeeRewardRatio = *dec.FeeRewardRatio
+	}
+	if dec.FeeRewardExportAddress != nil {
+		h.FeeRewardExportAddress = *dec.FeeRewardExportAddress
+	}
+	if dec.IncentivePoolRewardRatio != nil {
+		h.IncentivePoolRewardRatio = *dec.IncentivePoolRewardRatio
+	}
+	if dec.IncentivePoolRewardAddress != nil {
+		h.IncentivePoolRewardAddress = *dec.IncentivePoolRewardAddress
 	}
 	return nil
 }
