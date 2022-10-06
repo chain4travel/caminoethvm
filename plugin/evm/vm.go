@@ -374,6 +374,9 @@ func (vm *VM) Initialize(
 	if err := json.Unmarshal(genesisBytes, g); err != nil {
 		return err
 	}
+	if err := g.PreDeploy(); err != nil {
+		return err
+	}
 
 	// Set the chain config for mainnet/fuji chain IDs
 	switch {
@@ -1218,7 +1221,7 @@ func (vm *VM) verifyTxAtTip(tx *Tx) error {
 	timestamp := vm.clock.Time().Unix()
 	bigTimestamp := big.NewInt(timestamp)
 	if vm.chainConfig.IsApricotPhase3(bigTimestamp) {
-		_, nextBaseFee, err = dummy.EstimateNextBaseFee(vm.chainConfig, parentHeader, uint64(timestamp))
+		_, nextBaseFee, err = dummy.EstimateNextBaseFee(vm.chainConfig, vm.chain.APIBackend().AdminController(), parentHeader, uint64(timestamp))
 		if err != nil {
 			// Return extremely detailed error since CalcBaseFee should never encounter an issue here
 			return fmt.Errorf("failed to calculate base fee with parent timestamp (%d), parent ExtraData: (0x%x), and current timestamp (%d): %w", parentHeader.Time, parentHeader.Extra, timestamp, err)

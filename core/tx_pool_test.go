@@ -50,6 +50,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/chain4travel/caminoethvm/core/admin"
 	"github.com/chain4travel/caminoethvm/core/rawdb"
 	"github.com/chain4travel/caminoethvm/core/state"
 	"github.com/chain4travel/caminoethvm/core/types"
@@ -132,6 +133,10 @@ func (bc *testBlockChain) SubscribeChainHeadEvent(ch chan<- ChainHeadEvent) even
 
 func (bc *testBlockChain) SenderCacher() *TxSenderCacher {
 	return newTxSenderCacher(1)
+}
+
+func (bc *testBlockChain) AdminController() admin.AdminController {
+	return nil
 }
 
 func transaction(nonce uint64, gaslimit uint64, key *ecdsa.PrivateKey) *types.Transaction {

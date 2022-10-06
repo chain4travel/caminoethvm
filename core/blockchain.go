@@ -50,6 +50,7 @@ import (
 	"time"
 
 	"github.com/chain4travel/caminoethvm/consensus"
+	"github.com/chain4travel/caminoethvm/core/admin"
 	"github.com/chain4travel/caminoethvm/core/rawdb"
 	"github.com/chain4travel/caminoethvm/core/state"
 	"github.com/chain4travel/caminoethvm/core/state/snapshot"
@@ -147,8 +148,9 @@ var DefaultCacheConfig = &CacheConfig{
 // included in the canonical one where as GetBlockByNumber always represents the
 // canonical chain.
 type BlockChain struct {
-	chainConfig *params.ChainConfig // Chain & network configuration
-	cacheConfig *CacheConfig        // Cache configuration for pruning
+	chainConfig *params.ChainConfig   // Chain & network configuration
+	cacheConfig *CacheConfig          // Cache configuration for pruning
+	adminCtrl   admin.AdminController // Block based administrative control
 
 	db ethdb.Database // Low level persistent database to store final content in
 
@@ -282,6 +284,11 @@ func NewBlockChain(
 	}
 
 	return bc, nil
+}
+
+// SetAdminController sets the admin Controller.
+func (bc *BlockChain) SetAdminController(ctrl admin.AdminController) {
+	bc.adminCtrl = ctrl
 }
 
 // SenderCacher returns the *TxSenderCacher used within the core package.
