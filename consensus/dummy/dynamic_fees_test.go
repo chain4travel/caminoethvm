@@ -214,7 +214,7 @@ func testDynamicFeesStaysWithinRange(t *testing.T, test test) {
 	}
 
 	for index, block := range blocks[1:] {
-		nextExtraData, nextBaseFee, err := CalcBaseFee(params.TestApricotPhase3Config, header, block.timestamp)
+		nextExtraData, nextBaseFee, err := CalcBaseFee(params.TestApricotPhase3Config, nil, header, block.timestamp)
 		if err != nil {
 			t.Fatalf("Failed to calculate base fee at index %d: %s", index, err)
 		}
@@ -419,7 +419,7 @@ func TestCalcBaseFeeAP4(t *testing.T) {
 
 	for index, event := range events {
 		block := event.block
-		nextExtraData, nextBaseFee, err := CalcBaseFee(params.TestApricotPhase4Config, header, block.timestamp)
+		nextExtraData, nextBaseFee, err := CalcBaseFee(params.TestApricotPhase4Config, nil, header, block.timestamp)
 		assert.NoError(t, err)
 		log.Info("Update", "baseFee", nextBaseFee)
 		header = &types.Header{
@@ -430,7 +430,7 @@ func TestCalcBaseFeeAP4(t *testing.T) {
 			Extra:   nextExtraData,
 		}
 
-		nextExtraData, nextBaseFee, err = CalcBaseFee(params.TestApricotPhase4Config, extDataHeader, block.timestamp)
+		nextExtraData, nextBaseFee, err = CalcBaseFee(params.TestApricotPhase4Config, nil, extDataHeader, block.timestamp)
 		assert.NoError(t, err)
 		log.Info("Update", "baseFee (w/extData)", nextBaseFee)
 		extDataHeader = &types.Header{

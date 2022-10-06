@@ -47,6 +47,7 @@ import (
 
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/core"
+	"github.com/chain4travel/caminoethvm/core/admin"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/params"
 	"github.com/chain4travel/caminoethvm/rpc"
@@ -106,6 +107,7 @@ type OracleBackend interface {
 	SubscribeChainHeadEvent(ch chan<- core.ChainHeadEvent) event.Subscription
 	MinRequiredTip(ctx context.Context, header *types.Header) (*big.Int, error)
 	LastAcceptedBlock() *types.Block
+	AdminController() admin.AdminController
 }
 
 // Oracle recommends gas prices based on the content of recent
@@ -251,7 +253,7 @@ func (oracle *Oracle) estimateNextBaseFee(ctx context.Context) (*big.Int, error)
 	// If the block does have a baseFee, calculate the next base fee
 	// based on the current time and add it to the tip to estimate the
 	// total gas price estimate.
-	_, nextBaseFee, err := dummy.EstimateNextBaseFee(oracle.backend.ChainConfig(), block.Header(), oracle.clock.Unix())
+	_, nextBaseFee, err := dummy.EstimateNextBaseFee(oracle.backend.ChainConfig(), oracle.backend.AdminController(), block.Header(), oracle.clock.Unix())
 	return nextBaseFee, err
 }
 
@@ -357,7 +359,7 @@ func (oracle *Oracle) suggestDynamicFees(ctx context.Context) (*big.Int, *big.In
 	}
 
 	if oracle.backend.ChainConfig().IsSunrisePhase0(new(big.Int).SetUint64(head.Time)) {
-		baseFee = new(big.Int).SetUint64(params.SunrisePhase0BaseFee)
+		baseFee = oracle.fixedBaseFee(head)
 	} else if len(baseFeeResults) > 0 {
 		sort.Sort(bigIntArray(baseFeeResults))
 		baseFee = baseFeeResults[(len(baseFeeResults)-1)*oracle.percentile/100]
@@ -417,6 +419,14 @@ func (oracle *Oracle) getBlockTips(ctx context.Context, blockNum uint64, result 
 	select {
 	case result <- results{minTip, header.BaseFee, err}:
 	case <-quit:
+	}
+}
+
+func (oracle *Oracle) fixedBaseFee(head *types.Header) *big.Int {
+	if ctrl := oracle.backend.AdminController(); ctrl != nil {
+		return ctrl.GetFixedBaseFee(head, nil)
+	} else {
+		return new(big.Int).SetUint64(params.SunrisePhase0BaseFee)
 	}
 }
 

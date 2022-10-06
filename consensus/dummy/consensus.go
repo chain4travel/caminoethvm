@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/chain4travel/caminoethvm/consensus"
+	"github.com/chain4travel/caminoethvm/core/admin"
 	"github.com/chain4travel/caminoethvm/core/state"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/params"
@@ -96,7 +97,7 @@ func NewFullFaker() *DummyEngine {
 	}
 }
 
-func (de *DummyEngine) verifyHeaderGasFields(config *params.ChainConfig, header *types.Header, parent *types.Header) error {
+func (de *DummyEngine) verifyHeaderGasFields(config *params.ChainConfig, ctrl admin.AdminController, header *types.Header, parent *types.Header) error {
 	timestamp := new(big.Int).SetUint64(header.Time)
 
 	// Verify that the gas limit is <= 2^63-1
@@ -132,7 +133,8 @@ func (de *DummyEngine) verifyHeaderGasFields(config *params.ChainConfig, header 
 	} else {
 		// Verify baseFee and rollupWindow encoding as part of header verification
 		// starting in AP3
-		expectedRollupWindowBytes, expectedBaseFee, err := CalcBaseFee(config, parent, header.Time)
+		// ToDo: AdminController
+		expectedRollupWindowBytes, expectedBaseFee, err := CalcBaseFee(config, nil, parent, header.Time)
 		if err != nil {
 			return fmt.Errorf("failed to calculate base fee: %w", err)
 		}
@@ -220,7 +222,7 @@ func (de *DummyEngine) verifyHeader(chain consensus.ChainHeaderReader, header *t
 		}
 	}
 	// Ensure gas-related header fields are correct
-	if err := de.verifyHeaderGasFields(config, header, parent); err != nil {
+	if err := de.verifyHeaderGasFields(config, chain.AdminController(), header, parent); err != nil {
 		return err
 	}
 	// Verify the header's timestamp
