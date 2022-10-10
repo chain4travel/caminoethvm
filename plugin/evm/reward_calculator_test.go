@@ -7,25 +7,44 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCalculateEverything(t *testing.T) {
-	blackHoleAddressBalance := big.NewInt(1000000000000000000)
+func TestRewardRatesExceed100Percent(t *testing.T) {
+	blackHoleAddressBalance := big.NewInt(1_000_000_000_000_000_000)
 	payedOutBalance := big.NewInt(0)
-	feeRewardRate := uint64(1000000)
 	incentivePoolBalance := big.NewInt(0)
-	incentivePoolRate := uint64(1000000)
-	x2cDenominationRate := big.NewInt(1000000000000000000)
+	feeRewardRate := uint64(0.51 * float64(percentDenominator))
+	incentivePoolRate := uint64(0.50 * float64(percentDenominator))
 
-	feeRewardAmountToExport, newPayedOutBalance, newBlackHoleAddressBalance, newIncentivePoolBalance := CalculateEverything(
-		*blackHoleAddressBalance,
-		*payedOutBalance,
+	_, err := CalculateRewards(
+		blackHoleAddressBalance,
+		payedOutBalance,
+		incentivePoolBalance,
 		feeRewardRate,
-		*incentivePoolBalance,
 		incentivePoolRate,
-		*x2cDenominationRate,
 	)
 
-	assert.Equal(t, uint64(1000000000000000000), feeRewardAmountToExport)
-	assert.Equal(t, big.NewInt(1000000000000000000), &newPayedOutBalance)
-	assert.Equal(t, big.NewInt(0), &newBlackHoleAddressBalance)
-	assert.Equal(t, big.NewInt(1000000000000000000), &newIncentivePoolBalance)
+	assert.Error(t, err)
+	assert.Equal(t, "feeRewardRate + incentivePoolRate > 100%", err.Error())
+}
+
+func TestCalculate10PercentReward(t *testing.T) {
+	blackHoleAddressBalance := big.NewInt(1_000_000_000_000_000_000)
+	payedOutBalance := big.NewInt(0)
+	incentivePoolBalance := big.NewInt(0)
+	feeRewardRate := uint64(0.10 * float64(percentDenominator))
+	incentivePoolRate := uint64(0.10 * float64(percentDenominator))
+
+	calc, err := CalculateRewards(
+		blackHoleAddressBalance,
+		payedOutBalance,
+		incentivePoolBalance,
+		feeRewardRate,
+		incentivePoolRate,
+	)
+
+	assert.NoError(t, err)
+	assert.Equal(t, uint64(100_000_000), calc.FeeRewardAmountToExport)
+	assert.Equal(t, big.NewInt(100_000_000_000_000_000), calc.NewPayedOutBalance)
+	assert.Equal(t, big.NewInt(100_000_000_000_000_000), calc.NewIncentivePoolBalance)
+	assert.Equal(t, big.NewInt(800_000_000_000_000_000), calc.NewBlackHoleAddressBalance)
+	assert.Equal(t, big.NewInt(100_000_000_000_000_000), calc.IncentivePoolRewardToTransfer)
 }
