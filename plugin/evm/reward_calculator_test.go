@@ -42,9 +42,8 @@ func TestCalculate10PercentReward(t *testing.T) {
 	)
 
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(100_000_000), calc.FeeRewardAmountToExport)
-	assert.Equal(t, big.NewInt(100_000_000_000_000_000), calc.NewPayedOutBalance)
-	assert.Equal(t, big.NewInt(100_000_000_000_000_000), calc.NewIncentivePoolBalance)
-	assert.Equal(t, big.NewInt(800_000_000_000_000_000), calc.NewBlackHoleAddressBalance)
-	assert.Equal(t, big.NewInt(100_000_000_000_000_000), calc.IncentivePoolRewardToTransfer)
+	assert.Equal(t, big.NewInt(100_000_000_000_000_000), calc.ValidatorRewardAmount)
+	assert.Equal(t, uint64(100_000_000), calc.ValidatorRewardToExport)
+	assert.Equal(t, big.NewInt(100_000_000_000_000_000), calc.IncentivePoolRewardAmount)
+	assert.Equal(t, big.NewInt(200_000_000_000_000_000), calc.CoinbaseAmountToSub)
 }

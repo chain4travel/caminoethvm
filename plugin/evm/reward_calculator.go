@@ -12,62 +12,54 @@ const (
 )
 
 type RewardCalculation struct {
-	FeeRewardAmountToExport       uint64
-	IncentivePoolRewardToTransfer *big.Int
-	NewPayedOutBalance            *big.Int
-	NewBlackHoleAddressBalance    *big.Int
-	NewIncentivePoolBalance       *big.Int
+	ValidatorRewardAmount     *big.Int `serialize:"true" json:"validatorRewardAmount"`
+	ValidatorRewardToExport   uint64   `serialize:"true" json:"validatorRewardToExport"`
+	IncentivePoolRewardAmount *big.Int `serialize:"true" json:"incentivePoolRewardAmount"`
+	CoinbaseAmountToSub       *big.Int `serialize:"true" json:"coinbaseAmountToSub"`
 }
 
+// CalculateRewards calculates the rewards for validators and incentive pool account
+//
+//	feesBurned: the amount of fees burned already, balance of the coinbase address
+//	validatorRewards: the amount of validator's rewards already paid out, state at slot 0 of coinbase
+//	incentivePoolRewards: the amount of incentive pool's rewards already paid out, state at slot 0 of
+//		incentive pool account
+//	feeRewardRate: the percentage of fees to be paid out to validators, denominated in `percentDenominator`
+//	incentivePoolRate: the percentage of fees to be paid out to incentive pool, denominated in `percentDenominator`
 func CalculateRewards(
-	blackHoleAddressBalance, payedOutBalance, incentivePoolBalance *big.Int,
+	feesBurned, validatorRewards, incentivePoolRewards *big.Int,
 	feeRewardRate, incentivePoolRate uint64,
 ) (RewardCalculation, error) {
-	calculations := RewardCalculation{}
+	calc := RewardCalculation{}
 	errs := wrappers.Errs{}
 	bigZero := big.NewInt(0)
 
 	errs.Add(
 		errIf(feeRewardRate+incentivePoolRate > percentDenominator, errors.New("feeRewardRate + incentivePoolRate > 100%")),
-		errIf(blackHoleAddressBalance.Cmp(bigZero) < 0, errors.New("blackHoleAddressBalance < 0")),
-		errIf(payedOutBalance.Cmp(bigZero) < 0, errors.New("payedOutBalance < 0")),
-		errIf(incentivePoolBalance.Cmp(bigZero) < 0, errors.New("incentivePoolBalance < 0")),
+		errIf(feesBurned.Cmp(bigZero) < 0, errors.New("feesBurned < 0")),
+		errIf(validatorRewards.Cmp(bigZero) < 0, errors.New("validatorRewards < 0")),
+		errIf(incentivePoolRewards.Cmp(bigZero) < 0, errors.New("incentivePoolRewards < 0")),
 	)
 	if errs.Errored() {
-		return calculations, errs.Err
+		return calc, errs.Err
 	}
 
-	// 1.1 Calculate totalFeeAmount = BHBalance + IPBalance + payedOutBalance
-	totalBalance := big.NewInt(0).Add(blackHoleAddressBalance, incentivePoolBalance)
-	totalBalance.Add(totalBalance, payedOutBalance)
+	totalFeesAmount := big.NewInt(0).Add(feesBurned, incentivePoolRewards)
+	totalFeesAmount.Add(totalFeesAmount, validatorRewards)
 
-	// 1.2 Calculate the validator reward partFeeRewardAmount = feeRewardRatio * totalFeeAmount - payedOutBalance
-	feeRewardAmount := calculateReward(totalBalance, payedOutBalance, feeRewardRate)
+	feeRewardAmount := calculateReward(totalFeesAmount, validatorRewards, feeRewardRate)
 
-	// 1.3 Denominate it from C-chain to P-chain precision feeRewardToExport = denominateCtoP(feeRewardAmount)
-	calculations.FeeRewardAmountToExport = bigDiv(feeRewardAmount, x2cRateUint64).Uint64()
+	// Validator's reward is exported to the P-Chain, we intentionally loose precision so the C-Chain's
+	// "decimal loss" can be accumulated in the account for future collections
+	feeRewardAmount = bigDiv(feeRewardAmount, x2cRateUint64)
+	calc.ValidatorRewardToExport = feeRewardAmount.Uint64()
+	calc.ValidatorRewardAmount = bigMul(feeRewardAmount, x2cRateUint64)
 
-	// 1.4 Calculate payedOut = denominatePtoC(feeRewardToExport). Note: intentionally loosing precision here
-	payedOut := bigMul(
-		big.NewInt(int64(calculations.FeeRewardAmountToExport)),
-		x2cRateUint64)
+	calc.IncentivePoolRewardAmount = calculateReward(totalFeesAmount, incentivePoolRewards, incentivePoolRate)
 
-	// 1.5 Increase payedOutBalance += payedOut
-	calculations.NewPayedOutBalance = new(big.Int).Add(payedOutBalance, payedOut)
+	calc.CoinbaseAmountToSub = new(big.Int).Add(calc.ValidatorRewardAmount, calc.IncentivePoolRewardAmount)
 
-	// 2.1 Calculate the Incentive Pool partIncentivePoolAmount = incentivePoolRatio * totalFeeAmount - incentivePoolBalance
-	calculations.IncentivePoolRewardToTransfer = calculateReward(totalBalance, incentivePoolBalance, incentivePoolRate)
-
-	// 2.2 Increase incentivePoolBalance += incentivePoolReward
-	calculations.NewIncentivePoolBalance = new(big.Int).Add(incentivePoolBalance, calculations.IncentivePoolRewardToTransfer)
-
-	// 3.1 Decrease BHBalance -= (payedOut + ipAmount)
-	calculations.NewBlackHoleAddressBalance = new(big.Int).Sub(
-		blackHoleAddressBalance,
-		new(big.Int).Add(payedOut, calculations.IncentivePoolRewardToTransfer),
-	)
-
-	return calculations, nil
+	return calc, nil
 }
 
 func calculateReward(total, alreadyPayed *big.Int, percentRate uint64) *big.Int {
