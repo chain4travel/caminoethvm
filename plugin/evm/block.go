@@ -16,6 +16,7 @@ package evm
 
 import (
 	"fmt"
+	"github.com/chain4travel/caminoethvm/core/state"
 	"math/big"
 	"time"
 
@@ -192,8 +193,23 @@ func (b *Block) Accept() error {
 		vm.mempool.RemoveTx(tx)
 	}
 
-	// Is it the right place to check fee collection conditions and create a new ExportFeeTx?
-	// TODO: implement fee collection
+	// Calculate rewards and issue CollectRewardsTx
+	state, err := vm.chain.CurrentState()
+	if err == nil {
+		header := b.ethBlock.Header()
+		lastCheckTime := state.GetState(header.Coinbase, Slot1).Big().Uint64()
+		checkInterval := header.FeeRewardExportIntervalSeconds
+
+		if b.ethBlock.Time() > lastCheckTime+checkInterval {
+			calc, err := b.calculateRewards(state)
+			// Quick fixes
+			if err != nil {
+				return err
+			}
+			calc.ValidatorRewardToExport = 1
+		}
+
+	}
 
 	isBonus := bonusBlocks.Contains(b.id)
 	if err := b.indexAtomics(vm, b.Height(), b.atomicTxs, batchChainsAndInputs, isBonus); err != nil {
@@ -373,3 +389,41 @@ func (b *Block) Bytes() []byte {
 }
 
 func (b *Block) String() string { return fmt.Sprintf("EVM block, ID = %s", b.ID()) }
+
+func (b *Block) calculateRewards(state *state.StateDB) (RewardCalculation, error) {
+	calculation := RewardCalculation{}
+	header := b.ethBlock.Header()
+
+	lastCheckTime := state.GetState(header.Coinbase, Slot1).Big().Uint64()
+	checkInterval := header.FeeRewardExportIntervalSeconds
+
+	if b.ethBlock.Time() < lastCheckTime+checkInterval {
+		return calculation, fmt.Errorf("too early to collect fee rewards. Current block time: %d, last check time: %d", b.ethBlock.Time(), lastCheckTime)
+	}
+
+	feesBurned := state.GetBalance(header.Coinbase)
+	validatorRewards := state.GetState(header.Coinbase, Slot0).Big()
+	incentivePoolRewards := state.GetState(header.IncentivePoolRewardAddress, Slot0).Big()
+
+	calculation, err := CalculateRewards(
+		feesBurned,
+		validatorRewards,
+		incentivePoolRewards,
+		header.FeeRewardRate,
+		header.IncentivePoolRewardRate,
+	)
+
+	if err != nil {
+		return calculation, err
+	}
+
+	if calculation.ValidatorRewardToExport < header.FeeRewardMinAmountToExport {
+		return calculation, fmt.Errorf("calculated fee reward amount %d is less than the minimum amount to export", calculation.ValidatorRewardAmount)
+	}
+
+	return calculation, nil
+}
+
+func (b *Block) collectRewards(calculation RewardCalculation) error {
+	return nil
+}

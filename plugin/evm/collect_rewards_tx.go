@@ -25,6 +25,7 @@ import (
 	"github.com/chain4travel/caminogo/chains/atomic"
 	"github.com/chain4travel/caminogo/ids"
 	"github.com/chain4travel/caminogo/snow"
+	"github.com/chain4travel/caminogo/utils/constants"
 	"github.com/chain4travel/caminogo/vms/components/avax"
 )
 
@@ -46,13 +47,13 @@ type UnsignedCollectRewardsTx struct {
 	RewardCalculation *RewardCalculation `serialize:"true" json:"rewardCalculation"`
 
 	Coinbase                   common.Address `serialize:"true" json:"coinbase"`
-	FeeRewardExportAddress     common.Address `serialize:"true" json:"feeRewardExportAddress"`
+	ValidatorRewardAddress     common.Address `serialize:"true" json:"validatorRewardAddress"`
 	IncentivePoolRewardAddress common.Address `serialize:"true" json:"incentivePoolRewardAddress"`
 }
 
 // InputUTXOs returns a set of all the hash(address:nonce) exporting funds.
 func (tx *UnsignedCollectRewardsTx) InputUTXOs() ids.Set {
-	// Not sure it will be needed - mock
+	// Not sure if it will be needed - mock
 	return ids.NewSet(0)
 }
 
@@ -121,19 +122,27 @@ func (tx *UnsignedCollectRewardsTx) AtomicOps() (ids.ID, *atomic.Requests, error
 	return tx.DestinationChain, &atomic.Requests{PutRequests: elems}, nil
 }
 
-func (vm *VM) newExportFeeTx(
-	assetID ids.ID, // AssetID of the tokens to export
-	amount uint64, // Amount of tokens to export
-	chainID ids.ID, // Chain to send the UTXOs to
-	to ids.ShortID, // Address of chain recipient
-	// TODO: other params
+func (vm *VM) newCollectRewardsTx(
+	calculation *RewardCalculation,
+	blockId ids.ID,
+	blockTimestamp uint64,
+	coinbase common.Address,
+	validatorRewardAddress common.Address,
+	incentivePoolRewardAddress common.Address,
+
 ) (*Tx, error) {
 	// Create the transaction
 	utx := &UnsignedCollectRewardsTx{
-		NetworkID:        vm.ctx.NetworkID,
-		BlockchainID:     vm.ctx.ChainID,
-		DestinationChain: chainID,
-		ExportedOutputs:  []*avax.TransferableOutput{},
+		NetworkID:                  vm.ctx.NetworkID,
+		BlockchainID:               vm.ctx.ChainID,
+		DestinationChain:           constants.PlatformChainID,
+		ExportedOutputs:            []*avax.TransferableOutput{},
+		BlockId:                    blockId,
+		BlockTimestamp:             blockTimestamp,
+		RewardCalculation:          calculation,
+		Coinbase:                   coinbase,
+		ValidatorRewardAddress:     validatorRewardAddress,
+		IncentivePoolRewardAddress: incentivePoolRewardAddress,
 	}
 	tx := &Tx{
 		UnsignedAtomicTx: utx,
@@ -145,5 +154,11 @@ func (vm *VM) newExportFeeTx(
 
 // EVMStateTransfer executes the state update from the atomic export transaction
 func (tx *UnsignedCollectRewardsTx) EVMStateTransfer(ctx *snow.Context, state *state.StateDB) error {
+	// Set state:
+	// - Coinbase balance -= calc.CoinbaseAmountToSub
+	// - Coinbase state slot0 += calc.FeeReward
+	// - Coinbase state slot1 := ethBlock.Time()
+	// - IP balance += calc.IncentivePoolReward
+	// - IP state slot0 += calc.IncentivePoolReward
 	return nil
 }

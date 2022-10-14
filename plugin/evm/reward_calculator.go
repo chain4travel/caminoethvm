@@ -3,6 +3,7 @@ package evm
 import (
 	"errors"
 	"github.com/chain4travel/caminogo/utils/wrappers"
+	"github.com/ethereum/go-ethereum/common"
 	"math/big"
 )
 
@@ -11,11 +12,21 @@ const (
 	x2cRateUint64             = uint64(x2cRateInt64)
 )
 
+var (
+	Slot0 = common.Hash{0x00}
+	Slot1 = common.Hash{0x01}
+)
+
 type RewardCalculation struct {
 	ValidatorRewardAmount     *big.Int `serialize:"true" json:"validatorRewardAmount"`
 	ValidatorRewardToExport   uint64   `serialize:"true" json:"validatorRewardToExport"`
 	IncentivePoolRewardAmount *big.Int `serialize:"true" json:"incentivePoolRewardAmount"`
 	CoinbaseAmountToSub       *big.Int `serialize:"true" json:"coinbaseAmountToSub"`
+
+	// Needed for validation that calculation can be applied
+	PrevFeesBurned           *big.Int `serialize:"true" json:"prevFeesBurned"`
+	PrevValidatorRewards     *big.Int `serialize:"true" json:"prevValidatorRewards"`
+	PrevIncentivePoolRewards *big.Int `serialize:"true" json:"prevIncentivePoolRewards"`
 }
 
 // CalculateRewards calculates the rewards for validators and incentive pool account
@@ -30,7 +41,11 @@ func CalculateRewards(
 	feesBurned, validatorRewards, incentivePoolRewards *big.Int,
 	feeRewardRate, incentivePoolRate uint64,
 ) (RewardCalculation, error) {
-	calc := RewardCalculation{}
+	calc := RewardCalculation{
+		PrevFeesBurned:           feesBurned,
+		PrevValidatorRewards:     validatorRewards,
+		PrevIncentivePoolRewards: incentivePoolRewards,
+	}
 	errs := wrappers.Errs{}
 	bigZero := big.NewInt(0)
 
