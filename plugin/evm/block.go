@@ -196,19 +196,17 @@ func (b *Block) Accept() error {
 	// Calculate rewards and issue CollectRewardsTx
 	state, err := vm.chain.CurrentState()
 	if err == nil {
-		header := b.ethBlock.Header()
-		lastCheckTime := state.GetState(header.Coinbase, Slot1).Big().Uint64()
-		checkInterval := header.FeeRewardExportIntervalSeconds
+		calc, err := b.calculateRewards(state)
 
-		if b.ethBlock.Time() > lastCheckTime+checkInterval {
-			calc, err := b.calculateRewards(state)
-			// Quick fixes
-			if err != nil {
-				return err
-			}
-			calc.ValidatorRewardToExport = 1
+		if err != nil {
+			log.Info("Calculation of the rewards skipped due to error: %s", err)
 		}
 
+		if err = b.issueRewardsCollection(calc); err != nil {
+			log.Info("Issuing of the rewards collection skipped due to error: %s", err)
+		}
+
+		log.Info("Issuing of the rewards transaction completed")
 	}
 
 	isBonus := bonusBlocks.Contains(b.id)
@@ -424,6 +422,19 @@ func (b *Block) calculateRewards(state *state.StateDB) (RewardCalculation, error
 	return calculation, nil
 }
 
-func (b *Block) collectRewards(calculation RewardCalculation) error {
-	return nil
+func (b *Block) issueRewardsCollection(calculation RewardCalculation) error {
+	h := b.ethBlock.Header()
+	tx, err := b.vm.NewCollectRewardsTx(
+		calculation,
+		b.ID(),
+		b.ethBlock.Time(),
+		h.Coinbase,
+		h.FeeRewardExportAddress,
+		h.IncentivePoolRewardAddress,
+	)
+	if err != nil {
+		return err
+	}
+
+	return b.vm.mempool.AddTx(tx)
 }

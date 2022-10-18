@@ -16,7 +16,9 @@ package evm
 
 import (
 	"github.com/chain4travel/caminogo/vms/components/verify"
+	"github.com/chain4travel/caminogo/vms/secp256k1fx"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/log"
 	"math/big"
 
 	"github.com/chain4travel/caminoethvm/core/state"
@@ -44,7 +46,7 @@ type UnsignedCollectRewardsTx struct {
 	BlockId        ids.ID `serialize:"true" json:"blockId"`
 	BlockTimestamp uint64 `serialize:"true" json:"blockTimestamp"`
 
-	RewardCalculation *RewardCalculation `serialize:"true" json:"rewardCalculation"`
+	RewardCalculation RewardCalculation `serialize:"true" json:"rewardCalculation"`
 
 	Coinbase                   common.Address `serialize:"true" json:"coinbase"`
 	ValidatorRewardAddress     common.Address `serialize:"true" json:"validatorRewardAddress"`
@@ -62,6 +64,23 @@ func (tx *UnsignedCollectRewardsTx) Verify(
 	ctx *snow.Context,
 	rules params.Rules,
 ) error {
+	switch {
+	case tx == nil:
+		return errNilTx
+	case tx.NetworkID != ctx.NetworkID:
+		return errWrongNetworkID
+	case ctx.ChainID != tx.BlockchainID:
+		return errWrongBlockchainID
+	}
+
+	// Make sure that the tx has a valid peer chain ID
+	if err := verify.SameSubnet(ctx, tx.DestinationChain); err != nil {
+		return errWrongChainID
+	}
+	if tx.DestinationChain != constants.PlatformChainID {
+		return errWrongChainID
+	}
+
 	return nil
 }
 
@@ -83,6 +102,7 @@ func (tx *UnsignedCollectRewardsTx) SemanticVerify(
 	baseFee *big.Int,
 	rules params.Rules,
 ) error {
+
 	// TODO: Verify the fee calculation results here
 	return nil
 }
@@ -92,38 +112,37 @@ func (tx *UnsignedCollectRewardsTx) AtomicOps() (ids.ID, *atomic.Requests, error
 	// TOOD: I'm leaving the ExportTx implementation here for inspiration
 	txID := tx.ID()
 
-	elems := make([]*atomic.Element, len(tx.ExportedOutputs))
-	for i, out := range tx.ExportedOutputs {
-		utxo := &avax.UTXO{
-			UTXOID: avax.UTXOID{
-				TxID:        txID,
-				OutputIndex: uint32(i),
-			},
-			Asset: avax.Asset{ID: out.AssetID()},
-			Out:   out.Out,
-		}
-
-		utxoBytes, err := Codec.Marshal(codecVersion, utxo)
-		if err != nil {
-			return ids.ID{}, nil, err
-		}
-		utxoID := utxo.InputID()
-		elem := &atomic.Element{
-			Key:   utxoID[:],
-			Value: utxoBytes,
-		}
-		if out, ok := utxo.Out.(avax.Addressable); ok {
-			elem.Traits = out.Addresses()
-		}
-
-		elems[i] = elem
+	elems := make([]*atomic.Element, 1)
+	out := tx.ExportedOutputs[0]
+	utxo := &avax.UTXO{
+		UTXOID: avax.UTXOID{
+			TxID:        txID,
+			OutputIndex: uint32(0),
+		},
+		Asset: avax.Asset{ID: out.AssetID()},
+		Out:   out.Out,
 	}
+
+	utxoBytes, err := Codec.Marshal(codecVersion, utxo)
+	if err != nil {
+		return ids.ID{}, nil, err
+	}
+	utxoID := utxo.InputID()
+	elem := &atomic.Element{
+		Key:   utxoID[:],
+		Value: utxoBytes,
+	}
+	if out, ok := utxo.Out.(avax.Addressable); ok {
+		elem.Traits = out.Addresses()
+	}
+
+	elems[0] = elem
 
 	return tx.DestinationChain, &atomic.Requests{PutRequests: elems}, nil
 }
 
-func (vm *VM) newCollectRewardsTx(
-	calculation *RewardCalculation,
+func (vm *VM) NewCollectRewardsTx(
+	calculation RewardCalculation,
 	blockId ids.ID,
 	blockTimestamp uint64,
 	coinbase common.Address,
@@ -136,7 +155,6 @@ func (vm *VM) newCollectRewardsTx(
 		NetworkID:                  vm.ctx.NetworkID,
 		BlockchainID:               vm.ctx.ChainID,
 		DestinationChain:           constants.PlatformChainID,
-		ExportedOutputs:            []*avax.TransferableOutput{},
 		BlockId:                    blockId,
 		BlockTimestamp:             blockTimestamp,
 		RewardCalculation:          calculation,
@@ -144,21 +162,45 @@ func (vm *VM) newCollectRewardsTx(
 		ValidatorRewardAddress:     validatorRewardAddress,
 		IncentivePoolRewardAddress: incentivePoolRewardAddress,
 	}
+
+	// TODO: Make validatorRewardAddress ShortID typed
+	pChainAddress, _ := ids.ToShortID(validatorRewardAddress.Bytes())
+	utx.ExportedOutputs = []*avax.TransferableOutput{{
+		Asset: avax.Asset{ID: vm.ctx.AVAXAssetID},
+		Out: &secp256k1fx.TransferOutput{
+			Amt: calculation.ValidatorRewardToExport,
+			OutputOwners: secp256k1fx.OutputOwners{
+				Locktime:  0,
+				Threshold: 1,
+				Addrs:     []ids.ShortID{pChainAddress},
+			},
+		},
+	}}
+
 	tx := &Tx{
 		UnsignedAtomicTx: utx,
 		Creds:            make([]verify.Verifiable, 0),
 	}
+
+	log.Info("New CollectionRewardTx\nTo: %s\nAmount: %d\nCurr Coinbase balance: %d\n",
+		pChainAddress.String(),
+		calculation.ValidatorRewardToExport,
+		calculation.PrevValidatorRewards,
+	)
 
 	return tx, utx.Verify(vm.ctx, vm.currentRules())
 }
 
 // EVMStateTransfer executes the state update from the atomic export transaction
 func (tx *UnsignedCollectRewardsTx) EVMStateTransfer(ctx *snow.Context, state *state.StateDB) error {
-	// Set state:
-	// - Coinbase balance -= calc.CoinbaseAmountToSub
-	// - Coinbase state slot0 += calc.FeeReward
-	// - Coinbase state slot1 := ethBlock.Time()
-	// - IP balance += calc.IncentivePoolReward
-	// - IP state slot0 += calc.IncentivePoolReward
+	state.SubBalance(tx.Coinbase, tx.RewardCalculation.CoinbaseAmountToSub)
+	validatorRewards := new(big.Int).Add(tx.RewardCalculation.PrevValidatorRewards, tx.RewardCalculation.ValidatorRewardAmount)
+	state.SetState(tx.Coinbase, Slot0, common.BigToHash(validatorRewards))
+	state.SetState(tx.Coinbase, Slot1, common.BigToHash(new(big.Int).SetUint64(tx.BlockTimestamp)))
+
+	ipRewards := new(big.Int).Add(tx.RewardCalculation.PrevIncentivePoolRewards, tx.RewardCalculation.IncentivePoolRewardAmount)
+	state.AddBalance(tx.IncentivePoolRewardAddress, tx.RewardCalculation.IncentivePoolRewardAmount)
+	state.SetState(tx.IncentivePoolRewardAddress, Slot0, common.BigToHash(ipRewards))
+
 	return nil
 }
