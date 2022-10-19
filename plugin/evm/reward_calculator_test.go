@@ -54,8 +54,6 @@ func TestCalculate10PercentReward(t *testing.T) {
 }
 
 func TestCalculationWithoutFeeIncrementIsZeroRewards(t *testing.T) {
-	// sytuacja: brak nowych feesBurned
-	// oczekiwany wynik: brak nagród
 	feesBurned := CAM1
 	validatorRewards := ZERO
 	incentivePoolRewards := ZERO
@@ -64,8 +62,8 @@ func TestCalculationWithoutFeeIncrementIsZeroRewards(t *testing.T) {
 
 	calc1, err := CalculateRewards(
 		feesBurned,
-		validatorRewards,     // 10% feesów ale z denominacją
-		incentivePoolRewards, //10% feesów
+		validatorRewards,
+		incentivePoolRewards,
 		feeRewardRate,
 		incentivePoolRate,
 	)
@@ -98,20 +96,16 @@ func TestSumOfCalculationsEqualsTotalCalculation(t *testing.T) {
 
 	calc1, err := CalculateRewards(
 		feesBurned,
-		validatorRewards,     // 10% feesów ale z denominacją
-		incentivePoolRewards, //10% feesów
+		validatorRewards,
+		incentivePoolRewards,
 		feeRewardRate,
 		incentivePoolRate,
 	)
 	assert.NoError(t, err)
 
-	// po każdym bloku dodajmy 1 CAM (1_000_000_000_000_000_000)
-
 	coinbaseAmountAfterCalc1 := big.NewInt(0).Sub(feesBurned, calc1.CoinbaseAmountToSub)
 	validatorAmountAfterCalc1 := big.NewInt(0).Add(validatorRewards, calc1.ValidatorRewardAmount)
 	incentivePoolRewardAmountAfterCalc1 := big.NewInt(0).Add(incentivePoolRewards, calc1.IncentivePoolRewardAmount)
-	// niezmiennik: po kazdej kalkulacji calc.CoinbaseAmountToSub ==  calc.ValidatorRewardAmount + calc.IncentivePoolRewardAmount
-	// total = coinbaseAmountAfterCalc + validatorAmountAfterCalc + incentivePoolAmountAfterCalc
 
 	total := CAM1
 	assert.Equal(t,
@@ -172,7 +166,7 @@ func TestSumOfCalculationsEqualsTotalCalculation(t *testing.T) {
 	assert.Equal(t, calcTotal.IncentivePoolRewardAmount, incentivePoolRewardAmountAfterCalc3)
 }
 
-func TestPercentageChangeAfterFirstCalculation(t *testing.T) {
+func TestPercentageUpAfterFirstCalculation(t *testing.T) {
 	feesBurned := CAM1
 	validatorRewards := ZERO
 	incentivePoolRewards := ZERO
@@ -181,20 +175,16 @@ func TestPercentageChangeAfterFirstCalculation(t *testing.T) {
 
 	calc1, err := CalculateRewards(
 		feesBurned,
-		validatorRewards,     // 10% feesów ale z denominacją
-		incentivePoolRewards, //10% feesów
+		validatorRewards,
+		incentivePoolRewards,
 		feeRewardRate,
 		incentivePoolRate,
 	)
 	assert.NoError(t, err)
 
-	// po każdym bloku dodajmy 1 CAM (1_000_000_000_000_000_000)
-
 	coinbaseAmountAfterCalc1 := big.NewInt(0).Sub(feesBurned, calc1.CoinbaseAmountToSub)
 	validatorAmountAfterCalc1 := big.NewInt(0).Add(validatorRewards, calc1.ValidatorRewardAmount)
 	incentivePoolRewardAmountAfterCalc1 := big.NewInt(0).Add(incentivePoolRewards, calc1.IncentivePoolRewardAmount)
-	// niezmiennik: po kazdej kalkulacji calc.CoinbaseAmountToSub ==  calc.ValidatorRewardAmount + calc.IncentivePoolRewardAmount
-	// total = coinbaseAmountAfterCalc + validatorAmountAfterCalc + incentivePoolAmountAfterCalc
 
 	total := CAM1
 	assert.Equal(t,
@@ -224,27 +214,9 @@ func TestPercentageChangeAfterFirstCalculation(t *testing.T) {
 	)
 
 	feesBurned = bigAdd(coinbaseAmountAfterCalc2, CAM1)
-	calc3, err := CalculateRewards(
-		feesBurned,
-		validatorAmountAfterCalc2,
-		incentivePoolRewardAmountAfterCalc2,
-		feeRewardRate,
-		incentivePoolRate,
-	)
-	assert.NoError(t, err)
-
-	coinbaseAmountAfterCalc3 := big.NewInt(0).Sub(feesBurned, calc3.CoinbaseAmountToSub)
-	validatorAmountAfterCalc3 := bigAdd(validatorAmountAfterCalc2, calc3.ValidatorRewardAmount)
-	incentivePoolRewardAmountAfterCalc3 := bigAdd(incentivePoolRewardAmountAfterCalc2, calc3.IncentivePoolRewardAmount)
-
-	total = bigMul(CAM1, 3)
-	assert.Equal(t,
-		total,
-		bigAdd(coinbaseAmountAfterCalc3, validatorAmountAfterCalc3, incentivePoolRewardAmountAfterCalc3),
-	)
 
 	calcTotal, err := CalculateRewards(
-		bigMul(CAM1, 3),
+		bigMul(CAM1, 2),
 		ZERO,
 		ZERO,
 		feeRewardRate,
@@ -252,9 +224,72 @@ func TestPercentageChangeAfterFirstCalculation(t *testing.T) {
 	)
 	assert.NoError(t, err)
 
-	assert.Equal(t, incentivePoolRewardAmountAfterCalc3, validatorAmountAfterCalc3)
-	assert.Equal(t, calcTotal.ValidatorRewardAmount, validatorAmountAfterCalc3)
-	assert.Equal(t, calcTotal.IncentivePoolRewardAmount, incentivePoolRewardAmountAfterCalc3)
+	assert.Equal(t, incentivePoolRewardAmountAfterCalc2, validatorAmountAfterCalc2)
+	assert.Equal(t, calcTotal.ValidatorRewardAmount, validatorAmountAfterCalc2)
+	assert.Equal(t, calcTotal.IncentivePoolRewardAmount, incentivePoolRewardAmountAfterCalc2)
+}
+
+func TestPercentageDownAfterFirstCalculation(t *testing.T) {
+	feesBurned := CAM1
+	validatorRewards := ZERO
+	incentivePoolRewards := ZERO
+	feeRewardRate := uint64(0.20 * float64(percentDenominator))
+	incentivePoolRate := uint64(0.20 * float64(percentDenominator))
+
+	calc1, err := CalculateRewards(
+		feesBurned,
+		validatorRewards,
+		incentivePoolRewards,
+		feeRewardRate,
+		incentivePoolRate,
+	)
+	assert.NoError(t, err)
+
+	coinbaseAmountAfterCalc1 := big.NewInt(0).Sub(feesBurned, calc1.CoinbaseAmountToSub)
+	validatorAmountAfterCalc1 := big.NewInt(0).Add(validatorRewards, calc1.ValidatorRewardAmount)
+	incentivePoolRewardAmountAfterCalc1 := big.NewInt(0).Add(incentivePoolRewards, calc1.IncentivePoolRewardAmount)
+
+	total := CAM1
+	assert.Equal(t,
+		total,
+		bigAdd(coinbaseAmountAfterCalc1, validatorAmountAfterCalc1, incentivePoolRewardAmountAfterCalc1),
+	)
+	feesBurned = bigAdd(coinbaseAmountAfterCalc1, CAM1)
+	feeRewardRate = uint64(0.10 * float64(percentDenominator))
+	incentivePoolRate = uint64(0.10 * float64(percentDenominator))
+	calc2, err := CalculateRewards(
+		feesBurned,
+		validatorAmountAfterCalc1,
+		incentivePoolRewardAmountAfterCalc1,
+		feeRewardRate,
+		incentivePoolRate,
+	)
+	assert.NoError(t, err)
+
+	coinbaseAmountAfterCalc2 := big.NewInt(0).Sub(feesBurned, calc2.CoinbaseAmountToSub)
+	validatorAmountAfterCalc2 := bigAdd(validatorAmountAfterCalc1, calc2.ValidatorRewardAmount)
+	incentivePoolRewardAmountAfterCalc2 := bigAdd(incentivePoolRewardAmountAfterCalc1, calc2.IncentivePoolRewardAmount)
+
+	total = bigMul(CAM1, 2)
+	assert.Equal(t,
+		total,
+		bigAdd(coinbaseAmountAfterCalc2, validatorAmountAfterCalc2, incentivePoolRewardAmountAfterCalc2),
+	)
+
+	feesBurned = bigAdd(coinbaseAmountAfterCalc2, CAM1)
+
+	calcTotal, err := CalculateRewards(
+		bigMul(CAM1, 2),
+		ZERO,
+		ZERO,
+		feeRewardRate,
+		incentivePoolRate,
+	)
+	assert.NoError(t, err)
+
+	assert.Equal(t, incentivePoolRewardAmountAfterCalc2, validatorAmountAfterCalc2)
+	assert.Equal(t, calcTotal.ValidatorRewardAmount, validatorAmountAfterCalc2)
+	assert.Equal(t, calcTotal.IncentivePoolRewardAmount, incentivePoolRewardAmountAfterCalc2)
 }
 
 func TestPercentageChangeAfterFirstCalculationAndBackBeforeTotalCalculation(t *testing.T) {
@@ -266,20 +301,16 @@ func TestPercentageChangeAfterFirstCalculationAndBackBeforeTotalCalculation(t *t
 
 	calc1, err := CalculateRewards(
 		feesBurned,
-		validatorRewards,     // 10% feesów ale z denominacją
-		incentivePoolRewards, //10% feesów
+		validatorRewards,
+		incentivePoolRewards,
 		feeRewardRate,
 		incentivePoolRate,
 	)
 	assert.NoError(t, err)
 
-	// po każdym bloku dodajmy 1 CAM (1_000_000_000_000_000_000)
-
 	coinbaseAmountAfterCalc1 := big.NewInt(0).Sub(feesBurned, calc1.CoinbaseAmountToSub)
 	validatorAmountAfterCalc1 := big.NewInt(0).Add(validatorRewards, calc1.ValidatorRewardAmount)
 	incentivePoolRewardAmountAfterCalc1 := big.NewInt(0).Add(incentivePoolRewards, calc1.IncentivePoolRewardAmount)
-	// niezmiennik: po kazdej kalkulacji calc.CoinbaseAmountToSub ==  calc.ValidatorRewardAmount + calc.IncentivePoolRewardAmount
-	// total = coinbaseAmountAfterCalc + validatorAmountAfterCalc + incentivePoolAmountAfterCalc
 
 	total := CAM1
 	assert.Equal(t,
@@ -287,6 +318,9 @@ func TestPercentageChangeAfterFirstCalculationAndBackBeforeTotalCalculation(t *t
 		bigAdd(coinbaseAmountAfterCalc1, validatorAmountAfterCalc1, incentivePoolRewardAmountAfterCalc1),
 	)
 	feesBurned = bigAdd(coinbaseAmountAfterCalc1, CAM1)
+
+	feeRewardRate = uint64(0.20 * float64(percentDenominator))
+	incentivePoolRate = uint64(0.20 * float64(percentDenominator))
 	calc2, err := CalculateRewards(
 		feesBurned,
 		validatorAmountAfterCalc1,
@@ -307,27 +341,6 @@ func TestPercentageChangeAfterFirstCalculationAndBackBeforeTotalCalculation(t *t
 	)
 
 	feesBurned = bigAdd(coinbaseAmountAfterCalc2, CAM1)
-
-	feeRewardRate = uint64(0.20 * float64(percentDenominator))
-	incentivePoolRate = uint64(0.20 * float64(percentDenominator))
-	calc3, err := CalculateRewards(
-		feesBurned,
-		validatorAmountAfterCalc2,
-		incentivePoolRewardAmountAfterCalc2,
-		feeRewardRate,
-		incentivePoolRate,
-	)
-	assert.NoError(t, err)
-
-	coinbaseAmountAfterCalc3 := big.NewInt(0).Sub(feesBurned, calc3.CoinbaseAmountToSub)
-	validatorAmountAfterCalc3 := bigAdd(validatorAmountAfterCalc2, calc3.ValidatorRewardAmount)
-	incentivePoolRewardAmountAfterCalc3 := bigAdd(incentivePoolRewardAmountAfterCalc2, calc3.IncentivePoolRewardAmount)
-
-	total = bigMul(CAM1, 3)
-	assert.Equal(t,
-		total,
-		bigAdd(coinbaseAmountAfterCalc3, validatorAmountAfterCalc3, incentivePoolRewardAmountAfterCalc3),
-	)
 
 	feeRewardRate = uint64(0.10 * float64(percentDenominator))
 	incentivePoolRate = uint64(0.10 * float64(percentDenominator))
@@ -341,9 +354,14 @@ func TestPercentageChangeAfterFirstCalculationAndBackBeforeTotalCalculation(t *t
 	)
 	assert.NoError(t, err)
 
-	assert.Equal(t, incentivePoolRewardAmountAfterCalc3, validatorAmountAfterCalc3)
-	assert.NotEqual(t, calcTotal.ValidatorRewardAmount, validatorAmountAfterCalc3)
-	assert.NotEqual(t, calcTotal.IncentivePoolRewardAmount, incentivePoolRewardAmountAfterCalc3)
+	/*
+		The way calculation is done does not allow to change rates on the go, changing rates requires more work
+		than just changing rate parameters (we need to freeze current state, calculate total on new %, set all
+		the states to the previous values
+	*/
+	assert.Equal(t, incentivePoolRewardAmountAfterCalc2, validatorAmountAfterCalc2)
+	assert.NotEqual(t, calcTotal.ValidatorRewardAmount, validatorAmountAfterCalc2)
+	assert.NotEqual(t, calcTotal.IncentivePoolRewardAmount, incentivePoolRewardAmountAfterCalc2)
 }
 
 func TestNegativeBlackHoleAddressBalance(t *testing.T) {
