@@ -45,8 +45,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chain4travel/caminoethvm/eth"
-
 	"github.com/chain4travel/caminoethvm/accounts/abi"
 	"github.com/chain4travel/caminoethvm/accounts/abi/bind"
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
@@ -56,6 +54,7 @@ import (
 	"github.com/chain4travel/caminoethvm/core/state"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/core/vm"
+	"github.com/chain4travel/caminoethvm/eth"
 	"github.com/chain4travel/caminoethvm/eth/filters"
 	"github.com/chain4travel/caminoethvm/ethdb"
 	"github.com/chain4travel/caminoethvm/interfaces"
@@ -119,6 +118,10 @@ func NewSimulatedBackendWithInitialAdmin(database ethdb.Database, alloc core.Gen
 	cpcfg := params.TestChainConfig
 	cpcfg.ChainID = big.NewInt(1337)
 	genesis := core.Genesis{Config: cpcfg, GasLimit: gasLimit, Alloc: alloc, InitialAdmin: addr}
+	err := genesis.PreDeploy()
+	if err != nil {
+		panic(err)
+	}
 	genesis.MustCommit(database)
 	cacheConfig := &core.CacheConfig{}
 	blockchain, _ := core.NewBlockChain(database, cacheConfig, genesis.Config, dummy.NewFaker(), vm.Config{}, common.Hash{})
@@ -129,6 +132,7 @@ func NewSimulatedBackendWithInitialAdmin(database ethdb.Database, alloc core.Gen
 		config:     genesis.Config,
 		events:     filters.NewEventSystem(&filterBackend{database, blockchain}, false),
 	}
+
 	backend.rollback(blockchain.CurrentBlock())
 	return backend
 }
@@ -150,6 +154,7 @@ func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc core.Genesis
 		config:     genesis.Config,
 		events:     filters.NewEventSystem(&filterBackend{database, blockchain}, false),
 	}
+
 	backend.rollback(blockchain.CurrentBlock())
 	return backend
 }

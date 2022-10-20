@@ -8,11 +8,11 @@ import (
 	"math/big"
 	"strings"
 
-	ethereum "github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/chain4travel/caminoethvm/accounts/abi"
+	"github.com/chain4travel/caminoethvm/accounts/abi/bind"
+	"github.com/chain4travel/caminoethvm/core/types"
+	"github.com/chain4travel/caminoethvm/interfaces"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/event"
 )
 
@@ -21,7 +21,7 @@ var (
 	_ = errors.New
 	_ = big.NewInt
 	_ = strings.NewReader
-	_ = ethereum.NotFound
+	_ = interfaces.NotFound
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -30,7 +30,7 @@ var (
 
 // BuildMetaData contains all meta data concerning the Build contract.
 var BuildMetaData = &bind.MetaData{
-	ABI: "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"DropRole\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newGasFee\",\"type\":\"uint256\"}],\"name\":\"GasFeeSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"oldState\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newState\",\"type\":\"uint256\"}],\"name\":\"KycStateChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"SetRole\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"remove\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"state\",\"type\":\"uint256\"}],\"name\":\"applyKycState\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getBaseFee\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"bytes4\",\"name\":\"signature\",\"type\":\"bytes4\"}],\"name\":\"getBlacklistState\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"getKycState\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"getRoles\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"grantRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"hasRole\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"revokeRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"newFee\",\"type\":\"uint256\"}],\"name\":\"setBaseFee\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"bytes4\",\"name\":\"signature\",\"type\":\"bytes4\"},{\"internalType\":\"uint256\",\"name\":\"state\",\"type\":\"uint256\"}],\"name\":\"setBlacklistState\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"}],\"name\":\"upgrade\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"}],\"name\":\"setImplementation\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"DropRole\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"SetRole\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"DropRole\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"SetRole\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"getRoles\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"grantRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"hasRole\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"revokeRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"DropRole\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newGasFee\",\"type\":\"uint256\"}],\"name\":\"GasFeeSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"oldState\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newState\",\"type\":\"uint256\"}],\"name\":\"KycStateChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"SetRole\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"remove\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"state\",\"type\":\"uint256\"}],\"name\":\"applyKycState\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getBaseFee\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"bytes4\",\"name\":\"signature\",\"type\":\"bytes4\"}],\"name\":\"getBlacklistState\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"getKycState\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"getRoles\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"grantRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"hasRole\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"role\",\"type\":\"uint256\"}],\"name\":\"revokeRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"newFee\",\"type\":\"uint256\"}],\"name\":\"setBaseFee\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"bytes4\",\"name\":\"signature\",\"type\":\"bytes4\"},{\"internalType\":\"uint256\",\"name\":\"state\",\"type\":\"uint256\"}],\"name\":\"setBlacklistState\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"}],\"name\":\"upgrade\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // BuildABI is the input ABI used to generate the binding from.
@@ -303,37 +303,6 @@ func (_Build *BuildCallerSession) GetRoles(addr common.Address) (*big.Int, error
 	return _Build.Contract.GetRoles(&_Build.CallOpts, addr)
 }
 
-// GetRoles0 is a free data retrieval call binding the contract method 0xce6ccfaf.
-//
-// Solidity: function getRoles(address addr) view returns(uint256)
-func (_Build *BuildCaller) GetRoles0(opts *bind.CallOpts, addr common.Address) (*big.Int, error) {
-	var out []interface{}
-	err := _Build.contract.Call(opts, &out, "getRoles0", addr)
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
-}
-
-// GetRoles0 is a free data retrieval call binding the contract method 0xce6ccfaf.
-//
-// Solidity: function getRoles(address addr) view returns(uint256)
-func (_Build *BuildSession) GetRoles0(addr common.Address) (*big.Int, error) {
-	return _Build.Contract.GetRoles0(&_Build.CallOpts, addr)
-}
-
-// GetRoles0 is a free data retrieval call binding the contract method 0xce6ccfaf.
-//
-// Solidity: function getRoles(address addr) view returns(uint256)
-func (_Build *BuildCallerSession) GetRoles0(addr common.Address) (*big.Int, error) {
-	return _Build.Contract.GetRoles0(&_Build.CallOpts, addr)
-}
-
 // HasRole is a free data retrieval call binding the contract method 0x5c97f4a2.
 //
 // Solidity: function hasRole(address addr, uint256 role) view returns(bool)
@@ -363,37 +332,6 @@ func (_Build *BuildSession) HasRole(addr common.Address, role *big.Int) (bool, e
 // Solidity: function hasRole(address addr, uint256 role) view returns(bool)
 func (_Build *BuildCallerSession) HasRole(addr common.Address, role *big.Int) (bool, error) {
 	return _Build.Contract.HasRole(&_Build.CallOpts, addr, role)
-}
-
-// HasRole0 is a free data retrieval call binding the contract method 0x5c97f4a2.
-//
-// Solidity: function hasRole(address addr, uint256 role) view returns(bool)
-func (_Build *BuildCaller) HasRole0(opts *bind.CallOpts, addr common.Address, role *big.Int) (bool, error) {
-	var out []interface{}
-	err := _Build.contract.Call(opts, &out, "hasRole0", addr, role)
-
-	if err != nil {
-		return *new(bool), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-
-	return out0, err
-
-}
-
-// HasRole0 is a free data retrieval call binding the contract method 0x5c97f4a2.
-//
-// Solidity: function hasRole(address addr, uint256 role) view returns(bool)
-func (_Build *BuildSession) HasRole0(addr common.Address, role *big.Int) (bool, error) {
-	return _Build.Contract.HasRole0(&_Build.CallOpts, addr, role)
-}
-
-// HasRole0 is a free data retrieval call binding the contract method 0x5c97f4a2.
-//
-// Solidity: function hasRole(address addr, uint256 role) view returns(bool)
-func (_Build *BuildCallerSession) HasRole0(addr common.Address, role *big.Int) (bool, error) {
-	return _Build.Contract.HasRole0(&_Build.CallOpts, addr, role)
 }
 
 // ApplyKycState is a paid mutator transaction binding the contract method 0x9a11b2e8.
@@ -438,27 +376,6 @@ func (_Build *BuildTransactorSession) GrantRole(addr common.Address, role *big.I
 	return _Build.Contract.GrantRole(&_Build.TransactOpts, addr, role)
 }
 
-// GrantRole0 is a paid mutator transaction binding the contract method 0x3c09e2fd.
-//
-// Solidity: function grantRole(address addr, uint256 role) returns()
-func (_Build *BuildTransactor) GrantRole0(opts *bind.TransactOpts, addr common.Address, role *big.Int) (*types.Transaction, error) {
-	return _Build.contract.Transact(opts, "grantRole0", addr, role)
-}
-
-// GrantRole0 is a paid mutator transaction binding the contract method 0x3c09e2fd.
-//
-// Solidity: function grantRole(address addr, uint256 role) returns()
-func (_Build *BuildSession) GrantRole0(addr common.Address, role *big.Int) (*types.Transaction, error) {
-	return _Build.Contract.GrantRole0(&_Build.TransactOpts, addr, role)
-}
-
-// GrantRole0 is a paid mutator transaction binding the contract method 0x3c09e2fd.
-//
-// Solidity: function grantRole(address addr, uint256 role) returns()
-func (_Build *BuildTransactorSession) GrantRole0(addr common.Address, role *big.Int) (*types.Transaction, error) {
-	return _Build.Contract.GrantRole0(&_Build.TransactOpts, addr, role)
-}
-
 // RevokeRole is a paid mutator transaction binding the contract method 0x0912ed77.
 //
 // Solidity: function revokeRole(address addr, uint256 role) returns()
@@ -478,27 +395,6 @@ func (_Build *BuildSession) RevokeRole(addr common.Address, role *big.Int) (*typ
 // Solidity: function revokeRole(address addr, uint256 role) returns()
 func (_Build *BuildTransactorSession) RevokeRole(addr common.Address, role *big.Int) (*types.Transaction, error) {
 	return _Build.Contract.RevokeRole(&_Build.TransactOpts, addr, role)
-}
-
-// RevokeRole0 is a paid mutator transaction binding the contract method 0x0912ed77.
-//
-// Solidity: function revokeRole(address addr, uint256 role) returns()
-func (_Build *BuildTransactor) RevokeRole0(opts *bind.TransactOpts, addr common.Address, role *big.Int) (*types.Transaction, error) {
-	return _Build.contract.Transact(opts, "revokeRole0", addr, role)
-}
-
-// RevokeRole0 is a paid mutator transaction binding the contract method 0x0912ed77.
-//
-// Solidity: function revokeRole(address addr, uint256 role) returns()
-func (_Build *BuildSession) RevokeRole0(addr common.Address, role *big.Int) (*types.Transaction, error) {
-	return _Build.Contract.RevokeRole0(&_Build.TransactOpts, addr, role)
-}
-
-// RevokeRole0 is a paid mutator transaction binding the contract method 0x0912ed77.
-//
-// Solidity: function revokeRole(address addr, uint256 role) returns()
-func (_Build *BuildTransactorSession) RevokeRole0(addr common.Address, role *big.Int) (*types.Transaction, error) {
-	return _Build.Contract.RevokeRole0(&_Build.TransactOpts, addr, role)
 }
 
 // SetBaseFee is a paid mutator transaction binding the contract method 0x46860698.
@@ -543,27 +439,6 @@ func (_Build *BuildTransactorSession) SetBlacklistState(account common.Address, 
 	return _Build.Contract.SetBlacklistState(&_Build.TransactOpts, account, signature, state)
 }
 
-// SetImplementation is a paid mutator transaction binding the contract method 0xd784d426.
-//
-// Solidity: function setImplementation(address newImplementation) returns()
-func (_Build *BuildTransactor) SetImplementation(opts *bind.TransactOpts, newImplementation common.Address) (*types.Transaction, error) {
-	return _Build.contract.Transact(opts, "setImplementation", newImplementation)
-}
-
-// SetImplementation is a paid mutator transaction binding the contract method 0xd784d426.
-//
-// Solidity: function setImplementation(address newImplementation) returns()
-func (_Build *BuildSession) SetImplementation(newImplementation common.Address) (*types.Transaction, error) {
-	return _Build.Contract.SetImplementation(&_Build.TransactOpts, newImplementation)
-}
-
-// SetImplementation is a paid mutator transaction binding the contract method 0xd784d426.
-//
-// Solidity: function setImplementation(address newImplementation) returns()
-func (_Build *BuildTransactorSession) SetImplementation(newImplementation common.Address) (*types.Transaction, error) {
-	return _Build.Contract.SetImplementation(&_Build.TransactOpts, newImplementation)
-}
-
 // Upgrade is a paid mutator transaction binding the contract method 0x0900f010.
 //
 // Solidity: function upgrade(address newImplementation) returns()
@@ -592,10 +467,10 @@ type BuildDropRoleIterator struct {
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
 
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
+	logs chan types.Log          // Log channel receiving the found contract events
+	sub  interfaces.Subscription // Subscription for errors, completion and termination
+	done bool                    // Whether the subscription completed delivering logs
+	fail error                   // Occurred error to stop iteration
 }
 
 // Next advances the iterator to the subsequent event, returning whether there
@@ -720,276 +595,6 @@ func (_Build *BuildFilterer) ParseDropRole(log types.Log) (*BuildDropRole, error
 	return event, nil
 }
 
-// BuildDropRole0Iterator is returned from FilterDropRole0 and is used to iterate over the raw logs and unpacked data for DropRole0 events raised by the Build contract.
-type BuildDropRole0Iterator struct {
-	Event *BuildDropRole0 // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *BuildDropRole0Iterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(BuildDropRole0)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(BuildDropRole0)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *BuildDropRole0Iterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *BuildDropRole0Iterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// BuildDropRole0 represents a DropRole0 event raised by the Build contract.
-type BuildDropRole0 struct {
-	Addr common.Address
-	Role *big.Int
-	Raw  types.Log // Blockchain specific contextual infos
-}
-
-// FilterDropRole0 is a free log retrieval operation binding the contract event 0xcfa5316bd1be4ceb62f363b0a162f322c33ba870641138cd8600dd4fa603fc3b.
-//
-// Solidity: event DropRole(address addr, uint256 role)
-func (_Build *BuildFilterer) FilterDropRole0(opts *bind.FilterOpts) (*BuildDropRole0Iterator, error) {
-
-	logs, sub, err := _Build.contract.FilterLogs(opts, "DropRole0")
-	if err != nil {
-		return nil, err
-	}
-	return &BuildDropRole0Iterator{contract: _Build.contract, event: "DropRole0", logs: logs, sub: sub}, nil
-}
-
-// WatchDropRole0 is a free log subscription operation binding the contract event 0xcfa5316bd1be4ceb62f363b0a162f322c33ba870641138cd8600dd4fa603fc3b.
-//
-// Solidity: event DropRole(address addr, uint256 role)
-func (_Build *BuildFilterer) WatchDropRole0(opts *bind.WatchOpts, sink chan<- *BuildDropRole0) (event.Subscription, error) {
-
-	logs, sub, err := _Build.contract.WatchLogs(opts, "DropRole0")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(BuildDropRole0)
-				if err := _Build.contract.UnpackLog(event, "DropRole0", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseDropRole0 is a log parse operation binding the contract event 0xcfa5316bd1be4ceb62f363b0a162f322c33ba870641138cd8600dd4fa603fc3b.
-//
-// Solidity: event DropRole(address addr, uint256 role)
-func (_Build *BuildFilterer) ParseDropRole0(log types.Log) (*BuildDropRole0, error) {
-	event := new(BuildDropRole0)
-	if err := _Build.contract.UnpackLog(event, "DropRole0", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// BuildDropRole1Iterator is returned from FilterDropRole1 and is used to iterate over the raw logs and unpacked data for DropRole1 events raised by the Build contract.
-type BuildDropRole1Iterator struct {
-	Event *BuildDropRole1 // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *BuildDropRole1Iterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(BuildDropRole1)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(BuildDropRole1)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *BuildDropRole1Iterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *BuildDropRole1Iterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// BuildDropRole1 represents a DropRole1 event raised by the Build contract.
-type BuildDropRole1 struct {
-	Addr common.Address
-	Role *big.Int
-	Raw  types.Log // Blockchain specific contextual infos
-}
-
-// FilterDropRole1 is a free log retrieval operation binding the contract event 0xcfa5316bd1be4ceb62f363b0a162f322c33ba870641138cd8600dd4fa603fc3b.
-//
-// Solidity: event DropRole(address addr, uint256 role)
-func (_Build *BuildFilterer) FilterDropRole1(opts *bind.FilterOpts) (*BuildDropRole1Iterator, error) {
-
-	logs, sub, err := _Build.contract.FilterLogs(opts, "DropRole1")
-	if err != nil {
-		return nil, err
-	}
-	return &BuildDropRole1Iterator{contract: _Build.contract, event: "DropRole1", logs: logs, sub: sub}, nil
-}
-
-// WatchDropRole1 is a free log subscription operation binding the contract event 0xcfa5316bd1be4ceb62f363b0a162f322c33ba870641138cd8600dd4fa603fc3b.
-//
-// Solidity: event DropRole(address addr, uint256 role)
-func (_Build *BuildFilterer) WatchDropRole1(opts *bind.WatchOpts, sink chan<- *BuildDropRole1) (event.Subscription, error) {
-
-	logs, sub, err := _Build.contract.WatchLogs(opts, "DropRole1")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(BuildDropRole1)
-				if err := _Build.contract.UnpackLog(event, "DropRole1", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseDropRole1 is a log parse operation binding the contract event 0xcfa5316bd1be4ceb62f363b0a162f322c33ba870641138cd8600dd4fa603fc3b.
-//
-// Solidity: event DropRole(address addr, uint256 role)
-func (_Build *BuildFilterer) ParseDropRole1(log types.Log) (*BuildDropRole1, error) {
-	event := new(BuildDropRole1)
-	if err := _Build.contract.UnpackLog(event, "DropRole1", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
 // BuildGasFeeSetIterator is returned from FilterGasFeeSet and is used to iterate over the raw logs and unpacked data for GasFeeSet events raised by the Build contract.
 type BuildGasFeeSetIterator struct {
 	Event *BuildGasFeeSet // Event containing the contract specifics and raw log
@@ -997,10 +602,10 @@ type BuildGasFeeSetIterator struct {
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
 
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
+	logs chan types.Log          // Log channel receiving the found contract events
+	sub  interfaces.Subscription // Subscription for errors, completion and termination
+	done bool                    // Whether the subscription completed delivering logs
+	fail error                   // Occurred error to stop iteration
 }
 
 // Next advances the iterator to the subsequent event, returning whether there
@@ -1131,10 +736,10 @@ type BuildKycStateChangedIterator struct {
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
 
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
+	logs chan types.Log          // Log channel receiving the found contract events
+	sub  interfaces.Subscription // Subscription for errors, completion and termination
+	done bool                    // Whether the subscription completed delivering logs
+	fail error                   // Occurred error to stop iteration
 }
 
 // Next advances the iterator to the subsequent event, returning whether there
@@ -1277,10 +882,10 @@ type BuildSetRoleIterator struct {
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
 
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
+	logs chan types.Log          // Log channel receiving the found contract events
+	sub  interfaces.Subscription // Subscription for errors, completion and termination
+	done bool                    // Whether the subscription completed delivering logs
+	fail error                   // Occurred error to stop iteration
 }
 
 // Next advances the iterator to the subsequent event, returning whether there
@@ -1399,276 +1004,6 @@ func (_Build *BuildFilterer) WatchSetRole(opts *bind.WatchOpts, sink chan<- *Bui
 func (_Build *BuildFilterer) ParseSetRole(log types.Log) (*BuildSetRole, error) {
 	event := new(BuildSetRole)
 	if err := _Build.contract.UnpackLog(event, "SetRole", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// BuildSetRole0Iterator is returned from FilterSetRole0 and is used to iterate over the raw logs and unpacked data for SetRole0 events raised by the Build contract.
-type BuildSetRole0Iterator struct {
-	Event *BuildSetRole0 // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *BuildSetRole0Iterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(BuildSetRole0)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(BuildSetRole0)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *BuildSetRole0Iterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *BuildSetRole0Iterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// BuildSetRole0 represents a SetRole0 event raised by the Build contract.
-type BuildSetRole0 struct {
-	Addr common.Address
-	Role *big.Int
-	Raw  types.Log // Blockchain specific contextual infos
-}
-
-// FilterSetRole0 is a free log retrieval operation binding the contract event 0x385a9c70004a48177c93b74796d77d5ebf7e1248f9e2369624514da454cd01b0.
-//
-// Solidity: event SetRole(address addr, uint256 role)
-func (_Build *BuildFilterer) FilterSetRole0(opts *bind.FilterOpts) (*BuildSetRole0Iterator, error) {
-
-	logs, sub, err := _Build.contract.FilterLogs(opts, "SetRole0")
-	if err != nil {
-		return nil, err
-	}
-	return &BuildSetRole0Iterator{contract: _Build.contract, event: "SetRole0", logs: logs, sub: sub}, nil
-}
-
-// WatchSetRole0 is a free log subscription operation binding the contract event 0x385a9c70004a48177c93b74796d77d5ebf7e1248f9e2369624514da454cd01b0.
-//
-// Solidity: event SetRole(address addr, uint256 role)
-func (_Build *BuildFilterer) WatchSetRole0(opts *bind.WatchOpts, sink chan<- *BuildSetRole0) (event.Subscription, error) {
-
-	logs, sub, err := _Build.contract.WatchLogs(opts, "SetRole0")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(BuildSetRole0)
-				if err := _Build.contract.UnpackLog(event, "SetRole0", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseSetRole0 is a log parse operation binding the contract event 0x385a9c70004a48177c93b74796d77d5ebf7e1248f9e2369624514da454cd01b0.
-//
-// Solidity: event SetRole(address addr, uint256 role)
-func (_Build *BuildFilterer) ParseSetRole0(log types.Log) (*BuildSetRole0, error) {
-	event := new(BuildSetRole0)
-	if err := _Build.contract.UnpackLog(event, "SetRole0", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// BuildSetRole1Iterator is returned from FilterSetRole1 and is used to iterate over the raw logs and unpacked data for SetRole1 events raised by the Build contract.
-type BuildSetRole1Iterator struct {
-	Event *BuildSetRole1 // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *BuildSetRole1Iterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(BuildSetRole1)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(BuildSetRole1)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *BuildSetRole1Iterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *BuildSetRole1Iterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// BuildSetRole1 represents a SetRole1 event raised by the Build contract.
-type BuildSetRole1 struct {
-	Addr common.Address
-	Role *big.Int
-	Raw  types.Log // Blockchain specific contextual infos
-}
-
-// FilterSetRole1 is a free log retrieval operation binding the contract event 0x385a9c70004a48177c93b74796d77d5ebf7e1248f9e2369624514da454cd01b0.
-//
-// Solidity: event SetRole(address addr, uint256 role)
-func (_Build *BuildFilterer) FilterSetRole1(opts *bind.FilterOpts) (*BuildSetRole1Iterator, error) {
-
-	logs, sub, err := _Build.contract.FilterLogs(opts, "SetRole1")
-	if err != nil {
-		return nil, err
-	}
-	return &BuildSetRole1Iterator{contract: _Build.contract, event: "SetRole1", logs: logs, sub: sub}, nil
-}
-
-// WatchSetRole1 is a free log subscription operation binding the contract event 0x385a9c70004a48177c93b74796d77d5ebf7e1248f9e2369624514da454cd01b0.
-//
-// Solidity: event SetRole(address addr, uint256 role)
-func (_Build *BuildFilterer) WatchSetRole1(opts *bind.WatchOpts, sink chan<- *BuildSetRole1) (event.Subscription, error) {
-
-	logs, sub, err := _Build.contract.WatchLogs(opts, "SetRole1")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(BuildSetRole1)
-				if err := _Build.contract.UnpackLog(event, "SetRole1", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseSetRole1 is a log parse operation binding the contract event 0x385a9c70004a48177c93b74796d77d5ebf7e1248f9e2369624514da454cd01b0.
-//
-// Solidity: event SetRole(address addr, uint256 role)
-func (_Build *BuildFilterer) ParseSetRole1(log types.Log) (*BuildSetRole1, error) {
-	event := new(BuildSetRole1)
-	if err := _Build.contract.UnpackLog(event, "SetRole1", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
