@@ -55,6 +55,7 @@ import (
 	"github.com/chain4travel/caminoethvm/core/state/pruner"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/core/vm"
+	"github.com/chain4travel/caminoethvm/eth/ethadmin"
 	"github.com/chain4travel/caminoethvm/eth/ethconfig"
 	"github.com/chain4travel/caminoethvm/eth/filters"
 	"github.com/chain4travel/caminoethvm/eth/gasprice"
@@ -237,6 +238,15 @@ func New(
 		return nil, err
 	}
 
+	eth.APIBackend = &EthAPIBackend{
+		extRPCEnabled:       stack.Config().ExtRPCEnabled(),
+		allowUnprotectedTxs: config.AllowUnprotectedTxs,
+		eth:                 eth,
+	}
+
+	ac := ethadmin.NewController(eth.APIBackend)
+	eth.blockchain.SetAdminController(ac)
+
 	eth.bloomIndexer.Start(eth.blockchain)
 
 	config.TxPool.Journal = ""
@@ -244,14 +254,10 @@ func New(
 
 	eth.miner = miner.New(eth, &config.Miner, chainConfig, eth.EventMux(), eth.engine, clock)
 
-	eth.APIBackend = &EthAPIBackend{
-		extRPCEnabled:       stack.Config().ExtRPCEnabled(),
-		allowUnprotectedTxs: config.AllowUnprotectedTxs,
-		eth:                 eth,
-	}
 	if config.AllowUnprotectedTxs {
 		log.Info("Unprotected transactions allowed")
 	}
+
 	gpoParams := config.GPO
 	eth.APIBackend.gpo = gasprice.NewOracle(eth.APIBackend, gpoParams)
 

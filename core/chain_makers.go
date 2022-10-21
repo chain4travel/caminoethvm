@@ -44,6 +44,7 @@ import (
 	"github.com/chain4travel/caminoethvm/consensus"
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/consensus/misc"
+	"github.com/chain4travel/caminoethvm/core/admin"
 	"github.com/chain4travel/caminoethvm/core/state"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/core/vm"
@@ -314,7 +315,7 @@ func makeHeader(chain consensus.ChainReader, config *params.ChainConfig, parent 
 	}
 	if chain.Config().IsApricotPhase3(timestamp) {
 		var err error
-		header.Extra, header.BaseFee, err = dummy.CalcBaseFee(chain.Config(), parent.Header(), time)
+		header.Extra, header.BaseFee, err = dummy.CalcBaseFee(chain.Config(), chain.AdminController(), parent.Header(), time)
 		if err != nil {
 			panic(err)
 		}
@@ -331,6 +332,7 @@ func (cr *fakeChainReader) Config() *params.ChainConfig {
 	return cr.config
 }
 
+func (cr *fakeChainReader) AdminController() admin.AdminController                  { return nil }
 func (cr *fakeChainReader) CurrentHeader() *types.Header                            { return nil }
 func (cr *fakeChainReader) GetHeaderByNumber(number uint64) *types.Header           { return nil }
 func (cr *fakeChainReader) GetHeaderByHash(hash common.Hash) *types.Header          { return nil }

@@ -47,6 +47,7 @@ import (
 	"github.com/chain4travel/caminoethvm/consensus"
 	"github.com/chain4travel/caminoethvm/consensus/dummy"
 	"github.com/chain4travel/caminoethvm/core"
+	"github.com/chain4travel/caminoethvm/core/admin"
 	"github.com/chain4travel/caminoethvm/core/bloombits"
 	"github.com/chain4travel/caminoethvm/core/rawdb"
 	"github.com/chain4travel/caminoethvm/core/state"
@@ -80,6 +81,10 @@ func (b *EthAPIBackend) ChainConfig() *params.ChainConfig {
 
 func (b *EthAPIBackend) GetVMConfig() *vm.Config {
 	return b.eth.blockchain.GetVMConfig()
+}
+
+func (b *EthAPIBackend) AdminController() admin.AdminController {
+	return b.eth.blockchain.AdminController()
 }
 
 func (b *EthAPIBackend) CurrentBlock() *types.Block {
@@ -191,6 +196,10 @@ func (b *EthAPIBackend) BadBlocks() []*types.Block {
 
 func (b *EthAPIBackend) PendingBlockAndReceipts() (*types.Block, types.Receipts) {
 	return nil, nil
+}
+
+func (b *EthAPIBackend) StateByHeader(ctx context.Context, header *types.Header) (*state.StateDB, error) {
+	return b.eth.BlockChain().StateAt(header.Root)
 }
 
 func (b *EthAPIBackend) StateAndHeaderByNumber(ctx context.Context, number rpc.BlockNumber) (*state.StateDB, *types.Header, error) {
