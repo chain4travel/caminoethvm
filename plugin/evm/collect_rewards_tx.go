@@ -15,6 +15,7 @@
 package evm
 
 import (
+	"fmt"
 	"github.com/chain4travel/caminogo/vms/components/verify"
 	"github.com/chain4travel/caminogo/vms/secp256k1fx"
 	"github.com/ethereum/go-ethereum/common"
@@ -30,6 +31,8 @@ import (
 	"github.com/chain4travel/caminogo/utils/constants"
 	"github.com/chain4travel/caminogo/vms/components/avax"
 )
+
+var _ UnsignedAtomicTx = &UnsignedCollectRewardsTx{}
 
 // UnsignedCollectRewardsTx is an internal rewards collection transaction
 type UnsignedCollectRewardsTx struct {
@@ -64,6 +67,7 @@ func (tx *UnsignedCollectRewardsTx) Verify(
 	ctx *snow.Context,
 	rules params.Rules,
 ) error {
+	log.Info("Verify...")
 	switch {
 	case tx == nil:
 		return errNilTx
@@ -81,6 +85,7 @@ func (tx *UnsignedCollectRewardsTx) Verify(
 		return errWrongChainID
 	}
 
+	log.Info("Verify completed")
 	return nil
 }
 
@@ -98,18 +103,66 @@ func (tx *UnsignedCollectRewardsTx) Burned(assetID ids.ID) (uint64, error) {
 func (tx *UnsignedCollectRewardsTx) SemanticVerify(
 	vm *VM,
 	stx *Tx,
-	_ *Block,
+	b *Block,
 	baseFee *big.Int,
 	rules params.Rules,
 ) error {
+	log.Info("SemanticVerify...")
 
-	// TODO: Verify the fee calculation results here
+	state, err := vm.chain.CurrentState()
+	if err != nil {
+		log.Info("Cannot access current EVM state", "error", err)
+		return fmt.Errorf("cannot access current EVM state: %w", err)
+	}
+
+	log.Info("SemanticVerify processing tx", "txID", tx.ID().String())
+	currValidatorRewardPayedOut := state.GetState(tx.Coinbase, Slot0).Big()
+	if tx.RewardCalculation.PrevFeesBurned.Cmp(currValidatorRewardPayedOut) != 0 {
+		log.Info("validator rewards mismatch", "prevFeesBurned", tx.RewardCalculation.PrevFeesBurned, "currValidatorRewardPayedOut", currValidatorRewardPayedOut)
+		return fmt.Errorf("validator rewards mismatch")
+	}
+
+	ipRewardsPayedOut := state.GetState(tx.IncentivePoolRewardAddress, Slot0).Big()
+	if tx.RewardCalculation.PrevIncentivePoolRewards.Cmp(ipRewardsPayedOut) != 0 {
+		log.Info("Incentive pool rewards mismatch", "prevIncentivePoolRewards", tx.RewardCalculation.PrevIncentivePoolRewards, "ipRewardsPayedOut", ipRewardsPayedOut)
+		return fmt.Errorf("incentive pool balance mismatch")
+	}
+
+	h := b.ethBlock.Header()
+	feesBurned := state.GetBalance(tx.Coinbase)
+	calc, err := CalculateRewards(
+		feesBurned,
+		tx.RewardCalculation.PrevFeesBurned,
+		tx.RewardCalculation.PrevIncentivePoolRewards,
+		h.FeeRewardRate,
+		h.IncentivePoolRewardRate,
+	)
+
+	if err != nil {
+		log.Info("calculate rewards failed", "error", err)
+		return fmt.Errorf("cannot calculate rewards: %w", err)
+	}
+
+	if calc.ValidatorRewardAmount.Cmp(tx.RewardCalculation.ValidatorRewardAmount) != 0 {
+		log.Info("validator rewards mismatch", "expected", calc.ValidatorRewardAmount, "actual", tx.RewardCalculation.ValidatorRewardAmount)
+		return fmt.Errorf("validator rewards mismatch")
+	}
+	if calc.ValidatorRewardToExport != tx.RewardCalculation.ValidatorRewardToExport {
+		log.Info("validator rewards to export mismatch", "expected", calc.ValidatorRewardToExport, "actual", tx.RewardCalculation.ValidatorRewardToExport)
+		return fmt.Errorf("validator rewards to export mismatch")
+	}
+	if calc.IncentivePoolRewardAmount.Cmp(tx.RewardCalculation.IncentivePoolRewardAmount) != 0 {
+		log.Info("incentive pool rewards mismatch", "expected", calc.IncentivePoolRewardAmount, "actual", tx.RewardCalculation.IncentivePoolRewardAmount)
+		return fmt.Errorf("incentive pool rewards mismatch")
+	}
+
+	log.Info("SemanticVerify completed")
 	return nil
 }
 
 // AtomicOps returns the atomic operations for this transaction.
 func (tx *UnsignedCollectRewardsTx) AtomicOps() (ids.ID, *atomic.Requests, error) {
-	// TOOD: I'm leaving the ExportTx implementation here for inspiration
+	log.Info("AtomicOps...")
 	txID := tx.ID()
 
 	elems := make([]*atomic.Element, 1)
@@ -138,6 +191,7 @@ func (tx *UnsignedCollectRewardsTx) AtomicOps() (ids.ID, *atomic.Requests, error
 
 	elems[0] = elem
 
+	log.Info("AtomicOps completed")
 	return tx.DestinationChain, &atomic.Requests{PutRequests: elems}, nil
 }
 
@@ -177,15 +231,16 @@ func (vm *VM) NewCollectRewardsTx(
 		},
 	}}
 
-	tx := &Tx{
-		UnsignedAtomicTx: utx,
-		Creds:            make([]verify.Verifiable, 0),
+	tx := &Tx{UnsignedAtomicTx: utx}
+	if err := tx.Sign(vm.codec, nil); err != nil {
+		return nil, err
 	}
 
-	log.Info("New CollectionRewardTx\nTo: %s\nAmount: %d\nCurr Coinbase balance: %d\n",
-		pChainAddress.String(),
-		calculation.ValidatorRewardToExport,
-		calculation.PrevValidatorRewards,
+	log.Info("New CollectionRewardTx created.",
+		"To", pChainAddress.String(),
+		"Amount", calculation.ValidatorRewardToExport,
+		"Curr Coinbase balance", calculation.PrevValidatorRewards,
+		"curr IP balance", calculation.PrevIncentivePoolRewards,
 	)
 
 	return tx, utx.Verify(vm.ctx, vm.currentRules())
@@ -193,6 +248,7 @@ func (vm *VM) NewCollectRewardsTx(
 
 // EVMStateTransfer executes the state update from the atomic export transaction
 func (tx *UnsignedCollectRewardsTx) EVMStateTransfer(ctx *snow.Context, state *state.StateDB) error {
+	log.Info("EVMStateTransfer...", "txID", tx.ID().String())
 	state.SubBalance(tx.Coinbase, tx.RewardCalculation.CoinbaseAmountToSub)
 	validatorRewards := new(big.Int).Add(tx.RewardCalculation.PrevValidatorRewards, tx.RewardCalculation.ValidatorRewardAmount)
 	state.SetState(tx.Coinbase, Slot0, common.BigToHash(validatorRewards))
@@ -202,5 +258,6 @@ func (tx *UnsignedCollectRewardsTx) EVMStateTransfer(ctx *snow.Context, state *s
 	state.AddBalance(tx.IncentivePoolRewardAddress, tx.RewardCalculation.IncentivePoolRewardAmount)
 	state.SetState(tx.IncentivePoolRewardAddress, Slot0, common.BigToHash(ipRewards))
 
+	log.Info("EVMStateTransfer completed")
 	return nil
 }

@@ -33,6 +33,9 @@ func init() {
 		c.RegisterType(&secp256k1fx.Credential{}),
 		c.RegisterType(&secp256k1fx.Input{}),
 		c.RegisterType(&secp256k1fx.OutputOwners{}),
+		// TODO: Can I add this new Tx type above with Import / Export?
+		// ...and why the skipRegistrations(int) is needed there?
+		c.RegisterType(&UnsignedCollectRewardsTx{}),
 		Codec.RegisterCodec(codecVersion, c),
 	)
 

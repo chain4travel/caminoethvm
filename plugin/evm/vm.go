@@ -616,6 +616,10 @@ func (vm *VM) preBatchOnFinalizeAndAssemble(header *types.Header, state *state.S
 		if !exists {
 			break
 		}
+
+		// TODO: remove - I'm just currious
+		utx := tx.UnsignedAtomicTx
+		log.Info(fmt.Sprintf("Tx %T from mempool, ID: %s", utx, tx.ID().Hex()))
 		// Take a snapshot of [state] before calling verifyTx so that if the transaction fails verification
 		// we can revert to [snapshot].
 		// Note: snapshot is taken inside the loop because you cannot revert to the same snapshot more than
@@ -626,6 +630,7 @@ func (vm *VM) preBatchOnFinalizeAndAssemble(header *types.Header, state *state.S
 			// Discard the transaction from the mempool on failed verification.
 			vm.mempool.DiscardCurrentTx(tx.ID())
 			state.RevertToSnapshot(snapshot)
+			log.Info("Oops - discarded from processing", "txID", tx.ID().Hex(), "error", err)
 			continue
 		}
 
@@ -634,15 +639,19 @@ func (vm *VM) preBatchOnFinalizeAndAssemble(header *types.Header, state *state.S
 			// Discard the transaction from the mempool and error if the transaction
 			// cannot be marshalled. This should never happen.
 			vm.mempool.DiscardCurrentTx(tx.ID())
+			log.Info("Oops - marshaling failed", "txID", tx.ID().Hex(), "error", err)
 			return nil, nil, nil, fmt.Errorf("failed to marshal atomic transaction %s due to %w", tx.ID(), err)
 		}
 		var contribution, gasUsed *big.Int
 		if rules.IsApricotPhase4 {
 			contribution, gasUsed, err = tx.BlockFeeContribution(rules.IsApricotPhase5, vm.ctx.AVAXAssetID, header.BaseFee)
+			log.Info("Oops -  rules broken apricot4", "txID", tx.ID().Hex(), "error", err)
 			if err != nil {
 				return nil, nil, nil, err
 			}
 		}
+
+		log.Info("All good - atomic tx returned")
 		return atomicTxBytes, contribution, gasUsed, nil
 	}
 
@@ -990,10 +999,10 @@ func (vm *VM) Version() (string, error) {
 }
 
 // NewHandler returns a new Handler for a service where:
-//   * The handler's functionality is defined by [service]
+//   - The handler's functionality is defined by [service]
 //     [service] should be a gorilla RPC service (see https://www.gorillatoolkit.org/pkg/rpc/v2)
-//   * The name of the service is [name]
-//   * The LockOption is the first element of [lockOption]
+//   - The name of the service is [name]
+//   - The LockOption is the first element of [lockOption]
 //     By default the LockOption is WriteLock
 //     [lockOption] should have either 0 or 1 elements. Elements beside the first are ignored.
 func newHandler(name string, service interface{}, lockOption ...commonEng.LockOption) (*commonEng.HTTPHandler, error) {

@@ -199,11 +199,11 @@ func (b *Block) Accept() error {
 		calc, err := b.calculateRewards(state)
 
 		if err != nil {
-			log.Info("Calculation of the rewards skipped due to error: %s", err)
+			log.Info("Calculation of the rewards skipped", "error", err)
 		}
 
 		if err = b.issueRewardsCollection(calc); err != nil {
-			log.Info("Issuing of the rewards collection skipped due to error: %s", err)
+			log.Info("Issuing of the rewards collection skipped", "error", err)
 		}
 
 		log.Info("Issuing of the rewards transaction completed")

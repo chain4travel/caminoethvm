@@ -88,6 +88,10 @@ func (m *Mempool) atomicTxGasPrice(tx *Tx) (uint64, error) {
 		return 0, err
 	}
 	if gasUsed == 0 {
+		if _, ok := tx.UnsignedAtomicTx.(*UnsignedCollectRewardsTx); ok {
+			// Rewards collection transaction does not require gas
+			return 0, nil
+		}
 		return 0, errNoGasUsed
 	}
 	burned, err := tx.Burned(m.AVAXAssetID)
