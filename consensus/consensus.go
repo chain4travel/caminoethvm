@@ -41,6 +41,7 @@ package consensus
 import (
 	"math/big"
 
+	"github.com/chain4travel/caminoethvm/core/admin"
 	"github.com/chain4travel/caminoethvm/core/state"
 	"github.com/chain4travel/caminoethvm/core/types"
 	"github.com/chain4travel/caminoethvm/params"
@@ -64,6 +65,9 @@ type ChainHeaderReader interface {
 
 	// GetHeaderByHash retrieves a block header from the database by its hash.
 	GetHeaderByHash(hash common.Hash) *types.Header
+
+	// Admincontroler retrieves an interface to smart contract controlled state
+	AdminController() admin.AdminController
 }
 
 // ChainReader defines a small collection of methods needed to access the local
