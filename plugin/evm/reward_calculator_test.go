@@ -166,7 +166,7 @@ func TestSumOfCalculationsEqualsTotalCalculation(t *testing.T) {
 	assert.Equal(t, calcTotal.IncentivePoolRewardAmount, incentivePoolRewardAmountAfterCalc3)
 }
 
-func TestPercentageUpAfterFirstCalculation(t *testing.T) {
+func TestRaiseRateAfterFirstCalculation(t *testing.T) {
 	feesBurned := CAM1
 	validatorRewards := ZERO
 	incentivePoolRewards := ZERO
@@ -229,7 +229,7 @@ func TestPercentageUpAfterFirstCalculation(t *testing.T) {
 	assert.Equal(t, calcTotal.IncentivePoolRewardAmount, incentivePoolRewardAmountAfterCalc2)
 }
 
-func TestPercentageDownAfterFirstCalculation(t *testing.T) {
+func TestLowerRateAfterFirstCalculation(t *testing.T) {
 	feesBurned := CAM1
 	validatorRewards := ZERO
 	incentivePoolRewards := ZERO
@@ -356,7 +356,7 @@ func TestPercentageChangeAfterFirstCalculationAndBackBeforeTotalCalculation(t *t
 
 	/*
 		The way calculation is done does not allow to change rates on the go, changing rates requires more work
-		than just changing rate parameters (we need to freeze current state, calculate total on new %, set all
+		than just changing rate parameters (we need to freeze current state, calculate total on new rate, set all
 		the states to the previous values
 	*/
 	assert.Equal(t, incentivePoolRewardAmountAfterCalc2, validatorAmountAfterCalc2)
