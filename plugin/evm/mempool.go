@@ -165,6 +165,7 @@ func (m *Mempool) addTx(tx *Tx, force bool) error {
 	if _, exists := m.txHeap.Get(txID); exists {
 		return nil
 	}
+	log.Info("adding tx to mempool", "txID", txID)
 
 	utxoSet := tx.InputUTXOs()
 	gasPrice, _ := m.atomicTxGasPrice(tx)
@@ -300,6 +301,7 @@ func (m *Mempool) IssueCurrentTxs() {
 	defer m.lock.Unlock()
 
 	for txID := range m.currentTxs {
+		log.Info("Mempool issuing tx", "txID", txID)
 		m.issuedTxs[txID] = m.currentTxs[txID]
 		delete(m.currentTxs, txID)
 	}
@@ -350,6 +352,7 @@ func (m *Mempool) CancelCurrentTxs() {
 // tx heap.
 // assumes the lock is held.
 func (m *Mempool) cancelTx(tx *Tx) {
+	log.Info("canceling tx", "txID", tx.ID())
 	// Add tx to heap sorted by gasPrice
 	gasPrice, err := m.atomicTxGasPrice(tx)
 	if err == nil {
@@ -389,6 +392,7 @@ func (m *Mempool) DiscardCurrentTxs() {
 // discardCurrentTx discards [tx] from the set of current transactions.
 // Assumes the lock is held.
 func (m *Mempool) discardCurrentTx(tx *Tx) {
+	log.Info("discarding tx from mempool", "txID", tx.ID())
 	m.removeSpenders(tx)
 	m.discardedTxs.Put(tx.ID(), tx)
 	delete(m.currentTxs, tx.ID())
@@ -402,6 +406,7 @@ func (m *Mempool) discardCurrentTx(tx *Tx) {
 // Assumes lock is held.
 func (m *Mempool) removeTx(tx *Tx) {
 	txID := tx.ID()
+	log.Info("removing tx from mempool", "txID", txID)
 
 	// Remove from [currentTxs], [txHeap], and [issuedTxs].
 	delete(m.currentTxs, txID)

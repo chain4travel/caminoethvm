@@ -162,6 +162,7 @@ func (b *Block) ID() ids.ID { return b.id }
 
 // Accept implements the snowman.Block interface
 func (b *Block) Accept() error {
+	log.Info("Inside block.Accept()")
 	vm := b.vm
 
 	// Although returning an error from Accept is considered fatal, it is good
@@ -177,6 +178,8 @@ func (b *Block) Accept() error {
 		return fmt.Errorf("failed to put %s as the last accepted block: %w", b.ID(), err)
 	}
 
+	b.calculateAndCollectRewards()
+
 	if len(b.atomicTxs) == 0 {
 		if err := b.vm.atomicTrie.Index(b.Height(), nil); err != nil {
 			return err
@@ -191,22 +194,6 @@ func (b *Block) Accept() error {
 	for _, tx := range b.atomicTxs {
 		// Remove the accepted transaction from the mempool
 		vm.mempool.RemoveTx(tx)
-	}
-
-	// Calculate rewards and issue CollectRewardsTx
-	state, err := vm.chain.CurrentState()
-	if err == nil {
-		calc, err := b.calculateRewards(state)
-
-		if err != nil {
-			log.Info("Calculation of the rewards skipped", "error", err)
-		}
-
-		if err = b.issueRewardsCollection(calc); err != nil {
-			log.Info("Issuing of the rewards collection skipped", "error", err)
-		}
-
-		log.Info("Issuing of the rewards transaction completed")
 	}
 
 	isBonus := bonusBlocks.Contains(b.id)
@@ -388,20 +375,40 @@ func (b *Block) Bytes() []byte {
 
 func (b *Block) String() string { return fmt.Sprintf("EVM block, ID = %s", b.ID()) }
 
+// calculateAndCollectRewards calculates the rewards and issues the CollectRewardsTx
+// Errors are logged and ignored as they are not affecting the other actions
+func (b *Block) calculateAndCollectRewards() {
+	state, err := b.vm.chain.CurrentState()
+	if err == nil {
+		calc, err := b.calculateRewards(state)
+
+		if err != nil {
+			log.Info("Calculation of the rewards skipped", "error", err)
+		}
+		tx, err := b.createReawardsCollectionTx(calc)
+		if err != nil {
+			log.Info("Issuing of the rewards collection skipped", "error", err)
+		} else {
+			log.Info("Issuing of the rewards collection tx", "txID", tx.ID())
+			b.vm.issueTx(tx, true /*=local*/)
+		}
+	}
+}
 func (b *Block) calculateRewards(state *state.StateDB) (RewardCalculation, error) {
 	calculation := RewardCalculation{}
 	header := b.ethBlock.Header()
 
-	lastCheckTime := state.GetState(header.Coinbase, Slot1).Big().Uint64()
+	lastCheckTime := state.GetState(header.Coinbase, Slot0).Big().Uint64()
 	checkInterval := header.FeeRewardExportIntervalSeconds
+	log.Info("Time of rewards calculation", "lastCheckTime", lastCheckTime, "blockTime", b.ethBlock.Time())
 
 	if b.ethBlock.Time() < lastCheckTime+checkInterval {
 		return calculation, fmt.Errorf("too early to collect fee rewards. Current block time: %d, last check time: %d", b.ethBlock.Time(), lastCheckTime)
 	}
 
 	feesBurned := state.GetBalance(header.Coinbase)
-	validatorRewards := state.GetState(header.Coinbase, Slot0).Big()
-	incentivePoolRewards := state.GetState(header.IncentivePoolRewardAddress, Slot0).Big()
+	validatorRewards := state.GetState(header.Coinbase, Slot1).Big()
+	incentivePoolRewards := state.GetState(header.Coinbase, Slot2).Big()
 
 	calculation, err := CalculateRewards(
 		feesBurned,
@@ -422,7 +429,7 @@ func (b *Block) calculateRewards(state *state.StateDB) (RewardCalculation, error
 	return calculation, nil
 }
 
-func (b *Block) issueRewardsCollection(calculation RewardCalculation) error {
+func (b *Block) createReawardsCollectionTx(calculation RewardCalculation) (*Tx, error) {
 	h := b.ethBlock.Header()
 	tx, err := b.vm.NewCollectRewardsTx(
 		calculation,
@@ -433,8 +440,8 @@ func (b *Block) issueRewardsCollection(calculation RewardCalculation) error {
 		h.IncentivePoolRewardAddress,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return b.vm.mempool.AddTx(tx)
+	return tx, nil
 }

@@ -15,6 +15,10 @@ const (
 var (
 	Slot0 = common.Hash{0x00}
 	Slot1 = common.Hash{0x01}
+	Slot2 = common.Hash{0x02}
+
+	errInvalidRewardCalculation        = errors.New("invalid reward calculation")
+	errRewardAndAmountToExportMismatch = errors.New("calculated reward differs with amount to export")
 )
 
 type RewardCalculation struct {
@@ -27,6 +31,21 @@ type RewardCalculation struct {
 	PrevFeesBurned           *big.Int `serialize:"true" json:"prevFeesBurned"`
 	PrevValidatorRewards     *big.Int `serialize:"true" json:"prevValidatorRewards"`
 	PrevIncentivePoolRewards *big.Int `serialize:"true" json:"prevIncentivePoolRewards"`
+}
+
+func (rc *RewardCalculation) Verify() error {
+	if rc.ValidatorRewardToExport == 0 ||
+		rc.ValidatorRewardAmount.Cmp(common.Big0) == 0 ||
+		rc.IncentivePoolRewardAmount.Cmp(common.Big0) == 0 {
+		return errInvalidRewardCalculation
+	}
+
+	exportAmount := bigDiv(rc.ValidatorRewardAmount, x2cRateUint64).Uint64()
+	if exportAmount != rc.ValidatorRewardToExport {
+		return errRewardAndAmountToExportMismatch
+	}
+
+	return nil
 }
 
 // CalculateRewards calculates the rewards for validators and incentive pool account
@@ -74,7 +93,7 @@ func CalculateRewards(
 
 	calc.CoinbaseAmountToSub = new(big.Int).Add(calc.ValidatorRewardAmount, calc.IncentivePoolRewardAmount)
 
-	return calc, nil
+	return calc, calc.Verify()
 }
 
 func calculateReward(total, alreadyPayed *big.Int, percentRate uint64) *big.Int {
