@@ -24,8 +24,12 @@ import (
 
 	"github.com/chain4travel/caminoethvm/accounts/abi/bind"
 	"github.com/chain4travel/caminoethvm/accounts/abi/bind/backends"
+	"github.com/chain4travel/caminoethvm/chain"
 	admin "github.com/chain4travel/caminoethvm/contracts/build_contracts/admin/src"
 	"github.com/chain4travel/caminoethvm/core"
+	"github.com/chain4travel/caminoethvm/core/state"
+	"github.com/chain4travel/caminoethvm/core/types"
+	"github.com/chain4travel/caminoethvm/eth/ethadmin"
 
 	"github.com/chain4travel/caminoethvm/params"
 )
@@ -312,6 +316,75 @@ func TestDummySession(t *testing.T) {
 
 	_, err = dummySession.GrantRole(dummyAddr, ADMIN_ROLE)
 	assert.EqualError(t, err, errAccessDeniedMsg)
+}
+
+func TestEthAdmin(t *testing.T) {
+	contractAddr := AdminProxyAddr
+
+	// Initialize TransactOpts for each key
+	gasFeeOpts, err := bind.NewKeyedTransactorWithChainID(gasFeeKey, big.NewInt(1337))
+	assert.NoError(t, err)
+
+	// Generate GenesisAlloc
+	alloc := makeGenesisAllocation()
+
+	// Generate SimulatedBackend
+	sim := backends.NewSimulatedBackendWithInitialAdmin(alloc, gasLimit, gasFeeAddr)
+	defer func() {
+		err := sim.Close()
+		assert.NoError(t, err)
+	}()
+
+	sim.Commit(true)
+
+	ethChain, _, _ := chain.NewDefaultChain(t)
+
+	// Setting the new Admin Controller
+	ac := ethadmin.NewController(ethChain.APIBackend())
+	sim.Blockchain().SetAdminController(ac)
+
+	latestHeader, state := getLatestHeaderAndState(t, sim)
+
+	bf := ac.GetFixedBaseFee(latestHeader, state)
+	assert.EqualValues(t, big.NewInt(0), big.NewInt(int64(bf.Cmp(big.NewInt(int64(params.SunrisePhase0BaseFee))))))
+
+	adminContract, err := admin.NewBuild(contractAddr, sim)
+	assert.NoError(t, err)
+
+	// BuildSession Initialization
+	gasFeeSession := admin.BuildSession{Contract: adminContract, TransactOpts: *gasFeeOpts}
+
+	// Add Gas Fee Role in the address
+	_, err = gasFeeSession.GrantRole(gasFeeAddr, GAS_FEE_ROLE)
+	assert.NoError(t, err)
+
+	sim.Commit(true)
+
+	_, err = gasFeeSession.SetBaseFee(big.NewInt(1))
+	assert.NoError(t, err)
+
+	sim.Commit(true)
+
+	bf = ac.GetFixedBaseFee(latestHeader, state)
+	// Despite the fact that the base fee changed, the Admin Controller still tries to get it from the previous role.
+	// Therefore, it should return the SunrisePhase0BaseFee value
+	assert.EqualValues(t, big.NewInt(0), big.NewInt(int64(bf.Cmp(big.NewInt(int64(params.SunrisePhase0BaseFee))))))
+
+	// Get new block's header
+	latestHeader, state = getLatestHeaderAndState(t, sim)
+
+	bf = ac.GetFixedBaseFee(latestHeader, state)
+
+	// Now with the new block's header, Base Fee should be the new one.
+	assert.EqualValues(t, big.NewInt(1), bf)
+}
+
+func getLatestHeaderAndState(t *testing.T, sim *backends.SimulatedBackend) (*types.Header, *state.StateDB) {
+	latestHeader := sim.Blockchain().LastAcceptedBlock().Header()
+	state, err := sim.Blockchain().State()
+	assert.NoError(t, err)
+
+	return latestHeader, state
 }
 
 func makeGenesisAllocation() core.GenesisAlloc {
