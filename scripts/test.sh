@@ -10,10 +10,10 @@ export GOGC=25
 CORETH_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; cd .. && pwd )
 
 # Load the versions
-source "$CORETH_PATH"/scripts/versions.sh
+# source "$CORETH_PATH"/scripts/versions.sh
 
 # Load the constants
-source "$CORETH_PATH"/scripts/constants.sh
+# source "$CORETH_PATH"/scripts/constants.sh
 
 # We pass in the arguments to this script directly to enable easily passing parameters such as enabling race detection,
 # parallelism, and test coverage.
