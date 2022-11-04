@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/log"
 	"math/big"
 	"time"
 
@@ -318,6 +319,7 @@ func (de *DummyEngine) verifyBlockFee(
 	// set by this block.
 	blockGas := new(big.Int).Div(totalBlockFee, baseFee)
 
+	log.Info("verifyBlockFee", "blockGas", blockGas, "totalBlockFee", totalBlockFee, "requiredBlockGasCost", requiredBlockGasCost)
 	// Require that the amount of gas purchased by the effective tips within the block, [blockGas],
 	// covers at least [requiredBlockGasCost].
 	//
@@ -414,6 +416,7 @@ func (de *DummyEngine) FinalizeAndAssemble(chain consensus.ChainHeaderReader, he
 			parent.BlockGasCost,
 			parent.Time, header.Time,
 		)
+		log.Info("FinalizeAndAssemble.verifyBlkFee", "header.Number", header.Number)
 		if err := de.verifyBlockFee(
 			header.BaseFee,
 			header.BlockGasCost,

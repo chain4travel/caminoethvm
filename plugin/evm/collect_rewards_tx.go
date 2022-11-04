@@ -51,7 +51,7 @@ type UnsignedCollectRewardsTx struct {
 	BlockId        ids.ID `serialize:"true" json:"blockId"`
 	BlockTimestamp uint64 `serialize:"true" json:"blockTimestamp"`
 
-	RewardCalculation RewardCalculation `serialize:"true" json:"rewardCalculation"`
+	RewardCalculation RewardCalculationResult `serialize:"true" json:"rewardCalculation"`
 
 	Coinbase                   common.Address `serialize:"true" json:"coinbase"`
 	ValidatorRewardAddress     common.Address `serialize:"true" json:"validatorRewardAddress"`
@@ -70,11 +70,6 @@ func (tx *UnsignedCollectRewardsTx) Verify(
 	rules params.Rules,
 ) error {
 	log.Info("Verify...")
-
-	if err := tx.RewardCalculation.Verify(); err != nil {
-		return err
-	}
-
 	switch {
 	case tx == nil:
 		return errNilTx
@@ -82,6 +77,13 @@ func (tx *UnsignedCollectRewardsTx) Verify(
 		return errWrongNetworkID
 	case ctx.ChainID != tx.BlockchainID:
 		return errWrongBlockchainID
+	}
+
+	calculation := tx.RewardCalculation.Calculation()
+	log.Info("Sanity check of RC", "txID", tx.ID(), "calc", calculation)
+	if err := tx.RewardCalculation.Verify(); err != nil {
+		log.Info("RewardCollectionTx verification failed", "txID", tx.ID(), "error", err)
+		return err
 	}
 
 	// Make sure that the tx has a valid peer chain ID
@@ -102,7 +104,7 @@ func (tx *UnsignedCollectRewardsTx) GasUsed(bool) (uint64, error) {
 
 // Amount of [assetID] burned by this transaction
 func (tx *UnsignedCollectRewardsTx) Burned(assetID ids.ID) (uint64, error) {
-	// Not sure it will be needed - mock
+	// Let me lie here
 	return 0, nil
 }
 
@@ -125,21 +127,23 @@ func (tx *UnsignedCollectRewardsTx) SemanticVerify(
 		return fmt.Errorf("cannot access current EVM state: %w", err)
 	}
 
+	calculation := tx.RewardCalculation.Calculation()
+
 	log.Info("SemanticVerify processing tx", "txID", tx.ID().String())
 	currValidatorRewardPayedOut := state.GetState(tx.Coinbase, Slot1).Big()
-	if tx.RewardCalculation.PrevValidatorRewards.Cmp(currValidatorRewardPayedOut) != 0 {
-		log.Info("validator rewards mismatch", "prevFeesBurned", tx.RewardCalculation.PrevFeesBurned, "currValidatorRewardPayedOut", currValidatorRewardPayedOut)
+	if calculation.PrevValidatorRewards.Cmp(currValidatorRewardPayedOut) != 0 {
+		log.Info("validator rewards mismatch", "prevFeesBurned", calculation.PrevFeesBurned, "currValidatorRewardPayedOut", currValidatorRewardPayedOut)
 		return fmt.Errorf("validator rewards mismatch")
 	}
 
 	ipRewardsPayedOut := state.GetState(tx.Coinbase, Slot2).Big()
-	if tx.RewardCalculation.PrevIncentivePoolRewards.Cmp(ipRewardsPayedOut) != 0 {
-		log.Info("Incentive pool rewards mismatch", "prevIncentivePoolRewards", tx.RewardCalculation.PrevIncentivePoolRewards, "ipRewardsPayedOut", ipRewardsPayedOut)
+	if calculation.PrevIncentivePoolRewards.Cmp(ipRewardsPayedOut) != 0 {
+		log.Info("Incentive pool rewards mismatch", "prevIncentivePoolRewards", calculation.PrevIncentivePoolRewards, "ipRewardsPayedOut", ipRewardsPayedOut)
 		return fmt.Errorf("incentive pool balance mismatch")
 	}
 
 	// TODO: Question should we confirm the calculation (by re-calculate) at this point?
-	// The coinbase balance might increased due to processing further Txs
+	// YES: We need all information to be able to fully verify the tx, inc. recalculation
 
 	log.Info("SemanticVerify completed")
 	return nil
@@ -181,7 +185,7 @@ func (tx *UnsignedCollectRewardsTx) AtomicOps() (ids.ID, *atomic.Requests, error
 }
 
 func (vm *VM) NewCollectRewardsTx(
-	calculation RewardCalculation,
+	calculation RewardCalculationResult,
 	blockId ids.ID,
 	blockTimestamp uint64,
 	coinbase common.Address,
@@ -236,11 +240,12 @@ func (vm *VM) NewCollectRewardsTx(
 // EVMStateTransfer executes the state update from the atomic export transaction
 func (tx *UnsignedCollectRewardsTx) EVMStateTransfer(ctx *snow.Context, state *state.StateDB) error {
 	log.Info("EVMStateTransfer...", "txID", tx.ID().String())
-	state.SubBalance(tx.Coinbase, tx.RewardCalculation.CoinbaseAmountToSub)
-	validatorRewards := new(big.Int).Add(tx.RewardCalculation.PrevValidatorRewards, tx.RewardCalculation.ValidatorRewardAmount)
+	calculation := tx.RewardCalculation.Calculation()
+	state.SubBalance(tx.Coinbase, calculation.CoinbaseAmountToSub)
+	validatorRewards := new(big.Int).Add(calculation.PrevValidatorRewards, calculation.ValidatorRewardAmount)
 
-	ipRewards := new(big.Int).Add(tx.RewardCalculation.PrevIncentivePoolRewards, tx.RewardCalculation.IncentivePoolRewardAmount)
-	state.AddBalance(tx.IncentivePoolRewardAddress, tx.RewardCalculation.IncentivePoolRewardAmount)
+	ipRewards := new(big.Int).Add(calculation.PrevIncentivePoolRewards, calculation.IncentivePoolRewardAmount)
+	state.AddBalance(tx.IncentivePoolRewardAddress, calculation.IncentivePoolRewardAmount)
 
 	state.SetState(tx.Coinbase, Slot0, common.BigToHash(new(big.Int).SetUint64(tx.BlockTimestamp)))
 	state.SetState(tx.Coinbase, Slot1, common.BigToHash(validatorRewards))

@@ -175,6 +175,7 @@ func (tx *UnsignedExportTx) SemanticVerify(
 	baseFee *big.Int,
 	rules params.Rules,
 ) error {
+	log.Info("UnsignedExportTx SemanticVerify...")
 	if err := tx.Verify(vm.ctx, rules); err != nil {
 		return err
 	}
@@ -369,6 +370,7 @@ func (vm *VM) newExportTx(
 
 // EVMStateTransfer executes the state update from the atomic export transaction
 func (tx *UnsignedExportTx) EVMStateTransfer(ctx *snow.Context, state *state.StateDB) error {
+	log.Info("UnsignedExportTx EVMStateTransfer...")
 	addrs := map[[20]byte]uint64{}
 	for _, from := range tx.Ins {
 		if from.AssetID == ctx.AVAXAssetID {

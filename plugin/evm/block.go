@@ -394,8 +394,7 @@ func (b *Block) calculateAndCollectRewards() {
 		}
 	}
 }
-func (b *Block) calculateRewards(state *state.StateDB) (RewardCalculation, error) {
-	calculation := RewardCalculation{}
+func (b *Block) calculateRewards(state *state.StateDB) (*RewardCalculation, error) {
 	header := b.ethBlock.Header()
 
 	lastCheckTime := state.GetState(header.Coinbase, Slot0).Big().Uint64()
@@ -403,7 +402,7 @@ func (b *Block) calculateRewards(state *state.StateDB) (RewardCalculation, error
 	log.Info("Time of rewards calculation", "lastCheckTime", lastCheckTime, "blockTime", b.ethBlock.Time())
 
 	if b.ethBlock.Time() < lastCheckTime+checkInterval {
-		return calculation, fmt.Errorf("too early to collect fee rewards. Current block time: %d, last check time: %d", b.ethBlock.Time(), lastCheckTime)
+		return nil, fmt.Errorf("too early to collect fee rewards. Current block time: %d, last check time: %d", b.ethBlock.Time(), lastCheckTime)
 	}
 
 	feesBurned := state.GetBalance(header.Coinbase)
@@ -419,20 +418,24 @@ func (b *Block) calculateRewards(state *state.StateDB) (RewardCalculation, error
 	)
 
 	if err != nil {
-		return calculation, err
+		return nil, err
 	}
 
 	if calculation.ValidatorRewardToExport < header.FeeRewardMinAmountToExport {
-		return calculation, fmt.Errorf("calculated fee reward amount %d is less than the minimum amount to export", calculation.ValidatorRewardAmount)
+		return nil, fmt.Errorf("calculated fee reward amount %d is less than the minimum amount to export", calculation.ValidatorRewardAmount)
 	}
 
-	return calculation, nil
+	return &calculation, nil
 }
 
-func (b *Block) createReawardsCollectionTx(calculation RewardCalculation) (*Tx, error) {
+func (b *Block) createReawardsCollectionTx(calculation *RewardCalculation) (*Tx, error) {
+	if calculation == nil {
+		return nil, fmt.Errorf("no rewards to collect")
+	}
+
 	h := b.ethBlock.Header()
 	tx, err := b.vm.NewCollectRewardsTx(
-		calculation,
+		calculation.Result(),
 		b.ID(),
 		b.ethBlock.Time(),
 		h.Coinbase,

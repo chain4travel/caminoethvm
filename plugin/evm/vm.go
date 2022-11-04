@@ -616,10 +616,8 @@ func (vm *VM) preBatchOnFinalizeAndAssemble(header *types.Header, state *state.S
 		if !exists {
 			break
 		}
+		log.Info("preBatchOnFinalizeAndAssemble:", "tx", fmt.Sprintf("%T", tx.UnsignedAtomicTx), "txID", tx.ID())
 
-		// TODO: remove - I'm just currious
-		utx := tx.UnsignedAtomicTx
-		log.Info(fmt.Sprintf("Tx %T from mempool, ID: %s", utx, tx.ID().Hex()))
 		// Take a snapshot of [state] before calling verifyTx so that if the transaction fails verification
 		// we can revert to [snapshot].
 		// Note: snapshot is taken inside the loop because you cannot revert to the same snapshot more than
@@ -679,6 +677,8 @@ func (vm *VM) postBatchOnFinalizeAndAssemble(header *types.Header, state *state.
 		if !exists {
 			break
 		}
+
+		log.Info("postBatchOnFinalizeAndAssemble:", "tx", fmt.Sprintf("%T", tx.UnsignedAtomicTx), "txID", tx.ID())
 
 		// Ensure that adding [tx] to the block will not exceed the block size soft limit.
 		txSize := len(tx.Bytes())
@@ -901,6 +901,7 @@ func (vm *VM) buildBlock() (snowman.Block, error) {
 	// We call verify without writes here to avoid generating a reference
 	// to the blk state root in the triedb when we are going to call verify
 	// again from the consensus engine with writes enabled.
+	log.Info("plugin/evm block gets verified", "blkID", blk.ID(), "blkHeight", blk.Height())
 	if err := blk.verify(false /*=writes*/); err != nil {
 		vm.mempool.CancelCurrentTxs()
 		return nil, fmt.Errorf("block failed verification due to: %w", err)

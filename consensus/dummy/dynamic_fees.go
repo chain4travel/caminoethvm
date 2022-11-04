@@ -26,6 +26,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/log"
 )
 
 var (
@@ -312,8 +313,11 @@ func calcBlockGasCost(
 	parentBlockGasCost *big.Int,
 	parentTime, currentTime uint64,
 ) *big.Int {
+	return common.Big0
+	log.Info("In calcBlockGasCost", "targetBlockRate", targetBlockRate, "minBlockGasCost", minBlockGasCost, "maxBlockGasCost", maxBlockGasCost, "blockGasCostStep", blockGasCostStep, "parentBlockGasCost", parentBlockGasCost, "parentTime", parentTime, "currentTime", currentTime)
 	// Handle AP3/AP4 boundary by returning the minimum value as the boundary.
 	if parentBlockGasCost == nil {
+		log.Info("calcBlockGasCost: parentBlockGasCost is nil, returning minBlockGasCost", "minBlockGasCost", minBlockGasCost)
 		return new(big.Int).Set(minBlockGasCost)
 	}
 
@@ -336,6 +340,8 @@ func calcBlockGasCost(
 	if !blockGasCost.IsUint64() {
 		blockGasCost = new(big.Int).SetUint64(math.MaxUint64)
 	}
+
+	log.Info("calcBlockGasCost final return", "blockGasCost", blockGasCost)
 	return blockGasCost
 }
 

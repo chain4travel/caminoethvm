@@ -316,12 +316,15 @@ func (w *worker) commitTransactions(env *environment, txs *types.TransactionsByP
 // commit runs any post-transaction state modifications, assembles the final block
 // and commits new work if consensus engine is running.
 func (w *worker) commit(env *environment) (*types.Block, error) {
+	log.Info("Commit new mining work", "number", env.header.Number, "txs", env.tcount, "gas", env.gasPool)
 	// Deep copy receipts here to avoid interaction between different tasks.
 	receipts := copyReceipts(env.receipts)
 	block, err := w.engine.FinalizeAndAssemble(w.chain, env.header, env.parent, env.state, env.txs, nil, receipts)
 	if err != nil {
+		log.Info("Error in worker commit", "err", err)
 		return nil, err
 	}
+	log.Info("Block from Fin&Assem", "blkNo", block.Number().String(), "blkID", block.Hash().String())
 
 	return w.handleResult(env, block, time.Now(), receipts)
 }

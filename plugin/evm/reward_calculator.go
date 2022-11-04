@@ -22,18 +22,42 @@ var (
 )
 
 type RewardCalculation struct {
-	ValidatorRewardAmount     *big.Int `serialize:"true" json:"validatorRewardAmount"`
-	ValidatorRewardToExport   uint64   `serialize:"true" json:"validatorRewardToExport"`
-	IncentivePoolRewardAmount *big.Int `serialize:"true" json:"incentivePoolRewardAmount"`
-	CoinbaseAmountToSub       *big.Int `serialize:"true" json:"coinbaseAmountToSub"`
+	ValidatorRewardAmount     *big.Int
+	ValidatorRewardToExport   uint64
+	IncentivePoolRewardAmount *big.Int
+	CoinbaseAmountToSub       *big.Int
 
 	// Needed for validation that calculation can be applied
-	PrevFeesBurned           *big.Int `serialize:"true" json:"prevFeesBurned"`
-	PrevValidatorRewards     *big.Int `serialize:"true" json:"prevValidatorRewards"`
-	PrevIncentivePoolRewards *big.Int `serialize:"true" json:"prevIncentivePoolRewards"`
+	PrevFeesBurned           *big.Int
+	PrevValidatorRewards     *big.Int
+	PrevIncentivePoolRewards *big.Int
 }
 
-func (rc *RewardCalculation) Verify() error {
+type RewardCalculationResult struct {
+	ValidatorRewardAmount     common.Hash `serialize:"true" json:"validatorRewardAmount"`
+	ValidatorRewardToExport   uint64      `serialize:"true" json:"validatorRewardToExport"`
+	IncentivePoolRewardAmount common.Hash `serialize:"true" json:"incentivePoolRewardAmount"`
+	CoinbaseAmountToSub       common.Hash `serialize:"true" json:"coinbaseAmountToSub"`
+
+	// Needed for validation that calculation can be applied
+	PrevFeesBurned           common.Hash `serialize:"true" json:"prevFeesBurned"`
+	PrevValidatorRewards     common.Hash `serialize:"true" json:"prevValidatorRewards"`
+	PrevIncentivePoolRewards common.Hash `serialize:"true" json:"prevIncentivePoolRewards"`
+}
+
+func (rc RewardCalculation) Result() RewardCalculationResult {
+	return RewardCalculationResult{
+		ValidatorRewardAmount:     common.BigToHash(rc.ValidatorRewardAmount),
+		ValidatorRewardToExport:   rc.ValidatorRewardToExport,
+		IncentivePoolRewardAmount: common.BigToHash(rc.IncentivePoolRewardAmount),
+		CoinbaseAmountToSub:       common.BigToHash(rc.CoinbaseAmountToSub),
+		PrevFeesBurned:            common.BigToHash(rc.PrevFeesBurned),
+		PrevValidatorRewards:      common.BigToHash(rc.PrevValidatorRewards),
+		PrevIncentivePoolRewards:  common.BigToHash(rc.PrevIncentivePoolRewards),
+	}
+}
+
+func (rc RewardCalculation) Verify() error {
 	if rc.ValidatorRewardToExport == 0 ||
 		rc.ValidatorRewardAmount.Cmp(common.Big0) == 0 ||
 		rc.IncentivePoolRewardAmount.Cmp(common.Big0) == 0 {
@@ -46,6 +70,22 @@ func (rc *RewardCalculation) Verify() error {
 	}
 
 	return nil
+}
+
+func (res RewardCalculationResult) Calculation() RewardCalculation {
+	return RewardCalculation{
+		ValidatorRewardAmount:     res.ValidatorRewardAmount.Big(),
+		ValidatorRewardToExport:   res.ValidatorRewardToExport,
+		IncentivePoolRewardAmount: res.IncentivePoolRewardAmount.Big(),
+		CoinbaseAmountToSub:       res.CoinbaseAmountToSub.Big(),
+		PrevFeesBurned:            res.PrevFeesBurned.Big(),
+		PrevValidatorRewards:      res.PrevValidatorRewards.Big(),
+		PrevIncentivePoolRewards:  res.PrevIncentivePoolRewards.Big(),
+	}
+}
+
+func (res RewardCalculationResult) Verify() error {
+	return res.Calculation().Verify()
 }
 
 // CalculateRewards calculates the rewards for validators and incentive pool account

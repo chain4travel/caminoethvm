@@ -62,6 +62,7 @@ func (tx *UnsignedImportTx) Verify(
 	ctx *snow.Context,
 	rules params.Rules,
 ) error {
+	log.Info("UnsignedImportTx Verify...")
 	switch {
 	case tx == nil:
 		return errNilTx
@@ -137,6 +138,8 @@ func (tx *UnsignedImportTx) GasUsed(fixedFee bool) (uint64, error) {
 			return 0, err
 		}
 	}
+
+	log.Info("ImportTx GasUsed", "cost", cost)
 	return cost, nil
 }
 
@@ -164,6 +167,7 @@ func (tx *UnsignedImportTx) Burned(assetID ids.ID) (uint64, error) {
 		}
 	}
 
+	log.Info("ImportTx Burned", "input", input, "spent", spent)
 	return math.Sub64(input, spent)
 }
 
@@ -175,6 +179,7 @@ func (tx *UnsignedImportTx) SemanticVerify(
 	baseFee *big.Int,
 	rules params.Rules,
 ) error {
+	log.Info("UnsignedImportTx SemanticVerify...")
 	if err := tx.Verify(vm.ctx, rules); err != nil {
 		return err
 	}
@@ -259,6 +264,7 @@ func (tx *UnsignedImportTx) SemanticVerify(
 // only to have the transaction not be Accepted. This would be inconsistent.
 // Recall that imported UTXOs are not kept in a versionDB.
 func (tx *UnsignedImportTx) AtomicOps() (ids.ID, *atomic.Requests, error) {
+	log.Info("UnsignedImportTx AtomicOps...")
 	utxoIDs := make([][]byte, len(tx.ImportedInputs))
 	for i, in := range tx.ImportedInputs {
 		inputID := in.InputID()
@@ -269,11 +275,12 @@ func (tx *UnsignedImportTx) AtomicOps() (ids.ID, *atomic.Requests, error) {
 
 // newImportTx returns a new ImportTx
 func (vm *VM) newImportTx(
-	chainID ids.ID, // chain to import from
-	to common.Address, // Address of recipient
-	baseFee *big.Int, // fee to use post-AP3
+	chainID ids.ID,                      // chain to import from
+	to common.Address,                   // Address of recipient
+	baseFee *big.Int,                    // fee to use post-AP3
 	keys []*crypto.PrivateKeySECP256K1R, // Keys to import the funds
 ) (*Tx, error) {
+	log.Info("New ImportTx creation in newImportTx...")
 	kc := secp256k1fx.NewKeychain()
 	for _, key := range keys {
 		kc.Add(key)
@@ -289,12 +296,13 @@ func (vm *VM) newImportTx(
 
 // newImportTx returns a new ImportTx
 func (vm *VM) newImportTxWithUTXOs(
-	chainID ids.ID, // chain to import from
-	to common.Address, // Address of recipient
-	baseFee *big.Int, // fee to use post-AP3
+	chainID ids.ID,           // chain to import from
+	to common.Address,        // Address of recipient
+	baseFee *big.Int,         // fee to use post-AP3
 	kc *secp256k1fx.Keychain, // Keychain to use for signing the atomic UTXOs
 	atomicUTXOs []*avax.UTXO, // UTXOs to spend
 ) (*Tx, error) {
+	log.Info("New ImportTx creation in newImportTxWithUTXOs...")
 	importedInputs := []*avax.TransferableInput{}
 	signers := [][]*crypto.PrivateKeySECP256K1R{}
 
@@ -381,6 +389,9 @@ func (vm *VM) newImportTxWithUTXOs(
 		txFeeWithoutChange = params.AvalancheAtomicTxFee
 		txFeeWithChange = params.AvalancheAtomicTxFee
 	}
+	log.Info("ImportTx fees calculation", "txFeeWithoutChange", txFeeWithoutChange, "txFeeWithChange", txFeeWithChange)
+	log.Info("Apricot phases", "isApricotPhase2", rules.IsApricotPhase2, "isApricotPhase3", rules.IsApricotPhase3, "isApricotPhase5", rules.IsApricotPhase5)
+	log.Info("Imported AVAX amount", "importedAVAXAmount", importedAVAXAmount)
 
 	// AVAX output
 	if importedAVAXAmount < txFeeWithoutChange { // imported amount goes toward paying tx fee
@@ -416,12 +427,15 @@ func (vm *VM) newImportTxWithUTXOs(
 	if err := tx.Sign(vm.codec, signers); err != nil {
 		return nil, err
 	}
+
+	log.Info("newImportTxWithUTXOs... DONE")
 	return tx, utx.Verify(vm.ctx, vm.currentRules())
 }
 
 // EVMStateTransfer performs the state transfer to increase the balances of
 // accounts accordingly with the imported EVMOutputs
 func (tx *UnsignedImportTx) EVMStateTransfer(ctx *snow.Context, state *state.StateDB) error {
+	log.Info("UnsignedImportTx EVMStateTransfer...")
 	for _, to := range tx.Outs {
 		if to.AssetID == ctx.AVAXAssetID {
 			log.Debug("crosschain", "src", tx.SourceChain, "addr", to.Address, "amount", to.Amount, "assetID", "AVAX")
