@@ -86,6 +86,7 @@ type Backend interface {
 	ChainDb() ethdb.Database
 	StateAtBlock(ctx context.Context, block *types.Block, reexec uint64, base *state.StateDB, checkLive bool, preferDisk bool) (*state.StateDB, error)
 	StateAtTransaction(ctx context.Context, block *types.Block, txIndex int, reexec uint64) (core.Message, vm.BlockContext, *state.StateDB, error)
+	Chain() *core.BlockChain
 }
 
 // API is the collection of tracing APIs exposed over the private debugging endpoint.
@@ -525,7 +526,7 @@ func (api *API) IntermediateRoots(ctx context.Context, hash common.Hash, config 
 		var (
 			msg, _    = tx.AsMessage(signer, block.BaseFee())
 			txContext = core.NewEVMTxContext(msg)
-			vmenv     = vm.NewEVM(vmctx, txContext, statedb, chainConfig, vm.Config{})
+			vmenv     = vm.NewEVM(vmctx, txContext, statedb, chainConfig, vm.Config{EnableAdminEnforcement: api.backend.Chain().GetVMConfig().EnableAdminEnforcement})
 		)
 		statedb.Prepare(tx.Hash(), i)
 		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.Gas())); err != nil {
@@ -611,7 +612,7 @@ func (api *API) traceBlock(ctx context.Context, block *types.Block, config *Trac
 		// Generate the next state snapshot fast without tracing
 		msg, _ := tx.AsMessage(signer, block.BaseFee())
 		statedb.Prepare(tx.Hash(), i)
-		vmenv := vm.NewEVM(blockCtx, core.NewEVMTxContext(msg), statedb, api.backend.ChainConfig(), vm.Config{})
+		vmenv := vm.NewEVM(blockCtx, core.NewEVMTxContext(msg), statedb, api.backend.ChainConfig(), vm.Config{EnableAdminEnforcement: api.backend.Chain().GetVMConfig().EnableAdminEnforcement})
 		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.Gas())); err != nil {
 			failed = err
 			break
@@ -760,7 +761,7 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 	defer cancel()
 
 	// Run the transaction with tracing enabled.
-	vmenv := vm.NewEVM(vmctx, txContext, statedb, api.backend.ChainConfig(), vm.Config{Debug: true, Tracer: tracer, NoBaseFee: true})
+	vmenv := vm.NewEVM(vmctx, txContext, statedb, api.backend.ChainConfig(), vm.Config{Debug: true, Tracer: tracer, NoBaseFee: true, EnableAdminEnforcement: api.backend.Chain().GetVMConfig().EnableAdminEnforcement})
 	// Call Prepare to clear out the statedb access list
 	statedb.Prepare(txctx.TxHash, txctx.TxIndex)
 	if _, err = core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.Gas())); err != nil {

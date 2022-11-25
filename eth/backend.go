@@ -205,6 +205,7 @@ func New(
 		vmConfig = vm.Config{
 			EnablePreimageRecording: config.EnablePreimageRecording,
 			AllowUnfinalizedQueries: config.AllowUnfinalizedQueries,
+			EnableAdminEnforcement:  true,
 		}
 		cacheConfig = &core.CacheConfig{
 			TrieCleanLimit:                  config.TrieCleanCache,

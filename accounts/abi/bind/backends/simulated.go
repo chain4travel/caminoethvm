@@ -131,6 +131,32 @@ func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc core.Genesis
 	return backend
 }
 
+func NewSimulatedBackendWithDatabaseAndValidKYCRole(database ethdb.Database, alloc core.GenesisAlloc, gasLimit uint64, addr common.Address) *SimulatedBackend {
+	cpcfg := params.TestChainConfig
+	cpcfg.ChainID = big.NewInt(1337)
+	genesis := core.Genesis{Config: cpcfg, GasLimit: gasLimit, Alloc: alloc, InitialAdmin: addr}
+	if addr.String() != "0x0000000000000000000000000000000000000000" {
+		genesis.PreDeploy()
+		genesis.KycVerifyInitialAdmin()
+	}
+	genesis.MustCommit(database)
+	cacheConfig := &core.CacheConfig{}
+	blockchain, _ := core.NewBlockChain(database, cacheConfig, genesis.Config, dummy.NewFaker(), vm.Config{EnableAdminEnforcement: true}, common.Hash{})
+
+	backend := &SimulatedBackend{
+		database:   database,
+		blockchain: blockchain,
+		config:     genesis.Config,
+	}
+
+	filterBackend := &filterBackend{database, blockchain, backend}
+	backend.filterSystem = filters.NewFilterSystem(filterBackend, filters.Config{})
+	backend.events = filters.NewEventSystem(backend.filterSystem, false)
+
+	backend.rollback(blockchain.CurrentBlock())
+	return backend
+}
+
 // NewSimulatedBackend creates a new binding backend using a simulated blockchain
 // for testing purposes.
 // A simulated backend always uses chainID 1337.
@@ -143,6 +169,13 @@ func NewSimulatedBackend(alloc core.GenesisAlloc, gasLimit uint64) *SimulatedBac
 // A simulated backend always uses chainID 1337.
 func NewSimulatedBackendWithInitialAdmin(alloc core.GenesisAlloc, gasLimit uint64, addr common.Address) *SimulatedBackend {
 	return NewSimulatedBackendWithDatabase(rawdb.NewMemoryDatabase(), alloc, gasLimit, addr)
+}
+
+// NewSimulatedBackendWithInitialAdmin creates a new binding backend using a simulated blockchain
+// for testing purposes.
+// A simulated backend always uses chainID 1337.
+func NewSimulatedBackendWithKYCVerified(alloc core.GenesisAlloc, gasLimit uint64, addr common.Address) *SimulatedBackend {
+	return NewSimulatedBackendWithDatabaseAndValidKYCRole(rawdb.NewMemoryDatabase(), alloc, gasLimit, addr)
 }
 
 // Close terminates the underlying blockchain's update loop.
@@ -692,7 +725,7 @@ func (b *SimulatedBackend) callContract(ctx context.Context, call interfaces.Cal
 	evmContext := core.NewEVMBlockContext(block.Header(), b.blockchain, nil)
 	// Create a new environment which holds all relevant information
 	// about the transaction and calling mechanisms.
-	vmEnv := vm.NewEVM(evmContext, txContext, stateDB, b.config, vm.Config{NoBaseFee: true})
+	vmEnv := vm.NewEVM(evmContext, txContext, stateDB, b.config, vm.Config{NoBaseFee: true, EnableAdminEnforcement: b.blockchain.GetVMConfig().EnableAdminEnforcement})
 	gasPool := new(core.GasPool).AddGas(math.MaxUint64)
 
 	return core.NewStateTransition(vmEnv, msg, gasPool).TransitionDb()

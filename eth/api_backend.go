@@ -75,6 +75,10 @@ func (b *EthAPIBackend) ChainConfig() *params.ChainConfig {
 	return b.eth.blockchain.Config()
 }
 
+func (b *EthAPIBackend) Chain() *core.BlockChain {
+	return b.eth.blockchain
+}
+
 func (b *EthAPIBackend) GetVMConfig() *vm.Config {
 	return b.eth.blockchain.GetVMConfig()
 }
