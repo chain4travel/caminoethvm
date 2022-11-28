@@ -64,7 +64,7 @@ func waitDeployTestExec(name string, test waitDeployTest, backend *backends.Simu
 }
 
 func TestWaitDeployedVerified(t *testing.T) {
-	var tests = map[string]waitDeployTest{
+	tests := map[string]waitDeployTest{
 		"successful deploy": {
 			code:        `6060604052600a8060106000396000f360606040526008565b00`,
 			gas:         3000000,
@@ -92,10 +92,11 @@ func TestWaitDeployedVerified(t *testing.T) {
 }
 
 func TestWaitDeployUnverified(t *testing.T) {
-	var tests = map[string]waitDeployTest{
+	tests := map[string]waitDeployTest{
 		"failed deploy": {
 			code:        `6060604052600a8060106000396000f360606040526008565b00`,
 			gas:         3000000,
+			wantErr:     bind.ErrNoCodeAfterDeploy,
 			wantAddress: common.HexToAddress("0x3a220f351252089d385b29beca14e27f204c296a"),
 		},
 	}
