@@ -90,3 +90,24 @@ func TestWaitDeployedVerified(t *testing.T) {
 		waitDeployTestExec(name, test, backend, t)
 	}
 }
+
+func TestWaitDeployUnverified(t *testing.T) {
+	var tests = map[string]waitDeployTest{
+		"failed deploy": {
+			code:        `6060604052600a8060106000396000f360606040526008565b00`,
+			gas:         3000000,
+			wantAddress: common.HexToAddress("0x3a220f351252089d385b29beca14e27f204c296a"),
+		},
+	}
+	for name, test := range tests {
+		backend := backends.NewSimulatedBackendWithEnforcementEnabled(
+			core.GenesisAlloc{
+				crypto.PubkeyToAddress(testKey.PublicKey): {Balance: new(big.Int).Mul(big.NewInt(10000000000000000), big.NewInt(1000))},
+			},
+			10000000,
+		)
+		defer backend.Close()
+
+		waitDeployTestExec(name, test, backend, t)
+	}
+}

@@ -171,11 +171,18 @@ func NewSimulatedBackendWithInitialAdmin(alloc core.GenesisAlloc, gasLimit uint6
 	return NewSimulatedBackendWithDatabase(rawdb.NewMemoryDatabase(), alloc, gasLimit, addr)
 }
 
-// NewSimulatedBackendWithInitialAdmin creates a new binding backend using a simulated blockchain
-// for testing purposes.
+// NewSimulatedBackendWithKYCVerified creates a new binding backend using a simulated blockchain
+// for testing purposes. Initializes a Backend with enforcement enabled and the given address KYC verified
 // A simulated backend always uses chainID 1337.
 func NewSimulatedBackendWithKYCVerified(alloc core.GenesisAlloc, gasLimit uint64, addr common.Address) *SimulatedBackend {
 	return NewSimulatedBackendWithDatabaseAndValidKYCRole(rawdb.NewMemoryDatabase(), alloc, gasLimit, addr)
+}
+
+// NewSimulatedBackendWithEnforcementEnabled creates a new binding backend using a simulated blockchain
+// for testing purposes. Initializes a Backend with enforcement enabled but no address preverified
+// A simulated backend always uses chainID 1337.
+func NewSimulatedBackendWithEnforcementEnabled(alloc core.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
+	return NewSimulatedBackendWithDatabaseAndValidKYCRole(rawdb.NewMemoryDatabase(), alloc, gasLimit, common.Address{})
 }
 
 // Close terminates the underlying blockchain's update loop.
