@@ -55,6 +55,8 @@ type Config struct {
 
 	// AllowUnfinalizedQueries allow unfinalized queries
 	AllowUnfinalizedQueries bool
+
+	EnableAdminEnforcement bool
 }
 
 // ScopeContext contains the things that are per-call, such as stack and memory,

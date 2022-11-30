@@ -93,7 +93,7 @@ func newTestBackend(t *testing.T, n int, gspec *core.Genesis, generator func(i i
 		SnapshotLimit:  128,
 		Pruning:        false, // Archive mode
 	}
-	chain, err := core.NewBlockChain(backend.chaindb, cacheConfig, backend.chainConfig, backend.engine, vm.Config{}, common.Hash{})
+	chain, err := core.NewBlockChain(backend.chaindb, cacheConfig, backend.chainConfig, backend.engine, vm.Config{EnableAdminEnforcement: false}, common.Hash{})
 	if err != nil {
 		t.Fatalf("failed to create tester chain: %v", err)
 	}
@@ -150,6 +150,10 @@ func (b *testBackend) ChainConfig() *params.ChainConfig {
 	return b.chainConfig
 }
 
+func (b *testBackend) Chain() *core.BlockChain {
+	return b.chain
+}
+
 func (b *testBackend) Engine() consensus.Engine {
 	return b.engine
 }
@@ -187,7 +191,7 @@ func (b *testBackend) StateAtTransaction(ctx context.Context, block *types.Block
 		if idx == txIndex {
 			return msg, context, statedb, nil
 		}
-		vmenv := vm.NewEVM(context, txContext, statedb, b.chainConfig, vm.Config{})
+		vmenv := vm.NewEVM(context, txContext, statedb, b.chainConfig, vm.Config{EnableAdminEnforcement: b.chain.GetVMConfig().EnableAdminEnforcement})
 		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(tx.Gas())); err != nil {
 			return nil, vm.BlockContext{}, nil, fmt.Errorf("transaction %#x failed: %v", tx.Hash(), err)
 		}
@@ -281,6 +285,8 @@ func TestTraceCall(t *testing.T) {
 			config:    nil,
 			expectErr: errors.New("tracing on top of pending is not supported"),
 		},
+		// TODO @jax currently this is hard to workaround as the API is not replaceable by a mock
+		// TODO and is used by the actual RPC endpoints
 		{
 			blockNumber: rpc.LatestBlockNumber,
 			call: ethapi.TransactionArgs{
