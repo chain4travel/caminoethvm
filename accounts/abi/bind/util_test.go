@@ -64,11 +64,12 @@ var waitDeployedTests = map[string]struct {
 
 func TestWaitDeployed(t *testing.T) {
 	for name, test := range waitDeployedTests {
-		backend := backends.NewSimulatedBackend(
+		backend := backends.NewSimulatedBackendWithKYCVerified(
 			core.GenesisAlloc{
 				crypto.PubkeyToAddress(testKey.PublicKey): {Balance: new(big.Int).Mul(big.NewInt(10000000000000000), big.NewInt(1000))},
 			},
 			10000000,
+			crypto.PubkeyToAddress(testKey.PublicKey),
 		)
 		defer backend.Close()
 
