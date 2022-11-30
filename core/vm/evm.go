@@ -37,11 +37,13 @@
 package vm
 
 import (
+	"fmt"
 	"math/big"
 	"sync/atomic"
 	"time"
 
 	"github.com/ava-labs/coreth/constants"
+	"github.com/ava-labs/coreth/core/admin"
 	"github.com/ava-labs/coreth/params"
 	"github.com/ava-labs/coreth/precompile"
 	"github.com/ava-labs/coreth/vmerrs"
@@ -266,6 +268,13 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	if prohibitErr := evm.isProhibitedWithTimestamp(addr); prohibitErr != nil {
 		return nil, gas, prohibitErr
 	}
+
+	if evm.Config.EnableAdminEnforcement {
+		if blacklistedErr := admin.IsFunctionBlacklisted(evm.StateDB, addr, input); blacklistedErr != nil {
+			return nil, gas, blacklistedErr
+		}
+	}
+
 	// Fail if we're trying to execute above the call depth limit
 	if evm.depth > int(params.CallCreateDepth) {
 		return nil, gas, vmerrs.ErrDepth
@@ -352,6 +361,13 @@ func (evm *EVM) CallExpert(caller ContractRef, addr common.Address, input []byte
 	if prohibitErr := evm.isProhibitedWithTimestamp(addr); prohibitErr != nil {
 		return nil, gas, prohibitErr
 	}
+
+	if evm.Config.EnableAdminEnforcement {
+		if blacklistedErr := admin.IsFunctionBlacklisted(evm.StateDB, addr, input); blacklistedErr != nil {
+			return nil, gas, blacklistedErr
+		}
+	}
+
 	// Fail if we're trying to execute above the call depth limit
 	if evm.depth > int(params.CallCreateDepth) {
 		return nil, gas, vmerrs.ErrDepth
@@ -438,6 +454,13 @@ func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, 
 	if prohibitErr := evm.isProhibitedWithTimestamp(addr); prohibitErr != nil {
 		return nil, gas, prohibitErr
 	}
+
+	if evm.Config.EnableAdminEnforcement {
+		if blacklistedErr := admin.IsFunctionBlacklisted(evm.StateDB, addr, input); blacklistedErr != nil {
+			return nil, gas, blacklistedErr
+		}
+	}
+
 	// Fail if we're trying to execute above the call depth limit
 	if evm.depth > int(params.CallCreateDepth) {
 		return nil, gas, vmerrs.ErrDepth
@@ -492,6 +515,13 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 	if prohibitErr := evm.isProhibitedWithTimestamp(addr); prohibitErr != nil {
 		return nil, gas, prohibitErr
 	}
+
+	if evm.Config.EnableAdminEnforcement {
+		if blacklistedErr := admin.IsFunctionBlacklisted(evm.StateDB, addr, input); blacklistedErr != nil {
+			return nil, gas, blacklistedErr
+		}
+	}
+
 	// Fail if we're trying to execute above the call depth limit
 	if evm.depth > int(params.CallCreateDepth) {
 		return nil, gas, vmerrs.ErrDepth
@@ -534,6 +564,13 @@ func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte
 	if prohibitErr := evm.isProhibitedWithTimestamp(addr); prohibitErr != nil {
 		return nil, gas, prohibitErr
 	}
+
+	if evm.Config.EnableAdminEnforcement {
+		if blacklistedErr := admin.IsFunctionBlacklisted(evm.StateDB, addr, input); blacklistedErr != nil {
+			return nil, gas, blacklistedErr
+		}
+	}
+
 	// Fail if we're trying to execute above the call depth limit
 	if evm.depth > int(params.CallCreateDepth) {
 		return nil, gas, vmerrs.ErrDepth
@@ -630,6 +667,14 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 	if evm.StateDB.GetNonce(address) != 0 || (contractHash != (common.Hash{}) && contractHash != emptyCodeHash) {
 		return nil, common.Address{}, 0, vmerrs.ErrContractAddressCollision
 	}
+
+	// block creation of contracts if not KYC verified
+	if evm.Config.EnableAdminEnforcement {
+		if admin.GetKYCStatusForAddress(evm.StateDB, caller.Address()) != admin.KYC_VERIFIED {
+			return nil, common.Address{}, 0, fmt.Errorf("tx.origin %s is not authorized to deploy a contract", evm.TxContext.Origin)
+		}
+	}
+
 	// Create a new account on the state
 	snapshot := evm.StateDB.Snapshot()
 	evm.StateDB.CreateAccount(address)
