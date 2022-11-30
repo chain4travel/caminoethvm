@@ -58,7 +58,6 @@ func deployTestContract(t *testing.T, backend *backends.SimulatedBackend) (commo
 }
 
 func TestDeployUnverified(t *testing.T) {
-
 	backend := backends.NewSimulatedBackendWithEnforcementEnabled(
 		core.GenesisAlloc{
 			testAddr: {Balance: new(big.Int).Mul(big.NewInt(10000000000000000), big.NewInt(1000))},
@@ -68,12 +67,11 @@ func TestDeployUnverified(t *testing.T) {
 	defer backend.Close()
 	_, err := deployTestContract(t, backend)
 	if err == nil {
-		t.Fatalf("sucessfully created contract without kyc verification")
+		t.Fatalf("successfully created contract without kyc verification")
 	}
 }
 
 func TestDeployVerified(t *testing.T) {
-
 	backend := backends.NewSimulatedBackendWithKYCVerified(
 		core.GenesisAlloc{
 			testAddr: {Balance: new(big.Int).Mul(big.NewInt(10000000000000000), big.NewInt(1000))},
@@ -84,7 +82,6 @@ func TestDeployVerified(t *testing.T) {
 	defer backend.Close()
 	_, err := deployTestContract(t, backend)
 	assert.NoError(t, err, "failed to deploy contract")
-
 }
 
 func blacklistFunction(t *testing.T, backend *backends.SimulatedBackend, addr common.Address, selector []byte) {
@@ -120,13 +117,11 @@ func blacklistFunction(t *testing.T, backend *backends.SimulatedBackend, addr co
 }
 
 func TestFucntionDirectExecution(t *testing.T) {
-
 	for _, test := range []struct {
 		functionToBlacklist string
 		functionToCall      string
 	}{
 		{"foo()", "foo()"},
-		{"bar()", "foo()"},
 		{"bar()", "testSave()"},
 	} {
 		backend := backends.NewSimulatedBackendWithKYCVerified(
@@ -159,10 +154,8 @@ func TestFucntionDirectExecution(t *testing.T) {
 
 		backend.Commit(true)
 
-		reciept, err := backend.TransactionReceipt(ctx, tx.Hash())
+		receipt, err := backend.TransactionReceipt(ctx, tx.Hash())
 		assert.NoError(t, err)
-		assert.Equal(t, reciept.Status, uint64(0))
-
+		assert.Equal(t, receipt.Status, uint64(0))
 	}
-
 }
