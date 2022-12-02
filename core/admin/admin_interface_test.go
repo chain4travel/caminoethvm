@@ -183,7 +183,6 @@ func TestDisabledContract(t *testing.T) {
 		"bar()",
 		"testSave()",
 	} {
-
 		callSelector := crypto.Keccak256([]byte(functionToCall))[:4]
 
 		head, _ := backend.HeaderByNumber(ctx, nil) // Should be child's, good enough

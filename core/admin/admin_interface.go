@@ -72,7 +72,6 @@ func GetKYCStatusForAddress(state StateDB, addr common.Address) KYCStatus {
 
 // returns true if a fuction of a SC is blacklist and its execution should be prevented
 func IsFunctionBlacklisted(state StateDB, scAddr common.Address, input []byte) error {
-
 	if disabledErr := IsContractDisabled(state, scAddr); disabledErr != nil {
 		return disabledErr
 	}
