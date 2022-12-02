@@ -43,6 +43,10 @@ const (
 	FucntionSelectorLength = 4
 )
 
+var (
+	DisableContractFunctionSelector = common.FromHex("0x00000000")
+)
+
 func KycRoleKeyFromAddr(addr common.Address) common.Hash {
 	return crypto.Keccak256Hash(append(addr.Hash().Bytes(), common.HexToHash("0x2").Bytes()... /*slot 2 reference admin.sol map(address => uint)*/))
 }
@@ -55,6 +59,10 @@ func BlacklistFunctionKey(addr common.Address, selector []byte) common.Hash {
 	return crypto.Keccak256Hash(append(packFunctionSelector(addr, selector).Bytes(), common.HexToHash("0x3").Bytes()...) /*slot 3 reference admin.sol map(uint => uint)*/)
 }
 
+func DisableContractFunctionKey(addr common.Address) common.Hash {
+	return BlacklistFunctionKey(addr, DisableContractFunctionSelector)
+}
+
 // Returns the KYC status for a given address
 func GetKYCStatusForAddress(state StateDB, addr common.Address) KYCStatus {
 	addrKey := KycRoleKeyFromAddr(addr)
@@ -64,15 +72,28 @@ func GetKYCStatusForAddress(state StateDB, addr common.Address) KYCStatus {
 
 // returns true if a fuction of a SC is blacklist and its execution should be prevented
 func IsFunctionBlacklisted(state StateDB, scAddr common.Address, input []byte) error {
+
+	if disabledErr := IsContractDisabled(state, scAddr); disabledErr != nil {
+		return disabledErr
+	}
+
 	if len(input) >= FucntionSelectorLength {
 		var local = make([]byte, len(input)) // directly using the input resulted in execution reverted errors
 		copy(local, input)
 		funcSignature := local[:FucntionSelectorLength]
-		key := BlacklistFunctionKey(scAddr, funcSignature)
-		role := new(big.Int).SetBytes(state.GetState(AdminContractAddr, key).Bytes())
+		role := new(big.Int).SetBytes(state.GetState(AdminContractAddr, BlacklistFunctionKey(scAddr, funcSignature)).Bytes())
 		if role.Cmp(common.Big1) == 0 {
 			return fmt.Errorf("function %X on %s is blacklisted", funcSignature, scAddr)
 		}
 	}
+	return nil
+}
+
+func IsContractDisabled(state StateDB, scAddr common.Address) error {
+	role := new(big.Int).SetBytes(state.GetState(AdminContractAddr, DisableContractFunctionKey(scAddr)).Bytes())
+	if role.Cmp(common.Big1) == 0 {
+		return fmt.Errorf("contract %X is disabled", scAddr)
+	}
+
 	return nil
 }
