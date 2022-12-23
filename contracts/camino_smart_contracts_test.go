@@ -6,7 +6,9 @@ package contracts
 import (
 	"context"
 	"crypto/rand"
+	"fmt"
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -15,6 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ava-labs/avalanchego/utils/timer/mockable"
+	"github.com/ava-labs/coreth/accounts/abi"
 	"github.com/ava-labs/coreth/accounts/abi/bind"
 	"github.com/ava-labs/coreth/accounts/abi/bind/backends"
 	"github.com/ava-labs/coreth/accounts/keystore"
@@ -65,6 +68,40 @@ var (
 
 type ETHChain struct {
 	backend *eth.Ethereum
+}
+
+func TestSmartContracts(t *testing.T) {
+	// Initialize TransactOpts for each key
+	transOpts, err := bind.NewKeyedTransactorWithChainID(adminKey, big.NewInt(1337))
+	assert.NoError(t, err)
+
+	// Generate GenesisAlloc
+	alloc := makeGenesisAllocation()
+
+	// Generate SimulatedBackend
+	sim := backends.NewSimulatedBackendWithInitialAdmin(alloc, gasLimit, adminAddr)
+	defer func() {
+		err := sim.Close()
+		assert.NoError(t, err)
+	}()
+
+	sim.Commit(true)
+
+	// Create a bew Eth chain to generate an AdminController from its backend
+	// Simulated backed will not do
+	ethChain := newETHChain(t)
+
+	ac := ethadmin.NewController(ethChain.backend.APIBackend)
+	sim.Blockchain().SetAdminController(ac)
+
+	const contractAbi = "[{\"inputs\":[],\"name\":\"Assert\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"OOG\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"PureRevert\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"Revert\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"Valid\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+	const contractBin = "0x60806040523480156100115760006000fd5b50610017565b61016e806100266000396000f3fe60806040523480156100115760006000fd5b506004361061005c5760003560e01c806350f6fe3414610062578063aa8b1d301461006c578063b9b046f914610076578063d8b9839114610080578063e09fface1461008a5761005c565b60006000fd5b61006a610094565b005b6100746100ad565b005b61007e6100b5565b005b6100886100c2565b005b610092610135565b005b6000600090505b5b808060010191505061009b565b505b565b60006000fd5b565b600015156100bf57fe5b5b565b6040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252600d8152602001807f72657665727420726561736f6e0000000000000000000000000000000000000081526020015060200191505060405180910390fd5b565b5b56fea2646970667358221220345bbcbb1a5ecf22b53a78eaebf95f8ee0eceff6d10d4b9643495084d2ec934a64736f6c63430006040033"
+
+	parsed, _ := abi.JSON(strings.NewReader(contractAbi))
+	_, _, _, err = bind.DeployContract(transOpts, parsed, common.FromHex(contractBin), sim)
+	sim.Commit(false)
+
+	fmt.Println("ERROR: ", err)
 }
 
 func TestAdminRoleFunctions(t *testing.T) {
