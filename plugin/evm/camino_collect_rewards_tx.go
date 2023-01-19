@@ -14,6 +14,7 @@ import (
 	"github.com/ava-labs/avalanchego/utils/constants"
 	"github.com/ava-labs/avalanchego/vms/components/avax"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
+	gconstants "github.com/ava-labs/coreth/constants"
 	"github.com/ava-labs/coreth/core/state"
 	"github.com/ava-labs/coreth/params"
 	"github.com/ethereum/go-ethereum/common"
@@ -42,6 +43,8 @@ var (
 
 	errWrongInputCount  = errors.New("wrong input count")
 	errWrongExportCount = errors.New("wrong ExportedOuts count")
+	errExportLimit      = errors.New("export limit not yet reached")
+	errTimeNotPassed    = errors.New("time has not passed")
 )
 
 type UnsignedCollectRewardsTx struct {
@@ -83,6 +86,11 @@ func (ucx *UnsignedCollectRewardsTx) SemanticVerify(
 		return errAssetIDMismatch
 	}
 
+	// Verify sender of the rewards
+	if ucx.Ins[0].Address != gconstants.BlackholeAddr {
+		return fmt.Errorf("invalid input address")
+	}
+
 	// Verify receiver of the outputs
 	if len(output.OutputOwners.Addrs) != 1 || output.OutputOwners.Addrs[0] != FeeRewardAddressID {
 		return fmt.Errorf("invalid output owner")
@@ -95,17 +103,17 @@ func (ucx *UnsignedCollectRewardsTx) SemanticVerify(
 
 	// Check if the block timestamp is > nextReward
 	// ucx.blockTime will only be used once if we don't have state set
-	triggerTime := stateDB.GetState(block.ethBlock.Coinbase(), TimestampSlot).Big()
+	triggerTime := stateDB.GetState(gconstants.BlackholeAddr, TimestampSlot).Big()
 	ucx.blockTime = new(big.Int).SetInt64(block.Timestamp().Unix())
 	ucx.blockTime.Mod(ucx.blockTime, TimeInterval)
 	if ucx.blockTime.Cmp(triggerTime) < 0 {
-		return fmt.Errorf("time has not passed")
+		return errTimeNotPassed
 	}
 
 	// Check if we have enough amount to distribute
 	amountToExport := calculateRate(ucx.Ins[0].Amount, ExportRewardRate)
 	if amountToExport < FeeRewardMinAmountToExport {
-		return fmt.Errorf("export limit not yet reached")
+		return errExportLimit
 	}
 
 	return nil
@@ -156,11 +164,8 @@ func (ucx *UnsignedCollectRewardsTx) AtomicOps() (ids.ID, *atomic.Requests, erro
 	return ucx.DestinationChain, &atomic.Requests{PutRequests: []*atomic.Element{elem}}, nil
 }
 
-func (vm *VM) NewCollectRewardsTx(
-	amount uint64,
-	coinbase common.Address,
-) (*Tx, error) {
-	nonce, err := vm.GetCurrentNonce(coinbase)
+func (vm *VM) NewCollectRewardsTx(amount uint64) (*Tx, error) {
+	nonce, err := vm.GetCurrentNonce(gconstants.BlackholeAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +177,7 @@ func (vm *VM) NewCollectRewardsTx(
 			BlockchainID:     vm.ctx.ChainID,
 			DestinationChain: constants.PlatformChainID,
 			Ins: []EVMInput{{
-				Address: coinbase,
+				Address: gconstants.BlackholeAddr,
 				Amount:  amount,
 				AssetID: vm.ctx.AVAXAssetID,
 				Nonce:   nonce,
@@ -197,6 +202,31 @@ func (vm *VM) NewCollectRewardsTx(
 	}
 
 	return tx, utx.Verify(vm.ctx, vm.currentRules())
+}
+
+func (vm *VM) TriggerRewardsTx(block *Block) {
+	state, err := vm.blockChain.State()
+	if err != nil {
+		log.Warn("TriggerRewards: unable to get state")
+		return
+	}
+
+	// balance - lastPayoutBalance is the amount we can max distribute
+	balance := state.GetBalance(gconstants.BlackholeAddr)
+	balance.Sub(balance, state.GetState(gconstants.BlackholeAddr, BalanceSlot).Big())
+	balanceAvax := balance.Div(balance, x2cRate).Uint64()
+
+	if calculateRate(balanceAvax, ExportRewardRate) < FeeRewardMinAmountToExport {
+		return
+	}
+
+	tx, err := vm.NewCollectRewardsTx(balanceAvax)
+	if err != nil {
+		return
+	}
+
+	log.Info("Issue CollectRewardsTx", "amount", balanceAvax)
+	vm.issueTx(tx, true /*=local*/)
 }
 
 // EVMStateTransfer executes the state update from the atomic export transaction
