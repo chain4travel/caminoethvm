@@ -36,7 +36,7 @@ var (
 	BalanceSlot   = common.Hash{0x01}
 	TimestampSlot = common.Hash{0x02}
 
-	TimeInterval            = new(big.Int).SetUint64(3_600)
+	TimeInterval            = int64(3_600)
 	ExportRewardRate        = new(big.Int).SetUint64(300_000)
 	IncentivePoolRewardRate = new(big.Int).SetUint64(300_000)
 	RateDenominator         = new(big.Int).SetUint64(1_000_000)
@@ -48,8 +48,8 @@ var (
 )
 
 type UnsignedCollectRewardsTx struct {
-	UnsignedExportTx
-	blockTime *big.Int `serialize:"false"`
+	UnsignedExportTx `serialize:"true"`
+	ExecTime         int64 `serialize:"true"`
 }
 
 func (ucx *UnsignedCollectRewardsTx) GasUsed(fixedFee bool) (uint64, error) {
@@ -105,15 +105,10 @@ func (ucx *UnsignedCollectRewardsTx) SemanticVerify(
 		return err
 	}
 
-	triggerTime := stateDB.GetState(gconstants.BlackholeAddr, TimestampSlot).Big()
-	blockTime := new(big.Int).SetInt64(block.Timestamp().Unix())
-	// One time initialization: parent block time
-	if triggerTime.Cmp(common.Big0) == 0 {
-		ucx.blockTime = blockTime
-		ucx.blockTime.Mod(ucx.blockTime, TimeInterval)
-	}
-	// Check if the block timestamp is > nextReward
-	if blockTime.Cmp(triggerTime) < 0 {
+	triggerTime := stateDB.GetState(gconstants.BlackholeAddr, TimestampSlot).Big().Int64()
+	blockTime := block.Timestamp().Unix()
+	// TX must be build before / on this (parent) block and after triggerTime
+	if ucx.ExecTime > blockTime || ucx.ExecTime < triggerTime {
 		return errTimeNotPassed
 	}
 
@@ -171,7 +166,7 @@ func (ucx *UnsignedCollectRewardsTx) AtomicOps() (ids.ID, *atomic.Requests, erro
 	return ucx.DestinationChain, &atomic.Requests{PutRequests: []*atomic.Element{elem}}, nil
 }
 
-func (vm *VM) NewCollectRewardsTx(amount uint64) (*Tx, error) {
+func (vm *VM) NewCollectRewardsTx(amount uint64, execTime int64) (*Tx, error) {
 	nonce, err := vm.GetCurrentNonce(gconstants.BlackholeAddr)
 	if err != nil {
 		return nil, err
@@ -201,6 +196,7 @@ func (vm *VM) NewCollectRewardsTx(amount uint64) (*Tx, error) {
 				},
 			}},
 		},
+		ExecTime: execTime,
 	}
 
 	tx := &Tx{UnsignedAtomicTx: utx}
@@ -212,6 +208,11 @@ func (vm *VM) NewCollectRewardsTx(amount uint64) (*Tx, error) {
 }
 
 func (vm *VM) TriggerRewardsTx(block *Block) {
+	// reward distribution only for sunrise configurations
+	if !vm.chainConfig.IsSunrisePhase0(block.ethBlock.Timestamp()) {
+		return
+	}
+
 	state, err := vm.blockChain.State()
 	if err != nil {
 		log.Warn("TriggerRewards: unable to get state")
@@ -227,7 +228,7 @@ func (vm *VM) TriggerRewardsTx(block *Block) {
 		return
 	}
 
-	tx, err := vm.NewCollectRewardsTx(balanceAvax)
+	tx, err := vm.NewCollectRewardsTx(balanceAvax, block.Timestamp().Unix())
 	if err != nil {
 		return
 	}
@@ -302,14 +303,15 @@ func (ucx *UnsignedCollectRewardsTx) EVMStateTransfer(ctx *snow.Context, state *
 	state.AddBalance(common.Address(FeeRewardAddressID), amountIncentiveEVM)
 
 	// Step up timestamp for the next iteration
-	nextTimeStamp := state.GetState(from.Address, TimestampSlot).Big()
-	if nextTimeStamp.Cmp(common.Big0) == 0 {
-		nextTimeStamp = ucx.blockTime
+	nextTimeStamp := state.GetState(from.Address, TimestampSlot).Big().Int64()
+	txTime := ucx.ExecTime % TimeInterval
+
+	// Make sure that we never go backwards in time
+	if txTime > nextTimeStamp {
+		nextTimeStamp = txTime
 	}
-	if nextTimeStamp == nil {
-		return fmt.Errorf("initial timestamp must be set")
-	}
-	state.SetState(from.Address, TimestampSlot, common.BigToHash(nextTimeStamp.Add(nextTimeStamp, TimeInterval)))
+	nextBig := new(big.Int).SetInt64(nextTimeStamp + TimeInterval)
+	state.SetState(from.Address, TimestampSlot, common.BigToHash(nextBig))
 
 	if state.GetNonce(from.Address) != from.Nonce {
 		return errInvalidNonce
