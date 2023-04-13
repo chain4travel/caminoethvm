@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/ava-labs/coreth/contracts"
 	"github.com/ava-labs/coreth/core"
 	"github.com/ava-labs/coreth/core/state"
 	"github.com/ava-labs/coreth/params"
@@ -20,18 +21,22 @@ import (
 	"github.com/ava-labs/avalanchego/utils/math"
 	"github.com/ava-labs/avalanchego/utils/set"
 	"github.com/ava-labs/avalanchego/vms/components/avax"
+	"github.com/ava-labs/avalanchego/vms/components/multisig"
 	"github.com/ava-labs/avalanchego/vms/components/verify"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 
 	"github.com/ethereum/go-ethereum/common"
+	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 )
 
 var (
-	_                           UnsignedAtomicTx       = &UnsignedImportTx{}
-	_                           secp256k1fx.UnsignedTx = &UnsignedImportTx{}
-	errImportNonAVAXInputBanff                         = errors.New("import input cannot contain non-AVAX in Banff")
-	errImportNonAVAXOutputBanff                        = errors.New("import output cannot contain non-AVAX in Banff")
+	_                            UnsignedAtomicTx       = &UnsignedImportTx{}
+	_                            secp256k1fx.UnsignedTx = &UnsignedImportTx{}
+	errImportNonAVAXInputBanff                          = errors.New("import input cannot contain non-AVAX in Banff")
+	errImportNonAVAXOutputBanff                         = errors.New("import output cannot contain non-AVAX in Banff")
+	multisigAliasContractAddress                        = common.HexToAddress("0x010000000000000000000000000000000000000e")
+	multisigAliasMappingSlot                            = int64(0)
 )
 
 // UnsignedImportTx is an unsigned ImportTx
@@ -47,6 +52,8 @@ type UnsignedImportTx struct {
 	ImportedInputs []*avax.TransferableInput `serialize:"true" json:"importedInputs"`
 	// Outputs
 	Outs []EVMOutput `serialize:"true" json:"outputs"`
+	// MultisigAliases are filled on SemanticVerify where SharedMemory data is fetched and are used in EVMStateTransfer
+	MultisigAliases []*multisig.AliasWithNonce `serialize:"false"`
 }
 
 // InputUTXOs returns the UTXOIDs of the imported funds
@@ -301,6 +308,13 @@ func (utx *UnsignedImportTx) SemanticVerify(
 		}
 	}
 
+	utx.MultisigAliases = make([]*multisig.AliasWithNonce, len(*aliasSet))
+	i := 0
+	for _, alias := range *aliasSet {
+		utx.MultisigAliases[i] = alias
+		i++
+	}
+
 	return vm.conflicts(utx.InputUTXOs(), parent)
 }
 
@@ -487,5 +501,28 @@ func (utx *UnsignedImportTx) EVMStateTransfer(ctx *snow.Context, state *state.St
 			state.AddBalanceMultiCoin(to.Address, common.Hash(to.AssetID), amount)
 		}
 	}
+	for _, alias := range utx.MultisigAliases {
+		setAliasInState(state, alias)
+	}
 	return nil
+}
+
+func setAliasInState(state *state.StateDB, alias *multisig.AliasWithNonce) {
+	aliasIDAddress := common.BytesToAddress(alias.ID.Bytes())
+	owners := alias.Owners.(*secp256k1fx.OutputOwners)
+
+	aliasThresholdSlot := contracts.EntryAddress(aliasIDAddress, multisigAliasMappingSlot)
+	aliasThresholdBig := big.NewInt(int64(owners.Threshold))
+	state.SetState(multisigAliasContractAddress, aliasThresholdSlot, common.BigToHash(aliasThresholdBig))
+
+	aliasArrayLengthSlot := contracts.NextSlot(aliasThresholdSlot)
+	aliasArrayLengthBig := big.NewInt(int64(len(owners.Addrs)))
+	state.SetState(multisigAliasContractAddress, aliasArrayLengthSlot, common.BigToHash(aliasArrayLengthBig))
+
+	aliasArrayElemSlot := ethCrypto.Keccak256Hash(aliasArrayLengthSlot.Bytes())
+	for _, owner := range owners.Addrs {
+		ownerAddress := common.BytesToAddress(owner.Bytes())
+		state.SetState(multisigAliasContractAddress, aliasArrayElemSlot, ownerAddress.Hash())
+		aliasArrayElemSlot = contracts.NextSlot(aliasArrayElemSlot)
+	}
 }
