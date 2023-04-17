@@ -34,13 +34,13 @@ jobs:
       run: cd caminogo && git checkout ${{ github.event.inputs.caminogoBranch }}
     - uses: actions/setup-go@v2
       with:
-        go-version: 1.18
+        go-version: 1.20
     - run: ./scripts/lint_allowed_geth_imports.sh
       shell: bash
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v2
       with:
-        version: v1.47
+        version: v1.51
         working-directory: .
         args: --timeout 3m
         skip-go-installation: true
@@ -49,7 +49,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go: ['1.18']
+        go: ['1.20']
         os: [macos-11.0, ubuntu-20.04]
     steps:
     - name: check out
@@ -81,7 +81,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go: ['1.18']
+        go: ['1.20']
         os: [ubuntu-20.04]
     steps:
     - name: check out
