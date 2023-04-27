@@ -28,13 +28,16 @@ package vm
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/ava-labs/avalanchego/utils/formatting/address"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/stretchr/testify/assert"
 )
 
 // precompiledTest defines the input/output pairs for precompiled contract tests.
@@ -56,25 +59,26 @@ type precompiledFailureTest struct {
 // allPrecompiles does not map to the actual set of precompiles, as it also contains
 // repriced versions of precompiles at certain slots
 var allPrecompiles = map[common.Address]PrecompiledContract{
-	common.BytesToAddress([]byte{1}):    &ecrecover{},
-	common.BytesToAddress([]byte{2}):    &sha256hash{},
-	common.BytesToAddress([]byte{3}):    &ripemd160hash{},
-	common.BytesToAddress([]byte{4}):    &dataCopy{},
-	common.BytesToAddress([]byte{5}):    &bigModExp{eip2565: false},
-	common.BytesToAddress([]byte{0xf5}): &bigModExp{eip2565: true},
-	common.BytesToAddress([]byte{6}):    &bn256AddIstanbul{},
-	common.BytesToAddress([]byte{7}):    &bn256ScalarMulIstanbul{},
-	common.BytesToAddress([]byte{8}):    &bn256PairingIstanbul{},
-	common.BytesToAddress([]byte{9}):    &blake2F{},
-	common.BytesToAddress([]byte{10}):   &bls12381G1Add{},
-	common.BytesToAddress([]byte{11}):   &bls12381G1Mul{},
-	common.BytesToAddress([]byte{12}):   &bls12381G1MultiExp{},
-	common.BytesToAddress([]byte{13}):   &bls12381G2Add{},
-	common.BytesToAddress([]byte{14}):   &bls12381G2Mul{},
-	common.BytesToAddress([]byte{15}):   &bls12381G2MultiExp{},
-	common.BytesToAddress([]byte{16}):   &bls12381Pairing{},
-	common.BytesToAddress([]byte{17}):   &bls12381MapG1{},
-	common.BytesToAddress([]byte{18}):   &bls12381MapG2{},
+	common.BytesToAddress([]byte{1}):          &ecrecover{},
+	common.BytesToAddress([]byte{2}):          &sha256hash{},
+	common.BytesToAddress([]byte{3}):          &ripemd160hash{},
+	common.BytesToAddress([]byte{4}):          &dataCopy{},
+	common.BytesToAddress([]byte{5}):          &bigModExp{eip2565: false},
+	common.BytesToAddress([]byte{0xf5}):       &bigModExp{eip2565: true},
+	common.BytesToAddress([]byte{6}):          &bn256AddIstanbul{},
+	common.BytesToAddress([]byte{7}):          &bn256ScalarMulIstanbul{},
+	common.BytesToAddress([]byte{8}):          &bn256PairingIstanbul{},
+	common.BytesToAddress([]byte{9}):          &blake2F{},
+	common.BytesToAddress([]byte{10}):         &bls12381G1Add{},
+	common.BytesToAddress([]byte{11}):         &bls12381G1Mul{},
+	common.BytesToAddress([]byte{12}):         &bls12381G1MultiExp{},
+	common.BytesToAddress([]byte{13}):         &bls12381G2Add{},
+	common.BytesToAddress([]byte{14}):         &bls12381G2Mul{},
+	common.BytesToAddress([]byte{15}):         &bls12381G2MultiExp{},
+	common.BytesToAddress([]byte{16}):         &bls12381Pairing{},
+	common.BytesToAddress([]byte{17}):         &bls12381MapG1{},
+	common.BytesToAddress([]byte{18}):         &bls12381MapG2{},
+	common.BytesToAddress([]byte{0xca, 0x11}): &caminoRecover{},
 }
 
 // EIP-152 test vectors
@@ -342,6 +346,37 @@ func TestPrecompiledBLS12381G2MultiExpFail(t *testing.T) { testJsonFail("blsG2Mu
 func TestPrecompiledBLS12381PairingFail(t *testing.T)    { testJsonFail("blsPairing", "10", t) }
 func TestPrecompiledBLS12381MapG1Fail(t *testing.T)      { testJsonFail("blsMapG1", "11", t) }
 func TestPrecompiledBLS12381MapG2Fail(t *testing.T)      { testJsonFail("blsMapG2", "12", t) }
+
+func TestPrecompiledCaminoRecover(t *testing.T) { testJson("caminoRecover", "ca11", t) }
+func TestCaminoHexToBech32SanityCheck(t *testing.T) {
+	tests := map[string]struct {
+		hexAddr    string
+		bech32Addr string
+	}{
+		"long 1": {
+			hexAddr:    "3fdff3b44f8b376f5bc4a611d31ecafd361bcaa1",
+			bech32Addr: "X-columbus18l0l8dz03vmk7k7y5cgax8k2l5mphj4p73ph4p",
+		},
+		"long 2": {
+			hexAddr:    "e738d61380ca4aeee02785c1c5c23a5c9e255e16",
+			bech32Addr: "X-kopernikus1uuudvyuqef9wacp8shquts36tj0z2hskdj2ydl",
+		},
+		"short": {
+			hexAddr:    "a65a8b63cd38566216ccf94dad75f7e879e3737b",
+			bech32Addr: "P-columbus15edgkc7d8ptxy9kvl9x66a0hapu7xummkpu9cd",
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			_, _, expected, err := address.Parse(test.bech32Addr)
+			assert.NoError(t, err)
+			actual, err := hex.DecodeString(test.hexAddr)
+			assert.NoError(t, err)
+			assert.Equal(t, expected, actual)
+		})
+	}
+}
 
 func loadJson(name string) ([]precompiledTest, error) {
 	data, err := os.ReadFile(fmt.Sprintf("testdata/precompiles/%v.json", name))

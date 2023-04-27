@@ -1,0 +1,23 @@
+[
+  {
+    "Input": "0405e08a3bc814a34203ed633e006433db032bccd052900c5030a9b1ea93e9c985e7348e3b9efe1f537895ebde927e17cc37fffa35c368cb9d1409a20f32c1ab8b",
+    "Expected": "3fdff3b44f8b376f5bc4a611d31ecafd361bcaa1",
+    "Name": "long uncompressed-1",
+    "Gas": 1089,
+    "NoBenchmark": false
+  },
+  {
+    "Input": "02df1dae869b405c3e5887f9a5239e7f01219951d0bafc7b3f54711031c2c71942",
+    "Expected": "e738d61380ca4aeee02785c1c5c23a5c9e255e16",
+    "Name": "short compressed-1",
+    "Gas": 951,
+    "NoBenchmark": false
+  },
+  {
+    "Input": "04554b5f82b5683536b5a125b2ac7c4a90dd1b8cf2e39d5fc723a5bed1ee9aaafb6741eeee4ef8a3210d9bfe0ac82631d72eb8b96ed8d81727e4508e4bb7f451a8",
+    "Expected": "a65a8b63cd38566216ccf94dad75f7e879e3737b",
+    "Name": "long uncompressed-2",
+    "Gas": 1089,
+    "NoBenchmark": false
+  }
+]
