@@ -63,17 +63,16 @@ contract SimpleAccessControlImpl is SimpleAccessControl {
         return ADMIN_ROLE;
     }
 
-    function grantRole(address addr, uint256 role)
-        external
-        onlyRole(ADMIN_ROLE)
+    function grantRole(address addr, uint256 role) external onlyRole(ADMIN_ROLE)
     {
         _setRole(addr, role);
     }
 
-    function revokeRole(address addr, uint256 role)
-        external
-        onlyRole(ADMIN_ROLE)
+    function revokeRole(address addr, uint256 role) external onlyRole(ADMIN_ROLE)
     {
+        if (addr == msg.sender && _hasRole(msg.sender, ADMIN_ROLE)) {
+            require(ADMIN_ROLE != role, "Cannot revoke ADMIN_ROLE from yourself");
+        }
         _dropRole(addr, role);
     }
 
