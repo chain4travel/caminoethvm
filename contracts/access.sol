@@ -74,7 +74,7 @@ contract SimpleAccessControlImpl is SimpleAccessControl {
     external
     onlyRole(ADMIN_ROLE)
     {
-        if (addr == msg.sender && _hasRole(msg.sender, ADMIN_ROLE)) {
+        if (addr == msg.sender) {
             require(ADMIN_ROLE != role, "Cannot revoke ADMIN_ROLE from yourself");
         }
         _dropRole(addr, role);
