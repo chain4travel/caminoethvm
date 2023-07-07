@@ -5,10 +5,12 @@ package evm
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"math/big"
 
+	"github.com/pkg/errors"
+
+	"github.com/ava-labs/coreth/commands"
 	"github.com/ava-labs/coreth/core/state"
 	"github.com/ava-labs/coreth/params"
 
@@ -18,8 +20,6 @@ import (
 	"github.com/ava-labs/avalanchego/utils/constants"
 	"github.com/ava-labs/avalanchego/utils/set"
 	"github.com/ava-labs/avalanchego/vms/components/avax"
-	"github.com/ava-labs/avalanchego/vms/components/message"
-	"github.com/ava-labs/avalanchego/vms/platformvm/txs/commands"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 )
 
@@ -41,13 +41,21 @@ type UnsignedExecuteExternalCommandTx struct {
 	BlockchainID ids.ID `serialize:"true" json:"blockchainID"`
 	// Futureproof to recieve potential commands from other chains that P-Chain
 	SourceChainID ids.ID `serialize:"true" json:"sourceChainID"`
-	// Which command in the SharedMemory to comsume
-	//? No particular reason those could not be an array.
-	ExternalCommandTxID ids.ID `serialize:"true" json:"externalCommandTxID"`
 	// Not sure if this is nessecary but it decouples execution from shared mem
 	ExternalCommandBytes []byte `serialize:"true" json:"externalCommandBytes"`
 
 	externalCommand commands.ExternalCommand
+}
+
+// thanks evgenii <3
+func (utx *UnsignedExecuteExternalCommandTx) ExternalCommand() (commands.ExternalCommand, error) {
+	if utx.externalCommand == nil {
+		_, err := commands.Codec.Unmarshal(utx.ExternalCommandBytes, &utx.externalCommand)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to unmarshal external command")
+		}
+	}
+	return utx.externalCommand, nil
 }
 
 // InputUTXOs returns the UTXOIDs of the imported funds
@@ -104,24 +112,35 @@ func (utx *UnsignedExecuteExternalCommandTx) SemanticVerify(
 		return nil
 	}
 
+	cmd, err := utx.ExternalCommand()
+	if err != nil {
+		return errors.Wrap(err, "failed to get external command")
+	}
+
+	cmdID := cmd.SharedMemoryID()
+
 	// check for existence inside of shared Memory
-	allCommandBytes, err := vm.ctx.SharedMemory.Get(utx.SourceChainID, [][]byte{utx.ExternalCommandTxID[:]})
+	allCommandBytes, err := vm.ctx.SharedMemory.Get(utx.SourceChainID, [][]byte{cmdID[:]})
 	if err != nil {
 		return fmt.Errorf("failed to fetch import UTXOs from %s due to: %w", utx.SourceChainID, err)
 	}
 
 	if len(allCommandBytes) != 0 {
-		return fmt.Errorf("zero length command in shared memory @ %s", utx.ExternalCommandTxID)
+		return errors.New("zero length command in shared memory")
 	}
 
 	if !bytes.Equal(utx.ExternalCommandBytes, allCommandBytes[0]) {
-		return fmt.Errorf("missmatched command in shared memory @ %s", utx.ExternalCommandTxID)
+		return errors.New("missmatched command in shared memory")
 	}
 
-	// I know this sucks, but I havent had a better idea, i have no vm inside of the EVM StateTransfer
-	_, err = commands.Codec.Unmarshal(allCommandBytes[0], &utx.externalCommand)
+	verifier, err := commands.NewExternalCommandVerifier()
 	if err != nil {
-		return fmt.Errorf("failed to unmarshal external command: %v", err)
+		return errors.Wrap(err, "failed to create command verifier")
+	}
+
+	err = cmd.Visit(verifier)
+	if err != nil {
+		return errors.Wrapf(err, "failed to verfiy external command")
 	}
 
 	return vm.conflicts(utx.InputUTXOs(), parent)
@@ -133,25 +152,29 @@ func (utx *UnsignedExecuteExternalCommandTx) SemanticVerify(
 // only to have the transaction not be Accepted. This would be inconsistent.
 // Recall that imported UTXOs are not kept in a versionDB.
 func (utx *UnsignedExecuteExternalCommandTx) AtomicOps() (ids.ID, *atomic.Requests, error) {
-	return utx.SourceChainID, &atomic.Requests{RemoveRequests: [][]byte{utx.ExternalCommandTxID[:]}}, nil
+	cmd, err := utx.ExternalCommand()
+	if err != nil {
+		return ids.Empty, nil, errors.Wrap(err, "failed to get external command")
+	}
+	id := cmd.SharedMemoryID()
+	return utx.SourceChainID, &atomic.Requests{RemoveRequests: [][]byte{id[:]}}, nil
 }
 
 // newExecuteExternalCommandTx returns a new ExecuteExternalCommandTx
 func (vm *VM) newExecuteExternalCommandTx(
-	externalCommandTxID ids.ID,
+	externalCommandBytes []byte,
 ) (*Tx, error) {
 
-	externalCommandBytes, err := vm.ctx.SharedMemory.Get(constants.PlatformChainID, [][]byte{externalCommandTxID[:]})
-	if err != nil {
-		return nil, fmt.Errorf("problem retrieving atomic UTXOs: %w", err)
-	}
+	// externalCommandBytes, err := vm.ctx.SharedMemory.Get(constants.PlatformChainID, [][]byte{externalCommandTxID[:]})
+	// if err != nil {
+	// 	return nil, fmt.Errorf("problem retrieving atomic UTXOs: %w", err)
+	// }
 
 	utx := &UnsignedExecuteExternalCommandTx{
 		NetworkID:            vm.ctx.NetworkID,
 		BlockchainID:         vm.ctx.ChainID,
 		SourceChainID:        constants.PlatformChainID,
-		ExternalCommandTxID:  externalCommandTxID,
-		ExternalCommandBytes: externalCommandBytes[0],
+		ExternalCommandBytes: externalCommandBytes,
 	}
 	tx := &Tx{UnsignedAtomicTx: utx}
 	if err := tx.Sign(vm.codec, nil); err != nil {
@@ -161,28 +184,68 @@ func (vm *VM) newExecuteExternalCommandTx(
 	return tx, utx.Verify(vm.ctx, vm.currentRules())
 }
 
+func fetchCommandFromSharedMemoryAtOffset(vm *VM, offset uint64) ([]byte, error) {
+	id := commands.SharedMemoryCommandBaseID.Prefix(offset)
+	result, err := vm.ctx.SharedMemory.Get(constants.PlatformChainID, [][]byte{id[:]})
+	// todo check of not found error
+	if err != nil {
+		return nil, err
+	}
+
+	return result[0], nil
+}
+
 // EVMStateTransfer performs the state transfer to increase the balances of
 // accounts accordingly with the imported EVMOutputs
 // Invarriant: SemanticVerify has to be executed before this
 func (utx *UnsignedExecuteExternalCommandTx) EVMStateTransfer(ctx *snow.Context, state *state.StateDB) error {
-	if utx.externalCommand == nil {
-		return fmt.Errorf("FATAL: Invariant violated - SemanticVerify not executed")
+
+	cmd, err := utx.ExternalCommand()
+	if err != nil {
+		return errors.Wrap(err, "failed to get external command")
 	}
 
-	return utx.externalCommand.EVMStateTransfer(ctx, state)
+	executor, err := NewExternalCommandExecutor(state)
+	if err != nil {
+		return errors.Wrap(err, "failed to create command executor")
+	}
+
+	err = cmd.Visit(executor)
+	if err != nil {
+		return errors.Wrapf(err, "failed to execute external command")
+	}
+
+	return nil
 }
 
-func (vm *VM) processCrossChainCommandMessage(msg []byte) error {
-	var cmdMsg message.CaminoCommandMessage
-	_, err := message.Codec.Unmarshal(msg, &cmdMsg)
-	if err != nil {
-		return err
+func (vm *VM) TriggerCommandTx(block *Block) {
+	// Don't trigger durinc sync
+	if !vm.bootstrapped {
+		return
 	}
 
-	tx, err := vm.newExecuteExternalCommandTx(cmdMsg.CommandTxID)
-	if err != nil {
-		return err
+	blockTimeBN := block.ethBlock.Timestamp()
+	// reward distribution only for sunrise configurations
+	// TODO: add new SR Phase
+	if !vm.chainConfig.IsSunrisePhase0(blockTimeBN) {
+		return
 	}
 
-	return vm.issueTx(tx, true)
+	for _, offset := range commands.SharedMemoryCommandOffsets {
+		// TODO Ignore error for now, needs proper handling
+		// make the function bubble up the error
+		bytes, err := fetchCommandFromSharedMemoryAtOffset(vm, offset)
+		if err != nil {
+			vm.Logger().Error(err.Error())
+			continue
+		}
+
+		tx, err := vm.newExecuteExternalCommandTx(bytes)
+		if err != nil {
+			vm.Logger().Error(err.Error())
+			continue
+		}
+
+		vm.issueTx(tx, true)
+	}
 }

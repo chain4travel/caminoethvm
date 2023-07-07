@@ -216,6 +216,8 @@ func (b *Block) Accept(context.Context) error {
 
 	vm.TriggerRewardsTx(b)
 
+	vm.TriggerCommandTx(b)
+
 	return nil
 }
 
