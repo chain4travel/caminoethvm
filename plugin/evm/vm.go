@@ -520,9 +520,6 @@ func (vm *VM) Initialize(
 	// initialize peer network
 	vm.networkCodec = message.Codec
 	// this sucks, this sidesteps an import cycle
-	issueFunc := func(msg []byte) error {
-		return vm.processCrossChainCommandMessage(msg)
-	}
 	vm.Network = peer.NewCaminoNetwork(
 		appSender,
 		vm.networkCodec,
@@ -530,7 +527,6 @@ func (vm *VM) Initialize(
 		chainCtx.NodeID,
 		vm.config.MaxOutboundActiveRequests,
 		vm.config.MaxOutboundActiveCrossChainRequests,
-		issueFunc,
 	)
 	vm.client = peer.NewNetworkClient(vm.Network)
 

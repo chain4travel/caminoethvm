@@ -19,14 +19,11 @@ import (
 	"github.com/ava-labs/coreth/plugin/evm/message"
 )
 
-type issueFunc func(msg []byte) error
-
 type caminoNetwork struct {
 	network
-	issueFunc issueFunc
 }
 
-func NewCaminoNetwork(appSender common.AppSender, codec codec.Manager, crossChainCodec codec.Manager, self ids.NodeID, maxActiveAppRequests int64, maxActiveCrossChainRequests int64, issueFunc issueFunc) Network {
+func NewCaminoNetwork(appSender common.AppSender, codec codec.Manager, crossChainCodec codec.Manager, self ids.NodeID, maxActiveAppRequests int64, maxActiveCrossChainRequests int64) Network {
 	return &caminoNetwork{
 		network: network{
 			appSender:                  appSender,
@@ -43,7 +40,6 @@ func NewCaminoNetwork(appSender common.AppSender, codec codec.Manager, crossChai
 			appStats:                   stats.NewRequestHandlerStats(),
 			crossChainStats:            stats.NewCrossChainRequestHandlerStats(),
 		},
-		issueFunc: issueFunc,
 	}
 }
 
@@ -51,12 +47,7 @@ func NewCaminoNetwork(appSender common.AppSender, codec codec.Manager, crossChai
 // Send a CrossChainAppResponse to [chainID] in response to a valid message using the same
 // [requestID] before the deadline.
 func (cn *caminoNetwork) CrossChainAppRequest(ctx context.Context, requestingChainID ids.ID, requestID uint32, deadline time.Time, request []byte) error {
-	if err := cn.issueFunc(request); err == nil {
-		return nil
-	} else {
-		log.Info("not a commandMessage")
-		return cn.network.CrossChainAppRequest(ctx, requestingChainID, requestID, deadline, request)
-	}
+	return cn.network.CrossChainAppRequest(ctx, requestingChainID, requestID, deadline, request)
 }
 
 func (n *network) RequestCrossChain(chainID ids.ID, msg []byte, handler message.ResponseHandler) error {
