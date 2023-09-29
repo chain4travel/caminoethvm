@@ -23,6 +23,7 @@ import (
 	"github.com/ava-labs/coreth/accounts/abi/bind/backends"
 	"github.com/ava-labs/coreth/accounts/keystore"
 	"github.com/ava-labs/coreth/consensus/dummy"
+	admin "github.com/ava-labs/coreth/contracts/build_contracts/admin/src"
 	"github.com/ava-labs/coreth/core"
 	"github.com/ava-labs/coreth/core/rawdb"
 	"github.com/ava-labs/coreth/core/state"
@@ -34,7 +35,7 @@ import (
 	"github.com/ava-labs/coreth/params"
 	"github.com/ava-labs/coreth/vmerrs"
 
-	admin "github.com/ava-labs/coreth/contracts/build_contracts/admin/src"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -798,4 +799,26 @@ func addAndVerifyRoles(t *testing.T, adminSession admin.BuildSession, sim *backe
 	roles = append(roles, blacklistRole)
 
 	return roles
+}
+
+func TestStorageSlotIndices(t *testing.T) {
+	// See article about storing solidity structures https://c4t.atlassian.net/wiki/spaces/TECH/pages/315228161/Extending+Multisig+support+to+other+chains+X+C
+	const (
+		expectedAliasThresholdSlot         = "0x02d8eabfe500216f0da458b4ce6732047b68f7e037b3e2d7313765a12e1ff7fc"
+		expectedAliasCGroupArrayLengthSlot = "0x02d8eabfe500216f0da458b4ce6732047b68f7e037b3e2d7313765a12e1ff7fd"
+		expectedAliasCGroupArraySlot       = "0xba536a6eed5d97c805d767eb1aaffd73a6446dbca7494685f2c6f3bdc1fd2777"
+	)
+	var (
+		aliasAdddress       = common.HexToAddress("0x010000000000000000000000000000000000000e")
+		contractMappingSlot = int64(0)
+	)
+
+	aliasThresholdSlot := EntryAddress(aliasAdddress, contractMappingSlot)
+	require.Equal(t, expectedAliasThresholdSlot, aliasThresholdSlot.String())
+
+	aliasArrayLenSlot := NextSlot(aliasThresholdSlot)
+	require.Equal(t, expectedAliasCGroupArrayLengthSlot, aliasArrayLenSlot.String())
+
+	aliasArrauSlot := crypto.Keccak256Hash(aliasArrayLenSlot.Bytes())
+	require.Equal(t, expectedAliasCGroupArraySlot, aliasArrauSlot.String())
 }
