@@ -200,9 +200,8 @@ var DefaultCacheConfig = &CacheConfig{
 // included in the canonical one where as GetBlockByNumber always represents the
 // canonical chain.
 type BlockChain struct {
-	chainConfig *params.ChainConfig   // Chain & network configuration
-	cacheConfig *CacheConfig          // Cache configuration for pruning
-	adminCtrl   admin.AdminController // Block based administrative control
+	chainConfig *params.ChainConfig // Chain & network configuration
+	cacheConfig *CacheConfig        // Cache configuration for pruning
 
 	db ethdb.Database // Low level persistent database to store final content in
 
@@ -326,7 +325,6 @@ func NewBlockChain(
 	bc := &BlockChain{
 		chainConfig: chainConfig,
 		cacheConfig: cacheConfig,
-		adminCtrl:   vmConfig.AdminContoller,
 		db:          db,
 		stateCache: state.NewDatabaseWithConfig(db, &trie.Config{
 			Cache:       cacheConfig.TrieCleanLimit,
@@ -2078,4 +2076,10 @@ func (bc *BlockChain) ResetToStateSyncedBlock(block *types.Block) error {
 
 	bc.initSnapshot(head)
 	return nil
+}
+
+// SetAdminController sets the chain admin controller. Must be called right after chain creation and only once.
+// Must be also set in other vmConfig instances for consistency, cause chain copies vmConfig by value.
+func (bc *BlockChain) SetAdminController(adminCtrl admin.AdminController) {
+	bc.vmConfig.AdminContoller = adminCtrl
 }

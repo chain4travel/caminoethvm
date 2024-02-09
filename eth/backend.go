@@ -227,13 +227,14 @@ func New(
 		eth:                 eth,
 	}
 
-	vmConfig.AdminContoller = ethadmin.NewController(eth.APIBackend, chainConfig)
-
 	var err error
 	eth.blockchain, err = core.NewBlockChain(chainDb, cacheConfig, config.Genesis, eth.engine, vmConfig, lastAcceptedHash, config.SkipUpgradeCheck)
 	if err != nil {
 		return nil, err
 	}
+
+	vmConfig.AdminContoller = ethadmin.NewController(eth.APIBackend, eth.blockchain.Config())
+	eth.blockchain.SetAdminController(vmConfig.AdminContoller)
 
 	if err := eth.handleOfflinePruning(cacheConfig, config.Genesis, vmConfig, lastAcceptedHash); err != nil {
 		return nil, err
