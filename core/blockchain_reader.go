@@ -263,7 +263,7 @@ func (bc *BlockChain) StateAt(root common.Hash) (*state.StateDB, error) {
 func (bc *BlockChain) Config() *params.ChainConfig { return bc.chainConfig }
 
 // AdminController retrieves the chain's admin controller.
-func (bc *BlockChain) AdminController() admin.AdminController { return bc.adminCtrl }
+func (bc *BlockChain) AdminController() admin.AdminController { return bc.vmConfig.AdminContoller }
 
 // Engine retrieves the blockchain's consensus engine.
 func (bc *BlockChain) Engine() consensus.Engine { return bc.engine }
