@@ -130,7 +130,7 @@ func NewSimulatedBackendWithDatabaseAndChainConfig(database ethdb.Database, allo
 
 	filterBackend := &filterBackend{database, blockchain, backend}
 	backend.filterSystem = filters.NewFilterSystem(filterBackend, filters.Config{})
-	backend.events = filters.NewEventSystem(backend.filterSystem, false)
+	backend.events = filters.NewEventSystem(backend.filterSystem)
 
 	backend.rollback(blockchain.CurrentBlock())
 	return backend
@@ -170,7 +170,7 @@ func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc core.Genesis
 
 	filterBackend := &filterBackend{database, blockchain, backend}
 	backend.filterSystem = filters.NewFilterSystem(filterBackend, filters.Config{})
-	backend.events = filters.NewEventSystem(backend.filterSystem, false)
+	backend.events = filters.NewEventSystem(backend.filterSystem)
 
 	backend.rollback(blockchain.CurrentBlock())
 	return backend
