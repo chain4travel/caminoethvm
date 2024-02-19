@@ -138,7 +138,7 @@ func (a *AdminController) GetFixedBaseFee(head *types.Header, state admin.StateD
 }
 
 func (a *AdminController) KycVerified(head *types.Header, state admin.StateDB, addr common.Address) bool {
-	if a.cfg.IsSunrisePhase0(big.NewInt(int64(head.Time))) {
+	if a.cfg.IsSunrisePhase0(head.Time) {
 		// Calculate storage position
 		storagePos := crypto.Keccak256Hash(append(addr.Hash().Bytes(), common.HexToHash("0x2").Bytes()...))
 		// Get the KYC states

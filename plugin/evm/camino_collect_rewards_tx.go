@@ -290,9 +290,9 @@ func (vm *VM) TriggerRewardsTx(block *Block) {
 		return
 	}
 
-	blockTimeBN := block.ethBlock.Timestamp()
+	blockTime := block.ethBlock.Timestamp()
 	// reward distribution only for sunrise configurations
-	if !vm.chainConfig.IsSunrisePhase0(blockTimeBN) {
+	if !vm.chainConfig.IsSunrisePhase0(blockTime) {
 		return
 	}
 
@@ -308,7 +308,6 @@ func (vm *VM) TriggerRewardsTx(block *Block) {
 		}
 	}
 
-	blockTime := blockTimeBN.Uint64()
 	state, err := vm.blockChain.StateAt(block.ethBlock.Root())
 	if err != nil {
 		return
