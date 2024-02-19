@@ -13,7 +13,6 @@ run:
 linters:
   disable-all: true
   enable:
-    - deadcode
     - goconst
     - goimports
     - gosimple
@@ -21,7 +20,7 @@ linters:
     - ineffassign
     - misspell
     - unconvert
-    - varcheck
+    - unused
     - whitespace
 
 linters-settings:

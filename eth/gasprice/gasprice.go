@@ -50,10 +50,10 @@ import (
 	"github.com/ava-labs/coreth/params"
 	"github.com/ava-labs/coreth/rpc"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/lru"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
-	lru "github.com/hashicorp/golang-lru"
 )
 
 const (
@@ -136,7 +136,7 @@ type Oracle struct {
 	maxLookbackSeconds      uint64
 	maxCallBlockHistory     int
 	maxBlockHistory         int
-	historyCache            *lru.Cache
+	historyCache            *lru.Cache[uint64, *slimBlock]
 	feeInfoProvider         *feeInfoProvider
 }
 
@@ -187,7 +187,7 @@ func NewOracle(backend OracleBackend, config Config) (*Oracle, error) {
 		log.Warn("Sanitizing invalid gasprice oracle max block history", "provided", config.MaxBlockHistory, "updated", maxBlockHistory)
 	}
 
-	cache, _ := lru.New(DefaultFeeHistoryCacheSize)
+	cache := lru.NewCache[uint64, *slimBlock](DefaultFeeHistoryCacheSize)
 	headEvent := make(chan core.ChainHeadEvent, 1)
 	backend.SubscribeChainHeadEvent(headEvent)
 	go func() {
@@ -372,7 +372,7 @@ func (oracle *Oracle) suggestDynamicFees(ctx context.Context) (*big.Int, *big.In
 		price = tipResults[(len(tipResults)-1)*oracle.percentile/100]
 	}
 
-	if oracle.backend.ChainConfig().IsSunrisePhase0(new(big.Int).SetUint64(head.Time)) {
+	if oracle.backend.ChainConfig().IsSunrisePhase0(head.Time) {
 		baseFee = oracle.fixedBaseFee(head)
 	} else if len(baseFeeResults) > 0 {
 		sort.Sort(bigIntArray(baseFeeResults))
