@@ -33,6 +33,7 @@ import (
 	"github.com/ava-labs/coreth/core"
 	"github.com/ava-labs/coreth/core/rawdb"
 	"github.com/ava-labs/coreth/core/state"
+	"github.com/ava-labs/coreth/core/txpool"
 	"github.com/ava-labs/coreth/core/types"
 	"github.com/ava-labs/coreth/eth"
 	"github.com/ava-labs/coreth/eth/ethconfig"
@@ -49,6 +50,7 @@ import (
 	"github.com/ava-labs/coreth/sync/handlers"
 	handlerstats "github.com/ava-labs/coreth/sync/handlers/stats"
 	"github.com/ava-labs/coreth/trie"
+	"github.com/ava-labs/coreth/utils"
 
 	"github.com/prometheus/client_golang/prometheus"
 	// Force-load tracer engine to trigger registration
@@ -232,7 +234,7 @@ type VM struct {
 
 	// pointers to eth constructs
 	eth        *eth.Ethereum
-	txPool     *core.TxPool
+	txPool     *txpool.TxPool
 	blockChain *core.BlockChain
 	miner      *miner.Miner
 
@@ -318,7 +320,7 @@ func (vm *VM) Logger() logging.Logger { return vm.ctx.Log }
 
 // implements SnowmanPlusPlusVM interface
 func (vm *VM) GetActivationTime() time.Time {
-	return time.Unix(vm.chainConfig.ApricotPhase4BlockTimestamp.Int64(), 0)
+	return utils.Uint64ToTime(vm.chainConfig.ApricotPhase4BlockTimestamp)
 }
 
 // Initialize implements the snowman.ChainVM interface
@@ -443,7 +445,7 @@ func (vm *VM) Initialize(
 	vm.ethConfig = ethconfig.NewDefaultConfig()
 	vm.ethConfig.Genesis = g
 	vm.ethConfig.NetworkId = vm.chainID.Uint64()
-	vm.genesisHash = vm.ethConfig.Genesis.ToBlock(nil).Hash() // must create genesis hash before [vm.readLastAccepted]
+	vm.genesisHash = vm.ethConfig.Genesis.ToBlock().Hash() // must create genesis hash before [vm.readLastAccepted]
 	lastAcceptedHash, lastAcceptedHeight, err := vm.readLastAccepted()
 	if err != nil {
 		return err
@@ -482,7 +484,7 @@ func (vm *VM) Initialize(
 	vm.ethConfig.PopulateMissingTriesParallelism = vm.config.PopulateMissingTriesParallelism
 	vm.ethConfig.AllowMissingTries = vm.config.AllowMissingTries
 	vm.ethConfig.SnapshotDelayInit = vm.stateSyncEnabled(lastAcceptedHeight)
-	vm.ethConfig.SnapshotAsync = vm.config.SnapshotAsync
+	vm.ethConfig.SnapshotWait = vm.config.SnapshotWait
 	vm.ethConfig.SnapshotVerify = vm.config.SnapshotVerify
 	vm.ethConfig.OfflinePruning = vm.config.OfflinePruning
 	vm.ethConfig.OfflinePruningBloomFilterSize = vm.config.OfflinePruningBloomFilterSize
@@ -735,8 +737,8 @@ func (vm *VM) preBatchOnFinalizeAndAssemble(header *types.Header, state *state.S
 		// Note: snapshot is taken inside the loop because you cannot revert to the same snapshot more than
 		// once.
 		snapshot := state.Snapshot()
-		rules := vm.chainConfig.CaminoRules(header.Number, new(big.Int).SetUint64(header.Time))
-		if err := vm.verifyTx(tx, header.ParentHash, header.BaseFee, state, &rules); err != nil {
+		rules := vm.chainConfig.CaminoRules(header.Number, header.Time)
+		if err := vm.verifyTx(tx, header.ParentHash, header.BaseFee, state, rules); err != nil {
 			// Discard the transaction from the mempool on failed verification.
 			vm.mempool.DiscardCurrentTx(tx.ID())
 			state.RevertToSnapshot(snapshot)
@@ -775,7 +777,7 @@ func (vm *VM) postBatchOnFinalizeAndAssemble(header *types.Header, state *state.
 		batchAtomicUTXOs  set.Set[ids.ID]
 		batchContribution *big.Int = new(big.Int).Set(common.Big0)
 		batchGasUsed      *big.Int = new(big.Int).Set(common.Big0)
-		rules                      = vm.chainConfig.CaminoRules(header.Number, new(big.Int).SetUint64(header.Time))
+		rules                      = vm.chainConfig.CaminoRules(header.Number, header.Time)
 		size              int
 	)
 
@@ -867,7 +869,7 @@ func (vm *VM) postBatchOnFinalizeAndAssemble(header *types.Header, state *state.
 }
 
 func (vm *VM) onFinalizeAndAssemble(header *types.Header, state *state.StateDB, txs []*types.Transaction) ([]byte, *big.Int, *big.Int, error) {
-	if !vm.chainConfig.IsApricotPhase5(new(big.Int).SetUint64(header.Time)) {
+	if !vm.chainConfig.IsApricotPhase5(header.Time) {
 		return vm.preBatchOnFinalizeAndAssemble(header, state, txs)
 	}
 	return vm.postBatchOnFinalizeAndAssemble(header, state, txs)
@@ -878,7 +880,7 @@ func (vm *VM) onExtraStateChange(block *types.Block, state *state.StateDB) (*big
 		batchContribution *big.Int = big.NewInt(0)
 		batchGasUsed      *big.Int = big.NewInt(0)
 		header                     = block.Header()
-		rules                      = vm.chainConfig.CaminoRules(header.Number, new(big.Int).SetUint64(header.Time))
+		rules                      = vm.chainConfig.CaminoRules(header.Number, header.Time)
 	)
 
 	txs, err := ExtractAtomicTxs(block.ExtData(), rules.IsApricotPhase5, vm.codec)
@@ -1360,17 +1362,16 @@ func (vm *VM) verifyTxAtTip(tx *Tx) error {
 	// Note: we fetch the current block and then the state at that block instead of the current state directly
 	// since we need the header of the current block below.
 	preferredBlock := vm.blockChain.CurrentBlock()
-	preferredState, err := vm.blockChain.StateAt(preferredBlock.Root())
+	preferredState, err := vm.blockChain.StateAt(preferredBlock.Root)
 	if err != nil {
 		return fmt.Errorf("failed to retrieve block state at tip while verifying atomic tx: %w", err)
 	}
 	rules := vm.currentRules()
-	parentHeader := preferredBlock.Header()
+	parentHeader := preferredBlock
 	var nextBaseFee *big.Int
-	timestamp := vm.clock.Time().Unix()
-	bigTimestamp := big.NewInt(timestamp)
-	if vm.chainConfig.IsApricotPhase3(bigTimestamp) {
-		_, nextBaseFee, err = dummy.EstimateNextBaseFee(vm.chainConfig, vm.eth.APIBackend.AdminController(), parentHeader, uint64(timestamp))
+	timestamp := uint64(vm.clock.Time().Unix())
+	if vm.chainConfig.IsApricotPhase3(timestamp) {
+		_, nextBaseFee, err = dummy.EstimateNextBaseFee(vm.chainConfig, vm.eth.APIBackend.AdminController(), parentHeader, timestamp)
 		if err != nil {
 			// Return extremely detailed error since CalcBaseFee should never encounter an issue here
 			return fmt.Errorf("failed to calculate base fee with parent timestamp (%d), parent ExtraData: (0x%x), and current timestamp (%d): %w", parentHeader.Time, parentHeader.Extra, timestamp, err)
@@ -1664,7 +1665,7 @@ func (vm *VM) GetCurrentNonce(address common.Address) (uint64, error) {
 // currentRules returns the chain rules for the current (next) block.
 func (vm *VM) currentRules() params.Rules {
 	header := vm.eth.APIBackend.CurrentHeader()
-	return vm.chainConfig.CaminoRules(header.Number, big.NewInt(int64(header.Time)))
+	return vm.chainConfig.CaminoRules(header.Number, header.Time)
 }
 
 func (vm *VM) startContinuousProfiler() {
