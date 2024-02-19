@@ -383,7 +383,7 @@ func NewTxPool(config Config, chainconfig *params.ChainConfig, chain blockChain)
 	pool.wg.Add(1)
 	go pool.loop()
 
-	if !chainconfig.IsSunrisePhase0(new(big.Int).SetUint64(chain.CurrentBlock().Header().Time)) {
+	if !chainconfig.IsSunrisePhase0(chain.CurrentBlock().Time) {
 		pool.startPeriodicFeeUpdate()
 	}
 	return pool

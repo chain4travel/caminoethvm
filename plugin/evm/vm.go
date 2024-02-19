@@ -738,7 +738,7 @@ func (vm *VM) preBatchOnFinalizeAndAssemble(header *types.Header, state *state.S
 		// once.
 		snapshot := state.Snapshot()
 		rules := vm.chainConfig.CaminoRules(header.Number, header.Time)
-		if err := vm.verifyTx(tx, header.ParentHash, header.BaseFee, state, rules); err != nil {
+		if err := vm.verifyTx(tx, header.ParentHash, header.BaseFee, state, &rules); err != nil {
 			// Discard the transaction from the mempool on failed verification.
 			vm.mempool.DiscardCurrentTx(tx.ID())
 			state.RevertToSnapshot(snapshot)

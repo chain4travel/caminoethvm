@@ -629,7 +629,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 		!evm.Context.AdminController.KycVerified(
 			&types.Header{
 				Number: evm.Context.BlockNumber,
-				Time:   evm.Context.Time.Uint64(),
+				Time:   evm.Context.Time,
 			},
 			evm.StateDB, rootCaller.Address()) {
 		return nil, common.Address{}, gas, vmerrs.ErrNotKycVerified

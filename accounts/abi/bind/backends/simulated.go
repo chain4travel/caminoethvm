@@ -132,7 +132,9 @@ func NewSimulatedBackendWithDatabaseAndChainConfig(database ethdb.Database, allo
 	backend.filterSystem = filters.NewFilterSystem(filterBackend, filters.Config{})
 	backend.events = filters.NewEventSystem(backend.filterSystem)
 
-	backend.rollback(blockchain.CurrentBlock())
+	header := backend.blockchain.CurrentBlock()
+	block := backend.blockchain.GetBlock(header.Hash(), header.Number.Uint64())
+	backend.rollback(block)
 	return backend
 }
 

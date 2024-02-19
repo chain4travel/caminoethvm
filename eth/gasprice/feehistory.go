@@ -210,7 +210,7 @@ func (oracle *Oracle) FeeHistory(ctx context.Context, blocks int, unresolvedLast
 
 	// For Fixed base fees we only provide minimal fee history
 	if lastHead, err := oracle.backend.HeaderByNumber(ctx, rpc.LatestBlockNumber); err == nil {
-		if oracle.backend.ChainConfig().IsSunrisePhase0(new(big.Int).SetUint64(lastHead.Time)) {
+		if oracle.backend.ChainConfig().IsSunrisePhase0(lastHead.Time) {
 			if lastHead.Number.Uint64() == lastBlock {
 				baseFee := make([]*big.Int, 1)
 				baseFee[0] = oracle.fixedBaseFee(lastHead)
