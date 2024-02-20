@@ -1250,7 +1250,7 @@ func TestImportTxSemanticVerify(t *testing.T) {
 						Asset: avax.Asset{ID: vm.ctx.AVAXAssetID},
 						Out:   msigAliasOut,
 					},
-					Aliases: []verify.State{msigAlias},
+					Aliases: []verify.Verifiable{msigAlias},
 				}
 				err := putUTXOToSharedMemory(sharedMemory, vm.ctx.XChainID, vm.ctx.ChainID, [][]byte{}, utxo)
 				if err != nil {
