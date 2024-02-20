@@ -20,7 +20,7 @@ func (as AliasSet) GetMultisigAlias(id ids.ShortID) (*multisig.AliasWithNonce, e
 	return alias, nil
 }
 
-func (as *AliasSet) Add(aliasInfs ...verify.State) {
+func (as *AliasSet) Add(aliasInfs ...verify.Verifiable) {
 	for _, ali := range aliasInfs {
 		alias, ok := ali.(*multisig.AliasWithNonce)
 		if !ok {
