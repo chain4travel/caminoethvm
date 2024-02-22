@@ -134,7 +134,8 @@ func (bc *testBlockChain) SubscribeChainHeadEvent(ch chan<- core.ChainHeadEvent)
 }
 
 func (bc *testBlockChain) SenderCacher() *core.TxSenderCacher {
-	return core.NewTxSenderCacher(1)
+	// Zero threads avoids starting goroutines.
+	return core.NewTxSenderCacher(0)
 }
 
 func (bc *testBlockChain) AdminController() admin.AdminController {
