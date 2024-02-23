@@ -41,7 +41,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/ava-labs/coreth/core/admin"
 	"math/big"
 	"strings"
 	"time"
@@ -53,6 +52,7 @@ import (
 	"github.com/ava-labs/coreth/accounts/scwallet"
 	"github.com/ava-labs/coreth/consensus"
 	"github.com/ava-labs/coreth/core"
+	"github.com/ava-labs/coreth/core/admin"
 	"github.com/ava-labs/coreth/core/state"
 	"github.com/ava-labs/coreth/core/types"
 	"github.com/ava-labs/coreth/core/vm"
@@ -979,6 +979,7 @@ func (diff *BlockOverrides) Apply(blockCtx *vm.BlockContext) {
 type ChainContextBackend interface {
 	Engine() consensus.Engine
 	HeaderByNumber(context.Context, rpc.BlockNumber) (*types.Header, error)
+	AdminController() admin.AdminController
 }
 
 // ChainContext is an implementation of core.ChainContext. It's main use-case

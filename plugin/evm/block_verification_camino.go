@@ -56,7 +56,15 @@ func (bv blockValidatorCamino) SyntacticVerify(b *Block, rules params.Rules) err
 			ethHeader.Nonce.Uint64(), errInvalidNonce,
 		)
 	}
-	if ethHeader.GasLimit != params.ApricotPhase1GasLimit {
+	// Enforce static gas limit after ApricotPhase1 (prior to ApricotPhase1 it's handled in processing).
+	if rules.IsCortina {
+		if ethHeader.GasLimit != params.CortinaGasLimit {
+			return fmt.Errorf(
+				"expected gas limit to be %d after cortina but got %d",
+				params.CortinaGasLimit, ethHeader.GasLimit,
+			)
+		}
+	} else if ethHeader.GasLimit != params.ApricotPhase1GasLimit {
 		return fmt.Errorf(
 			"expected gas limit to be %d in apricot phase 1 but got %d",
 			params.ApricotPhase1GasLimit, ethHeader.GasLimit,
@@ -85,7 +93,7 @@ func (bv blockValidatorCamino) SyntacticVerify(b *Block, rules params.Rules) err
 	}
 
 	// Check that the tx hash in the header matches the body
-	txsHash := types.DeriveSha(b.ethBlock.Transactions(), new(trie.Trie))
+	txsHash := types.DeriveSha(b.ethBlock.Transactions(), trie.NewStackTrie(nil))
 	if txsHash != ethHeader.TxHash {
 		return fmt.Errorf("invalid txs hash %v does not match calculated txs hash %v", ethHeader.TxHash, txsHash)
 	}
