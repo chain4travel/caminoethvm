@@ -132,9 +132,10 @@ const (
 	codecVersion         = uint16(0)
 	secpFactoryCacheSize = 1024
 
-	decidedCacheSize    = 100
+	decidedCacheSize    = 10 * units.MiB
 	missingCacheSize    = 50
-	unverifiedCacheSize = 50
+	unverifiedCacheSize = 5 * units.MiB
+	bytesToIDCacheSize  = 5 * units.MiB
 
 	targetAtomicTxsSize = 40 * units.KiB
 )
@@ -701,6 +702,7 @@ func (vm *VM) initChainState(lastAcceptedBlock *types.Block) error {
 		DecidedCacheSize:    decidedCacheSize,
 		MissingCacheSize:    missingCacheSize,
 		UnverifiedCacheSize: unverifiedCacheSize,
+		BytesToIDCacheSize:  bytesToIDCacheSize,
 		GetBlockIDAtHeight:  vm.GetBlockIDAtHeight,
 		GetBlock:            vm.getBlock,
 		UnmarshalBlock:      vm.parseBlock,
