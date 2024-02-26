@@ -7,8 +7,6 @@ import (
 	"math/big"
 
 	"github.com/ava-labs/coreth/utils"
-
-	"github.com/ethereum/go-ethereum/common"
 )
 
 // Gas Price
@@ -25,7 +23,6 @@ var (
 		DAOForkBlock:                    big.NewInt(0),
 		DAOForkSupport:                  true,
 		EIP150Block:                     big.NewInt(0),
-		EIP150Hash:                      common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
 		EIP155Block:                     big.NewInt(0),
 		EIP158Block:                     big.NewInt(0),
 		ByzantiumBlock:                  big.NewInt(0),
@@ -53,7 +50,6 @@ var (
 		DAOForkBlock:                    big.NewInt(0),
 		DAOForkSupport:                  true,
 		EIP150Block:                     big.NewInt(0),
-		EIP150Hash:                      common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
 		EIP155Block:                     big.NewInt(0),
 		EIP158Block:                     big.NewInt(0),
 		ByzantiumBlock:                  big.NewInt(0),
@@ -81,7 +77,6 @@ var (
 		DAOForkBlock:                    big.NewInt(0),
 		DAOForkSupport:                  true,
 		EIP150Block:                     big.NewInt(0),
-		EIP150Hash:                      common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
 		EIP155Block:                     big.NewInt(0),
 		EIP158Block:                     big.NewInt(0),
 		ByzantiumBlock:                  big.NewInt(0),
