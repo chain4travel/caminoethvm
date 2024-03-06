@@ -71,7 +71,7 @@ func TestSunrisePhase0AndApricotPhase5Block(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := vm.issueTx(importTx, true /*=local*/); err != nil {
+	if err := vm.mempool.AddLocalTx(importTx); err != nil {
 		t.Fatal(err)
 	}
 
@@ -97,7 +97,7 @@ func TestSunrisePhase0AndApricotPhase5Block(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := vm.issueTx(importTx2, true /*=local*/); err != nil {
+	if err := vm.mempool.AddLocalTx(importTx2); err != nil {
 		t.Fatal(err)
 	}
 	<-issuer
@@ -118,7 +118,7 @@ func TestSunrisePhase0AndApricotPhase5Block(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := vm.issueTx(importTx3, true /*=local*/); err != nil {
+	if err := vm.mempool.AddLocalTx(importTx3); err != nil {
 		t.Fatal(err)
 	}
 	<-issuer
@@ -167,7 +167,7 @@ func DisabledTestSunrisePhase0OrphanBlock(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := vm.issueTx(importTx, true /*=local*/); err != nil {
+	if err := vm.mempool.AddLocalTx(importTx); err != nil {
 		t.Fatal(err)
 	}
 

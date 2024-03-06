@@ -329,7 +329,7 @@ func (vm *VM) TriggerRewardsTx(block *Block) {
 	}
 	log.Info("Issue CollectRewardsTx", "amount",
 		tx.UnsignedAtomicTx.(*UnsignedCollectRewardsTx).Ins[0].Amount)
-	vm.issueTx(tx, true /*=local*/)
+	vm.mempool.AddLocalTx(tx)
 }
 
 // EVMStateTransfer executes the state update from the atomic export transaction
