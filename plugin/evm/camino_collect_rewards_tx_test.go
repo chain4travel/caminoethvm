@@ -274,7 +274,7 @@ func TestIssueCollectRewardsTxAndBuildBlock(t *testing.T) {
 
 	tx, err := vm.NewCollectRewardsTx(parent.ethBlock.Hash(), amount, uint64(0))
 	require.NoError(t, err)
-	if err := vm.issueTx(tx, true /*=local*/); err != nil {
+	if err := vm.mempool.AddLocalTx(tx); err != nil {
 		t.Fatal(err)
 	}
 

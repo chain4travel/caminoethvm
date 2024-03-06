@@ -47,9 +47,9 @@ jobs:
     - run: ./scripts/lint_allowed_geth_imports.sh
       shell: bash
     - name: golangci-lint
-      uses: golangci/golangci-lint-action@v2
+      uses: golangci/golangci-lint-action@v3
       with:
-        version: v1.51
+        version: v1.54
         working-directory: .
         args: --timeout 3m
         skip-go-installation: true
@@ -130,3 +130,5 @@ jobs:
       shell: bash
     - run: ./scripts/build_test.sh -race
       shell: bash
+# TODO: Add the avalanchego_e2e job back after last cortina merge
+
