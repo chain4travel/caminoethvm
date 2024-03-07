@@ -122,7 +122,7 @@ func createSyncServerAndClientVMsCamino(t *testing.T, test syncTest) *syncVMSetu
 
 	// initialise [syncerVM] with blank genesis state
 	stateSyncEnabledJSON := fmt.Sprintf(`{"state-sync-enabled":true, "state-sync-min-blocks": %d}`, test.stateSyncMinBlocks)
-	syncerEngineChan, syncerVM, syncerDBManager, syncerAtomicMemory, syncerAppSender := GenesisVMWithUTXOs(
+	syncerEngineChan, syncerVM, syncerDB, syncerAtomicMemory, syncerAppSender := GenesisVMWithUTXOs(
 		t, false, "", stateSyncEnabledJSON, "", alloc,
 	)
 	shutdownOnceSyncerVM := &shutdownOnceVM{VM: syncerVM}
@@ -175,7 +175,7 @@ func createSyncServerAndClientVMsCamino(t *testing.T, test syncTest) *syncVMSetu
 		},
 		fundedAccounts:       accounts,
 		syncerVM:             syncerVM,
-		syncerDBManager:      syncerDBManager,
+		syncerDB:             syncerDB,
 		syncerEngineChan:     syncerEngineChan,
 		syncerAtomicMemory:   syncerAtomicMemory,
 		shutdownOnceSyncerVM: shutdownOnceSyncerVM,
