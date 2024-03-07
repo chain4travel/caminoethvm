@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/VictoriaMetrics/fastcache v1.10.0
-	github.com/ava-labs/avalanchego v1.10.12-rc.5
+	github.com/ava-labs/avalanchego v1.10.15-rc.1
 	github.com/cespare/cp v0.1.0
 	github.com/cockroachdb/pebble v0.0.0-20230209160836-829675f94811
 	github.com/davecgh/go-spew v1.1.1
@@ -40,7 +40,7 @@ require (
 	go.uber.org/goleak v1.2.1
 	go.uber.org/mock v0.2.0
 	golang.org/x/crypto v0.14.0
-	golang.org/x/exp v0.0.0-20230206171751-46f607a40771
+	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df
 	golang.org/x/sync v0.3.0
 	golang.org/x/sys v0.13.0
 	golang.org/x/text v0.13.0
@@ -109,7 +109,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/common v0.39.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
-	github.com/rogpeppe/go-internal v1.9.0 // indirect
+	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/rs/cors v1.7.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
@@ -145,6 +145,6 @@ require (
 	rsc.io/tmplfunc v0.0.3 // indirect
 )
 
-replace github.com/ava-labs/avalanchego => github.com/chain4travel/caminogo v1.1.13-rc0
+replace github.com/ava-labs/avalanchego => github.com/chain4travel/caminogo v1.1.15-rc0
 
 replace github.com/ava-labs/avalanche-ledger-go => github.com/chain4travel/camino-ledger-go v0.0.13-c4t
