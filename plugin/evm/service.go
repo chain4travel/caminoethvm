@@ -124,10 +124,7 @@ func (service *AvaxAPI) ExportKey(r *http.Request, args *ExportKeyArgs, reply *E
 	}
 	defer db.Close()
 
-	user := user{
-		secpFactory: &service.vm.secpFactory,
-		db:          db,
-	}
+	user := user{db: db}
 	reply.PrivateKey, err = user.getKey(address)
 	if err != nil {
 		return fmt.Errorf("problem retrieving private key: %w", err)
@@ -161,10 +158,7 @@ func (service *AvaxAPI) ImportKey(r *http.Request, args *ImportKeyArgs, reply *a
 	}
 	defer db.Close()
 
-	user := user{
-		secpFactory: &service.vm.secpFactory,
-		db:          db,
-	}
+	user := user{db: db}
 	if err := user.putAddress(args.PrivateKey); err != nil {
 		return fmt.Errorf("problem saving key %w", err)
 	}
@@ -210,10 +204,7 @@ func (service *AvaxAPI) Import(_ *http.Request, args *ImportArgs, response *api.
 	}
 	defer db.Close()
 
-	user := user{
-		secpFactory: &service.vm.secpFactory,
-		db:          db,
-	}
+	user := user{db: db}
 	privKeys, err := user.getKeys()
 	if err != nil { // Get keys
 		return fmt.Errorf("couldn't get keys controlled by the user: %w", err)
@@ -311,10 +302,7 @@ func (service *AvaxAPI) Export(_ *http.Request, args *ExportArgs, response *api.
 	}
 	defer db.Close()
 
-	user := user{
-		secpFactory: &service.vm.secpFactory,
-		db:          db,
-	}
+	user := user{db: db}
 	privKeys, err := user.getKeys()
 	if err != nil {
 		return fmt.Errorf("couldn't get addresses controlled by the user: %w", err)
