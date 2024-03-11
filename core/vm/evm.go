@@ -41,11 +41,15 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/ava-labs/avalanchego/snow"
 	"github.com/ava-labs/coreth/constants"
 	"github.com/ava-labs/coreth/core/admin"
 	"github.com/ava-labs/coreth/core/types"
 	"github.com/ava-labs/coreth/params"
-	"github.com/ava-labs/coreth/precompile"
+	"github.com/ava-labs/coreth/precompile/contract"
+	"github.com/ava-labs/coreth/precompile/modules"
+	"github.com/ava-labs/coreth/precompile/precompileconfig"
+	"github.com/ava-labs/coreth/predicate"
 	"github.com/ava-labs/coreth/vmerrs"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -53,8 +57,8 @@ import (
 )
 
 var (
-	_ precompile.PrecompileAccessibleState = &EVM{}
-	_ precompile.BlockContext              = &BlockContext{}
+	_ contract.AccessibleState = &EVM{}
+	_ contract.BlockContext    = &BlockContext{}
 )
 
 // IsProhibited returns true if [addr] is the blackhole address or is
@@ -63,12 +67,8 @@ func IsProhibited(addr common.Address) bool {
 	if addr == constants.BlackholeAddr {
 		return true
 	}
-	for _, reservedRange := range precompile.ReservedRanges {
-		if reservedRange.Contains(addr) {
-			return true
-		}
-	}
-	return false
+
+	return modules.ReservedAddress(addr)
 }
 
 // emptyCodeHash is used by create to ensure deployment is disallowed to already
@@ -87,8 +87,8 @@ type (
 	GetHashFunc func(uint64) common.Hash
 )
 
-func (evm *EVM) precompile(addr common.Address) (precompile.StatefulPrecompiledContract, bool) {
-	var precompiles map[common.Address]precompile.StatefulPrecompiledContract
+func (evm *EVM) precompile(addr common.Address) (contract.StatefulPrecompiledContract, bool) {
+	var precompiles map[common.Address]contract.StatefulPrecompiledContract
 	switch {
 	case evm.chainRules.IsBanff:
 		precompiles = PrecompiledContractsBanff
@@ -113,8 +113,12 @@ func (evm *EVM) precompile(addr common.Address) (precompile.StatefulPrecompiledC
 	}
 
 	// Otherwise, check the chain rules for the additionally configured precompiles.
-	p, ok = evm.chainRules.Precompiles[addr]
-	return p, ok
+	if _, ok = evm.chainRules.ActivePrecompiles[addr]; ok {
+		module, ok := modules.GetPrecompileModuleByAddress(addr)
+		return module.Contract, ok
+	}
+
+	return nil, false
 }
 
 // BlockContext provides the EVM with auxiliary information. Once provided
@@ -134,6 +138,9 @@ type BlockContext struct {
 	GetHash GetHashFunc
 	// The Admin Controller for restrictive operations
 	AdminController admin.AdminController
+	// PredicateResults are the results of predicate verification available throughout the EVM's execution.
+	// PredicateResults may be nil if it is not encoded in the block's header.
+	PredicateResults *predicate.Results
 
 	// Block information
 	Coinbase    common.Address // Provides information for COINBASE
@@ -150,6 +157,13 @@ func (b *BlockContext) Number() *big.Int {
 
 func (b *BlockContext) Timestamp() uint64 {
 	return b.Time
+}
+
+func (b *BlockContext) GetPredicateResults(txHash common.Hash, address common.Address) []byte {
+	if b.PredicateResults == nil {
+		return nil
+	}
+	return b.PredicateResults.GetResults(txHash, address)
 }
 
 // TxContext provides the EVM with information about a transaction.
@@ -229,13 +243,18 @@ func (evm *EVM) Cancelled() bool {
 	return evm.abort.Load()
 }
 
+// GetSnowContext returns the evm's snow.Context.
+func (evm *EVM) GetSnowContext() *snow.Context {
+	return evm.chainConfig.AvalancheContext.SnowCtx
+}
+
 // GetStateDB returns the evm's StateDB
-func (evm *EVM) GetStateDB() precompile.StateDB {
+func (evm *EVM) GetStateDB() contract.StateDB {
 	return evm.StateDB
 }
 
 // GetBlockContext returns the evm's BlockContext
-func (evm *EVM) GetBlockContext() precompile.BlockContext {
+func (evm *EVM) GetBlockContext() contract.BlockContext {
 	return &evm.Context
 }
 
@@ -720,6 +739,9 @@ func (evm *EVM) Create2(caller ContractRef, code []byte, gas uint64, endowment *
 
 // ChainConfig returns the environment's chain configuration
 func (evm *EVM) ChainConfig() *params.ChainConfig { return evm.chainConfig }
+
+// GetChainConfig implements AccessibleState
+func (evm *EVM) GetChainConfig() precompileconfig.ChainConfig { return evm.chainConfig }
 
 func (evm *EVM) NativeAssetCall(caller common.Address, input []byte, suppliedGas uint64, gasCost uint64, readOnly bool) (ret []byte, remainingGas uint64, err error) {
 	if suppliedGas < gasCost {

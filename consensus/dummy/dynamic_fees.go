@@ -58,10 +58,15 @@ func CalcBaseFee(config *params.ChainConfig, ctrl admin.AdminController, parent 
 		isSunrisePhase0 = config.IsSunrisePhase0(parent.Time)
 	)
 	if !isSunrisePhase0 && (!isApricotPhase3 || parent.Number.Cmp(common.Big0) == 0) {
-		initialSlice := make([]byte, params.ApricotPhase3ExtraDataSize)
+		initialSlice := make([]byte, params.DynamicFeeExtraDataSize)
 		initialBaseFee := big.NewInt(params.ApricotPhase3InitialBaseFee)
 		return initialSlice, initialBaseFee, nil
 	}
+
+	if uint64(len(parent.Extra)) < params.DynamicFeeExtraDataSize {
+		return nil, nil, fmt.Errorf("expected length of parent extra data to be %d, but found %d", params.DynamicFeeExtraDataSize, len(parent.Extra))
+	}
+	dynamicFeeWindow := parent.Extra[:params.DynamicFeeExtraDataSize]
 
 	if timestamp < parent.Time {
 		return nil, nil, fmt.Errorf("cannot calculate base fee for timestamp (%d) prior to parent timestamp (%d)", timestamp, parent.Time)
@@ -75,15 +80,15 @@ func CalcBaseFee(config *params.ChainConfig, ctrl admin.AdminController, parent 
 		return []byte{}, fixedBaseFee, nil
 	}
 
-	if uint64(len(parent.Extra)) != params.ApricotPhase3ExtraDataSize {
-		return nil, nil, fmt.Errorf("expected length of parent extra data to be %d, but found %d", params.ApricotPhase3ExtraDataSize, len(parent.Extra))
+	if uint64(len(parent.Extra)) != params.DynamicFeeExtraDataSize {
+		return nil, nil, fmt.Errorf("expected length of parent extra data to be %d, but found %d", params.DynamicFeeExtraDataSize, len(parent.Extra))
 	}
 
 	roll := timestamp - parent.Time
 
 	// roll the window over by the difference between the timestamps to generate
 	// the new rollup window.
-	newRollupWindow, err := rollLongWindow(parent.Extra, int(roll))
+	newRollupWindow, err := rollLongWindow(dynamicFeeWindow, int(roll))
 	if err != nil {
 		return nil, nil, err
 	}
