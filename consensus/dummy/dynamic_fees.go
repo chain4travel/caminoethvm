@@ -63,15 +63,6 @@ func CalcBaseFee(config *params.ChainConfig, ctrl admin.AdminController, parent 
 		return initialSlice, initialBaseFee, nil
 	}
 
-	if uint64(len(parent.Extra)) < params.DynamicFeeExtraDataSize {
-		return nil, nil, fmt.Errorf("expected length of parent extra data to be %d, but found %d", params.DynamicFeeExtraDataSize, len(parent.Extra))
-	}
-	dynamicFeeWindow := parent.Extra[:params.DynamicFeeExtraDataSize]
-
-	if timestamp < parent.Time {
-		return nil, nil, fmt.Errorf("cannot calculate base fee for timestamp (%d) prior to parent timestamp (%d)", timestamp, parent.Time)
-	}
-
 	if isSunrisePhase0 {
 		fixedBaseFee := new(big.Int).SetUint64(params.SunrisePhase0BaseFee)
 		if ctrl != nil {
@@ -80,8 +71,13 @@ func CalcBaseFee(config *params.ChainConfig, ctrl admin.AdminController, parent 
 		return []byte{}, fixedBaseFee, nil
 	}
 
-	if uint64(len(parent.Extra)) != params.DynamicFeeExtraDataSize {
+	if uint64(len(parent.Extra)) < params.DynamicFeeExtraDataSize {
 		return nil, nil, fmt.Errorf("expected length of parent extra data to be %d, but found %d", params.DynamicFeeExtraDataSize, len(parent.Extra))
+	}
+	dynamicFeeWindow := parent.Extra[:params.DynamicFeeExtraDataSize]
+
+	if timestamp < parent.Time {
+		return nil, nil, fmt.Errorf("cannot calculate base fee for timestamp (%d) prior to parent timestamp (%d)", timestamp, parent.Time)
 	}
 
 	roll := timestamp - parent.Time
