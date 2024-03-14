@@ -193,7 +193,6 @@ func New(
 	var (
 		vmConfig = vm.Config{
 			EnablePreimageRecording: config.EnablePreimageRecording,
-			AllowUnfinalizedQueries: config.AllowUnfinalizedQueries,
 		}
 		cacheConfig = &core.CacheConfig{
 			TrieCleanLimit:                  config.TrieCleanCache,
@@ -225,9 +224,10 @@ func New(
 	}
 
 	eth.APIBackend = &EthAPIBackend{
-		extRPCEnabled:       stack.Config().ExtRPCEnabled(),
-		allowUnprotectedTxs: config.AllowUnprotectedTxs,
-		eth:                 eth,
+		extRPCEnabled:           stack.Config().ExtRPCEnabled(),
+		allowUnprotectedTxs:     config.AllowUnprotectedTxs,
+		allowUnfinalizedQueries: config.AllowUnfinalizedQueries,
+		eth:                     eth,
 	}
 
 	var err error
