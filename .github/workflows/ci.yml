@@ -18,7 +18,7 @@ on:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - name: check out
       if: ${{ github.event_name != 'workflow_dispatch' }}
@@ -59,7 +59,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-11.0, ubuntu-20.04, windows-latest]
+        #os: [macos-11.0, ubuntu-20.04, windows-latest]
+        os: [ubuntu-latest]
     steps:
     - name: check out
       if: ${{ github.event_name != 'workflow_dispatch' }}
@@ -98,7 +99,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-latest]
     steps:
     - name: check out
       if: ${{ github.event_name != 'workflow_dispatch' }}
@@ -116,7 +117,7 @@ jobs:
         repository: chain4travel/caminogo
         ref: ${{ github.event.inputs.caminogoBranch }}
         path: caminogo
-    - uses: actions/setup-go@v2
+    - uses: actions/setup-go@v3
       with:
         go-version: '~1.20.12'
         check-latest: true
@@ -131,4 +132,38 @@ jobs:
       shell: bash
     - run: ./scripts/build_test.sh -race
       shell: bash
-# TODO: Add the avalanchego_e2e job back after last cortina merge
+  caminogo_e2e:
+    name: CaminoGo E2E Tests v${{ matrix.go }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    steps:
+    - name: check out
+      if: ${{ github.event_name != 'workflow_dispatch' }}
+      uses: actions/checkout@v3
+    - name: check out ${{ github.event.inputs.caminoethvmBranch }}
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.inputs.caminoethvmBranch }}
+    - name: check out chain4travel/caminogo ${{ github.event.inputs.caminogoBranch }}
+      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.caminogoBranch != '' }}
+      uses: actions/checkout@v3
+      with:
+        repository: chain4travel/caminogo
+        ref: ${{ github.event.inputs.caminogoBranch }}
+        path: caminogo
+    - uses: actions/setup-go@v3
+      with:
+        go-version: '~1.20.12'
+        check-latest: true
+    - name: Run e2e tests
+      run: E2E_SERIAL=1 ./scripts/tests.e2e.sh
+      shell: bash
+    - name: Upload testnet network dir
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: testnet-data
+        path: ~/.testnetctl/networks/1001

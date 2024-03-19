@@ -16,7 +16,7 @@ fi
 CORETH_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; cd .. && pwd )
 
 # Allow configuring the clone path to point to an existing clone
-AVALANCHEGO_CLONE_PATH="${AVALANCHEGO_CLONE_PATH:-avalanchego}"
+AVALANCHEGO_CLONE_PATH="${AVALANCHEGO_CLONE_PATH:-caminogo}"
 
 # Load the version
 source "$CORETH_PATH"/scripts/versions.sh
@@ -34,7 +34,7 @@ if [[ -d "${AVALANCHEGO_CLONE_PATH}" ]]; then
   git fetch
 else
   echo "creating new clone"
-  git clone https://github.com/ava-labs/avalanchego.git "${AVALANCHEGO_CLONE_PATH}"
+  git clone https://github.com/chain4travel/caminogo.git "${AVALANCHEGO_CLONE_PATH}"
   cd "${AVALANCHEGO_CLONE_PATH}"
 fi
 # Branch will be reset to $avalanche_version if it already exists
