@@ -45,12 +45,10 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 )
 
-var (
-	BuiltinAddr = common.Address{
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	}
-)
+var BuiltinAddr = common.Address{
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+}
 
 // Config are the configuration options for the Interpreter
 type Config struct {
@@ -58,9 +56,6 @@ type Config struct {
 	NoBaseFee               bool      // Forces the EIP-1559 baseFee to 0 (needed for 0 price calls)
 	EnablePreimageRecording bool      // Enables recording of SHA3/keccak preimages
 	ExtraEips               []int     // Additional EIPS that are to be enabled
-
-	// AllowUnfinalizedQueries allow unfinalized queries
-	AllowUnfinalizedQueries bool
 
 	// Admincontoller interface
 	AdminContoller admin.AdminController
@@ -91,8 +86,8 @@ func NewEVMInterpreter(evm *EVM) *EVMInterpreter {
 	// If jump table was not initialised we set the default one.
 	var table *JumpTable
 	switch {
-	case evm.chainRules.IsDUpgrade:
-		table = &dUpgradeInstructionSet
+	case evm.chainRules.IsDurango:
+		table = &durangoInstructionSet
 	case evm.chainRules.IsApricotPhase3:
 		table = &apricotPhase3InstructionSet
 	case evm.chainRules.IsApricotPhase2:
