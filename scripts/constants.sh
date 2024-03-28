@@ -24,11 +24,19 @@ caminoethvm_tag=${CAMINOETHVM_TAG:-$( git describe --tags )}
 echo "Using tag: ${caminoethvm_tag}"
 
 # caminogo version
-module=$(grep caminogo $CAMINOETHVM_PATH/go.mod)
+module=$(grep caminogo "$CAMINOETHVM_PATH"/go.mod)
 # trim leading
 module="${module#"${module%%[![:space:]]*}"}"
-t=(${module//\ / })
-caminogo_tag=${t[1]}
+# Splitting the module variable into an array
+IFS=' ' read -ra t <<< "$module"
+
+# Checking if the array t is properly populated
+if [ "${#t[@]}" -ge 2 ]; then
+    caminogo_tag="${t[1]}"
+else
+    echo "Error: Unable to determine caminogo tag."
+    exit 1
+fi
 
 build_image_id=${BUILD_IMAGE_ID:-"$caminogo_tag-$caminoethvm_short_commit"}
 
