@@ -54,6 +54,9 @@ jobs:
         working-directory: .
         args: --timeout 3m
         skip-go-installation: true
+    - name: Run shellcheck
+      shell: bash
+      run: scripts/shellcheck.sh
   test:
     name: Golang Unit Tests v${{ matrix.go }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
