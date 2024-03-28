@@ -202,7 +202,7 @@ func DisabledTestSunrisePhase0OrphanBlock(t *testing.T) {
 	}
 
 	// Manually created Eth Block with a manually created header
-	emptyEthBlk := types.NewBlock(
+	emptyEthBlk := types.NewBlockWithExtData(
 		&types.Header{
 			Coinbase:    common.Address{1},
 			ParentHash:  blkAEthBlock.Hash(),
@@ -235,7 +235,7 @@ func DisabledTestSunrisePhase0OrphanBlock(t *testing.T) {
 	assert.ErrorIs(t, emptyBlock.Verify(context.TODO()), errEmptyBlock)
 
 	// Manually created Eth Block with a manually created header
-	orphanEthBlock := types.NewBlock(
+	orphanEthBlock := types.NewBlockWithExtData(
 		&types.Header{
 			ParentHash:  common.Hash{},
 			Difficulty:  math.BigPow(11, 11),
