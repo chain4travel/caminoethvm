@@ -4,6 +4,7 @@
 package evm
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/big"
@@ -19,6 +20,7 @@ import (
 	gconstants "github.com/ava-labs/coreth/constants"
 	"github.com/ava-labs/coreth/core/state"
 	"github.com/ava-labs/coreth/params"
+	evmMsg "github.com/ava-labs/coreth/plugin/evm/message"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
 )
@@ -28,8 +30,9 @@ const (
 )
 
 var (
-	_ UnsignedAtomicTx       = &UnsignedCollectRewardsTx{}
-	_ secp256k1fx.UnsignedTx = &UnsignedCollectRewardsTx{}
+	_ UnsignedAtomicTx       = (*UnsignedCollectRewardsTx)(nil)
+	_ secp256k1fx.UnsignedTx = (*UnsignedCollectRewardsTx)(nil)
+	_ evmMsg.ResponseHandler = (*RewardsCrossChainMsgHandler)(nil)
 
 	FeeRewardAddress      = common.HexToAddress(FeeRewardAddressStr)
 	FeeRewardAddressID, _ = ids.ToShortID(FeeRewardAddress.Bytes())
@@ -284,7 +287,7 @@ func (vm *VM) NewCollectRewardsTx(
 	return tx, utx.Verify(vm.ctx, vm.currentRules())
 }
 
-func (vm *VM) TriggerRewardsTx(block *Block) {
+func (vm *VM) TriggerRewardsTx(ctx context.Context, block *Block) {
 	// Don't trigger durinc sync
 	if !vm.bootstrapped {
 		return
@@ -303,7 +306,12 @@ func (vm *VM) TriggerRewardsTx(block *Block) {
 			if err != nil {
 				log.Warn("cannot marshall reward message", "error", err)
 			}
-			vm.RequestCrossChain(ids.ID{}, request, nil)
+			vm.SendCrossChainRequest(
+				ctx,
+				constants.PlatformChainID,
+				request,
+				&RewardsCrossChainMsgHandler{},
+			)
 			break
 		}
 	}
@@ -446,4 +454,17 @@ func feeRewardExportMinTimeInterval(vm *VM) uint64 {
 		return 3600
 	}
 	return vm.ethConfig.Genesis.FeeRewardExportMinTimeInterval
+}
+
+type RewardsCrossChainMsgHandler struct {
+}
+
+func (h *RewardsCrossChainMsgHandler) OnResponse(response []byte) error {
+	log.Info("CollectRewards cross-chain request success", "response", string(response))
+	return nil
+}
+
+func (h *RewardsCrossChainMsgHandler) OnFailure() error {
+	log.Error("CollectRewards cross-chain request failed")
+	return nil
 }
