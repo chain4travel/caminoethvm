@@ -59,7 +59,6 @@ func InitCodec(durangoTime time.Time) error {
 		lc.RegisterCustomType(&secp256k1fx.CrossTransferOutput{}),
 		newCodec.RegisterCodec(codecVersion, lc),
 	)
-
 	if errs.Errored() {
 		return errs.Err
 	}
