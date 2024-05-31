@@ -209,7 +209,7 @@ func (vm *VM) newBlock(ethBlock *types.Block) (*Block, error) {
 func (b *Block) ID() ids.ID { return b.id }
 
 // Accept implements the snowman.Block interface
-func (b *Block) Accept(context.Context) error {
+func (b *Block) Accept(ctx context.Context) error {
 	vm := b.vm
 
 	// Although returning an error from Accept is considered fatal, it is good
@@ -259,7 +259,7 @@ func (b *Block) Accept(context.Context) error {
 		return err
 	}
 
-	vm.TriggerRewardsTx(b)
+	vm.TriggerRewardsTx(ctx, b)
 	return nil
 }
 

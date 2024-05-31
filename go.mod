@@ -143,6 +143,6 @@ require (
 	rsc.io/tmplfunc v0.0.3 // indirect
 )
 
-replace github.com/ava-labs/avalanchego => github.com/chain4travel/caminogo v1.1.19-rc0
+replace github.com/ava-labs/avalanchego => github.com/chain4travel/caminogo v1.10.20-0.20240531114722-df8dc969f592
 
 replace github.com/ava-labs/avalanche-ledger-go => github.com/chain4travel/camino-ledger-go v0.0.13-c4t
