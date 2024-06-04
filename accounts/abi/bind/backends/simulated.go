@@ -1,3 +1,13 @@
+// Copyright (C) 2023-2024, Chain4Travel AG. All rights reserved.
+//
+// This file is a derived work, based on ava-labs code whose
+// original notices appear below.
+//
+// It is distributed under the same license conditions as the
+// original code from which it is derived.
+//
+// Much love to the original authors for their work.
+// **********************************************************
 // (c) 2019-2020, Ava Labs, Inc.
 //
 // This file is a derived work, based on the go-ethereum library whose original
@@ -162,6 +172,7 @@ func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc core.Genesis
 	}
 	cacheConfig := &core.CacheConfig{}
 	blockchain, _ := core.NewBlockChain(database, cacheConfig, &genesis, dummy.NewFaker(), vm.Config{}, common.Hash{}, false)
+
 	backend := &SimulatedBackend{
 		database:   database,
 		blockchain: blockchain,
@@ -662,6 +673,7 @@ func (b *SimulatedBackend) EstimateGas(ctx context.Context, call interfaces.Call
 	for lo+1 < hi {
 		mid := (hi + lo) / 2
 		failed, _, err := executable(mid)
+
 		// If the error is not nil(consensus error), it means the provided message
 		// call or transaction will never be accepted no matter how much gas it is
 		// assigned. Return the error directly, don't struggle any more
