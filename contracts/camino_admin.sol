@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "./access.sol";
+import "./camino_access.sol";
 
 interface IProxy {
     function setImplementation(address newImplementation) external;
@@ -25,6 +25,7 @@ contract CaminoAdmin is SimpleAccessControlImpl {
 
     uint256 internal constant KYC_APPROVED = 1 << 0;
     uint256 internal constant KYC_EXPIRED = 1 << 1;
+    // uint256 internal constant KYB_APPROVED = 1 << 3;
 
     // Slot2
     mapping(address => uint256) private kyc;
