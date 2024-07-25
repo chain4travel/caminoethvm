@@ -78,7 +78,6 @@ func CalcBaseFee(config *params.ChainConfig, ctrl admin.AdminController, parent 
 	if uint64(len(parent.Extra)) != params.ApricotPhase3ExtraDataSize {
 		return nil, nil, fmt.Errorf("expected length of parent extra data to be %d, but found %d", params.ApricotPhase3ExtraDataSize, len(parent.Extra))
 	}
-
 	roll := timestamp - parent.Time
 
 	// roll the window over by the difference between the timestamps to generate
