@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "./access.sol";
+import "./camino_access.sol";
 
 interface IProxy {
     function setImplementation(address newImplementation) external;
