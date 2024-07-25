@@ -1,13 +1,3 @@
-// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
-//
-// This file is a derived work, based on ava-labs code whose
-// original notices appear below.
-//
-// It is distributed under the same license conditions as the
-// original code from which it is derived.
-//
-// Much love to the original authors for their work.
-// **********************************************************
 // (c) 2019-2020, Ava Labs, Inc.
 //
 // This file is a derived work, based on the go-ethereum library whose original
@@ -78,6 +68,10 @@ var (
 	// have enough funds for transfer(topmost call only).
 	ErrInsufficientFundsForTransfer = errors.New("insufficient funds for transfer")
 
+	// ErrMaxInitCodeSizeExceeded is returned if creation transaction provides the init code bigger
+	// than init code size limit.
+	ErrMaxInitCodeSizeExceeded = errors.New("max initcode size exceeded")
+
 	// ErrInsufficientFunds is returned if the total cost of executing a transaction
 	// is higher than the balance of the user's account.
 	ErrInsufficientFunds = errors.New("insufficient funds for gas * price + value")
@@ -106,19 +100,9 @@ var (
 	ErrFeeCapVeryHigh = errors.New("max fee per gas higher than 2^256-1")
 
 	// ErrFeeCapTooLow is returned if the transaction fee cap is less than the
-	// the base fee of the block.
+	// base fee of the block.
 	ErrFeeCapTooLow = errors.New("max fee per gas less than block base fee")
 
 	// ErrSenderNoEOA is returned if the sender of a transaction is a contract.
 	ErrSenderNoEOA = errors.New("sender not an eoa")
 )
-
-func CompareErrors(a, b error) bool {
-	if a == b {
-		return true
-	}
-	if a == nil || b == nil {
-		return false
-	}
-	return a.Error() == b.Error()
-}

@@ -13,7 +13,7 @@ import (
 func TestAliasSetGetMultisigAlias(t *testing.T) {
 	tests := map[string]struct {
 		set           *AliasSet
-		aliases       []verify.State
+		aliases       []verify.Verifiable
 		query         ids.ShortID
 		expectedErr   error
 		expectedNonce uint64
@@ -25,7 +25,7 @@ func TestAliasSetGetMultisigAlias(t *testing.T) {
 		},
 		"add to empty set": {
 			set: &AliasSet{},
-			aliases: []verify.State{
+			aliases: []verify.Verifiable{
 				&multisig.AliasWithNonce{
 					Alias: multisig.Alias{
 						ID: ids.ShortID{1},
@@ -36,7 +36,7 @@ func TestAliasSetGetMultisigAlias(t *testing.T) {
 		},
 		"add & read from empty set": {
 			set: &AliasSet{},
-			aliases: []verify.State{
+			aliases: []verify.Verifiable{
 				&multisig.AliasWithNonce{
 					Alias: multisig.Alias{
 						ID: ids.ShortID{1},
@@ -47,7 +47,7 @@ func TestAliasSetGetMultisigAlias(t *testing.T) {
 		},
 		"add newer expected newer": {
 			set: &AliasSet{},
-			aliases: []verify.State{
+			aliases: []verify.Verifiable{
 				&multisig.AliasWithNonce{
 					Alias: multisig.Alias{
 						ID: ids.ShortID{1},
@@ -66,7 +66,7 @@ func TestAliasSetGetMultisigAlias(t *testing.T) {
 		},
 		"add older expected newer": {
 			set: &AliasSet{},
-			aliases: []verify.State{
+			aliases: []verify.Verifiable{
 				&multisig.AliasWithNonce{
 					Alias: multisig.Alias{
 						ID: ids.ShortID{1},
@@ -85,7 +85,7 @@ func TestAliasSetGetMultisigAlias(t *testing.T) {
 		},
 		"add many expected latest": {
 			set: &AliasSet{},
-			aliases: []verify.State{
+			aliases: []verify.Verifiable{
 				&multisig.AliasWithNonce{
 					Alias: multisig.Alias{
 						ID: ids.ShortID{1},
@@ -117,7 +117,7 @@ func TestAliasSetGetMultisigAlias(t *testing.T) {
 					Nonce: 0,
 				},
 			},
-			aliases: []verify.State{
+			aliases: []verify.Verifiable{
 				&multisig.AliasWithNonce{
 					Alias: multisig.Alias{
 						ID: ids.ShortID{1},
@@ -137,7 +137,7 @@ func TestAliasSetGetMultisigAlias(t *testing.T) {
 					Nonce: 2,
 				},
 			},
-			aliases: []verify.State{
+			aliases: []verify.Verifiable{
 				&multisig.AliasWithNonce{
 					Alias: multisig.Alias{
 						ID: ids.ShortID{1},

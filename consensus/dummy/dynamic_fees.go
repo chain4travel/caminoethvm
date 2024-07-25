@@ -51,12 +51,11 @@ var (
 func CalcBaseFee(config *params.ChainConfig, ctrl admin.AdminController, parent *types.Header, timestamp uint64) ([]byte, *big.Int, error) {
 	// If the current block is the first EIP-1559 block, or it is the genesis block
 	// return the initial slice and initial base fee.
-	bigTimestamp := new(big.Int).SetUint64(parent.Time)
 	var (
-		isApricotPhase3 = config.IsApricotPhase3(bigTimestamp)
-		isApricotPhase4 = config.IsApricotPhase4(bigTimestamp)
-		isApricotPhase5 = config.IsApricotPhase5(bigTimestamp)
-		isSunrisePhase0 = config.IsSunrisePhase0(bigTimestamp)
+		isApricotPhase3 = config.IsApricotPhase3(parent.Time)
+		isApricotPhase4 = config.IsApricotPhase4(parent.Time)
+		isApricotPhase5 = config.IsApricotPhase5(parent.Time)
+		isSunrisePhase0 = config.IsSunrisePhase0(parent.Time)
 	)
 	if !isSunrisePhase0 && (!isApricotPhase3 || parent.Number.Cmp(common.Big0) == 0) {
 		initialSlice := make([]byte, params.ApricotPhase3ExtraDataSize)
@@ -79,7 +78,6 @@ func CalcBaseFee(config *params.ChainConfig, ctrl admin.AdminController, parent 
 	if uint64(len(parent.Extra)) != params.ApricotPhase3ExtraDataSize {
 		return nil, nil, fmt.Errorf("expected length of parent extra data to be %d, but found %d", params.ApricotPhase3ExtraDataSize, len(parent.Extra))
 	}
-
 	roll := timestamp - parent.Time
 
 	// roll the window over by the difference between the timestamps to generate
@@ -351,7 +349,7 @@ func calcBlockGasCost(
 //
 // This function will return nil for all return values prior to Apricot Phase 4.
 func MinRequiredTip(config *params.ChainConfig, header *types.Header) (*big.Int, error) {
-	if !config.IsApricotPhase4(new(big.Int).SetUint64(header.Time)) {
+	if !config.IsApricotPhase4(header.Time) {
 		return nil, nil
 	}
 	if header.BaseFee == nil {

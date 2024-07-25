@@ -65,7 +65,7 @@ var (
 	apricotPhase1InstructionSet    = newApricotPhase1InstructionSet()
 	apricotPhase2InstructionSet    = newApricotPhase2InstructionSet()
 	apricotPhase3InstructionSet    = newApricotPhase3InstructionSet()
-	cortinaInstructionSet          = newCortinaInstructionSet()
+	dUpgradeInstructionSet         = newDUpgradeInstructionSet()
 )
 
 // JumpTable contains the EVM opcodes supported at a given fork.
@@ -89,7 +89,7 @@ func validate(jt JumpTable) JumpTable {
 	return jt
 }
 
-func newCortinaInstructionSet() JumpTable {
+func newDUpgradeInstructionSet() JumpTable {
 	instructionSet := newApricotPhase3InstructionSet()
 	enable3855(&instructionSet) // PUSH0 instruction
 	enable3860(&instructionSet) // Limit and meter initcode
@@ -97,7 +97,7 @@ func newCortinaInstructionSet() JumpTable {
 }
 
 // newApricotPhase3InstructionSet returns the frontier, homestead, byzantium,
-// contantinople, istanbul, petersburg, apricotPhase1, 2, and 3 instructions.
+// constantinople, istanbul, petersburg, apricotPhase1, 2, and 3 instructions.
 func newApricotPhase3InstructionSet() JumpTable {
 	instructionSet := newApricotPhase2InstructionSet()
 	enable3198(&instructionSet) // Base fee opcode https://eips.ethereum.org/EIPS/eip-3198
@@ -105,7 +105,7 @@ func newApricotPhase3InstructionSet() JumpTable {
 }
 
 // newApricotPhase1InstructionSet returns the frontier,
-// homestead, byzantium, contantinople petersburg,
+// homestead, byzantium, constantinople petersburg,
 // istanbul, and apricotPhase1 instructions.
 func newApricotPhase2InstructionSet() JumpTable {
 	instructionSet := newApricotPhase1InstructionSet()
@@ -117,7 +117,7 @@ func newApricotPhase2InstructionSet() JumpTable {
 }
 
 // newApricotPhase1InstructionSet returns the frontier,
-// homestead, byzantium, contantinople petersburg,
+// homestead, byzantium, constantinople petersburg,
 // and istanbul instructions.
 func newApricotPhase1InstructionSet() JumpTable {
 	instructionSet := newIstanbulInstructionSet()
@@ -128,7 +128,7 @@ func newApricotPhase1InstructionSet() JumpTable {
 }
 
 // newIstanbulInstructionSet returns the frontier,
-// homestead, byzantium, contantinople and petersburg instructions.
+// homestead, byzantium, constantinople and petersburg instructions.
 func newIstanbulInstructionSet() JumpTable {
 	instructionSet := newConstantinopleInstructionSet()
 
@@ -140,7 +140,7 @@ func newIstanbulInstructionSet() JumpTable {
 }
 
 // newConstantinopleInstructionSet returns the frontier, homestead,
-// byzantium and contantinople instructions.
+// byzantium and constantinople instructions.
 func newConstantinopleInstructionSet() JumpTable {
 	instructionSet := newByzantiumInstructionSet()
 	instructionSet[SHL] = &operation{

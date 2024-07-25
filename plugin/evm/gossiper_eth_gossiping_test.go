@@ -1,13 +1,3 @@
-// Copyright (C) 2022, Chain4Travel AG. All rights reserved.
-//
-// This file is a derived work, based on ava-labs code whose
-// original notices appear below.
-//
-// It is distributed under the same license conditions as the
-// original code from which it is derived.
-//
-// Much love to the original authors for their work.
-// **********************************************************
 // (c) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
@@ -37,6 +27,7 @@ import (
 	"github.com/ava-labs/coreth/core/types"
 	"github.com/ava-labs/coreth/params"
 	"github.com/ava-labs/coreth/plugin/evm/message"
+	"github.com/ava-labs/coreth/utils"
 )
 
 func fundAddressByGenesis(addrs []common.Address) (string, error) {
@@ -55,10 +46,10 @@ func fundAddressByGenesis(addrs []common.Address) (string, error) {
 
 	genesis.Config = &params.ChainConfig{
 		ChainID:                     params.AvalancheLocalChainID,
-		ApricotPhase1BlockTimestamp: big.NewInt(0),
-		ApricotPhase2BlockTimestamp: big.NewInt(0),
-		ApricotPhase3BlockTimestamp: big.NewInt(0),
-		ApricotPhase4BlockTimestamp: big.NewInt(0),
+		ApricotPhase1BlockTimestamp: utils.NewUint64(0),
+		ApricotPhase2BlockTimestamp: utils.NewUint64(0),
+		ApricotPhase3BlockTimestamp: utils.NewUint64(0),
+		ApricotPhase4BlockTimestamp: utils.NewUint64(0),
 	}
 
 	bytes, err := json.Marshal(genesis)

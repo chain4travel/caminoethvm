@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"math/big"
 
+	"golang.org/x/exp/slices"
+
 	"github.com/ava-labs/coreth/core"
 	"github.com/ava-labs/coreth/core/state"
 	"github.com/ava-labs/coreth/params"
@@ -23,7 +25,6 @@ import (
 	"github.com/ava-labs/avalanchego/vms/components/avax"
 	"github.com/ava-labs/avalanchego/vms/components/verify"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
 )
@@ -107,16 +108,18 @@ func (utx *UnsignedImportTx) Verify(
 			return errImportNonAVAXInputBanff
 		}
 	}
-	if !utils.IsSortedAndUniqueSortable(utx.ImportedInputs) {
+	if !utils.IsSortedAndUnique(utx.ImportedInputs) {
 		return errInputsNotSortedUnique
 	}
 
 	if rules.IsApricotPhase2 {
-		if !IsSortedAndUniqueEVMOutputs(utx.Outs) {
+		if !utils.IsSortedAndUnique(utx.Outs) {
 			return errOutputsNotSortedUnique
 		}
 	} else if rules.IsApricotPhase1 {
-		if !IsSortedEVMOutputs(utx.Outs) {
+		if !slices.IsSortedFunc(utx.Outs, func(i, j EVMOutput) bool {
+			return i.Less(j)
+		}) {
 			return errOutputsNotSorted
 		}
 	}
@@ -197,7 +200,7 @@ func (utx *UnsignedImportTx) SemanticVerify(
 		if err != nil {
 			return err
 		}
-		txFee, err = calculateDynamicFee(gasUsed, baseFee)
+		txFee, err = CalculateDynamicFee(gasUsed, baseFee)
 		if err != nil {
 			return err
 		}
@@ -421,11 +424,11 @@ func (vm *VM) newImportTxWithUTXOs(
 		}
 		gasUsedWithChange := gasUsedWithoutChange + EVMOutputGas
 
-		txFeeWithoutChange, err = calculateDynamicFee(gasUsedWithoutChange, baseFee)
+		txFeeWithoutChange, err = CalculateDynamicFee(gasUsedWithoutChange, baseFee)
 		if err != nil {
 			return nil, err
 		}
-		txFeeWithChange, err = calculateDynamicFee(gasUsedWithChange, baseFee)
+		txFeeWithChange, err = CalculateDynamicFee(gasUsedWithChange, baseFee)
 		if err != nil {
 			return nil, err
 		}
@@ -454,7 +457,7 @@ func (vm *VM) newImportTxWithUTXOs(
 		return nil, errNoEVMOutputs
 	}
 
-	SortEVMOutputs(outs)
+	utils.Sort(outs)
 
 	// Create the transaction
 	utx := &UnsignedImportTx{

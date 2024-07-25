@@ -19,6 +19,7 @@ import (
 	gconstants "github.com/ava-labs/coreth/constants"
 	"github.com/ava-labs/coreth/core/state"
 	"github.com/ava-labs/coreth/params"
+	evmMsg "github.com/ava-labs/coreth/plugin/evm/message"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
 )
@@ -28,8 +29,9 @@ const (
 )
 
 var (
-	_ UnsignedAtomicTx       = &UnsignedCollectRewardsTx{}
-	_ secp256k1fx.UnsignedTx = &UnsignedCollectRewardsTx{}
+	_ UnsignedAtomicTx       = (*UnsignedCollectRewardsTx)(nil)
+	_ secp256k1fx.UnsignedTx = (*UnsignedCollectRewardsTx)(nil)
+	_ evmMsg.ResponseHandler = (*RewardsCrossChainMsgHandler)(nil)
 
 	FeeRewardAddress      = common.HexToAddress(FeeRewardAddressStr)
 	FeeRewardAddressID, _ = ids.ToShortID(FeeRewardAddress.Bytes())
@@ -290,9 +292,9 @@ func (vm *VM) TriggerRewardsTx(block *Block) {
 		return
 	}
 
-	blockTimeBN := block.ethBlock.Timestamp()
+	blockTime := block.ethBlock.Timestamp()
 	// reward distribution only for sunrise configurations
-	if !vm.chainConfig.IsSunrisePhase0(blockTimeBN) {
+	if !vm.chainConfig.IsSunrisePhase0(blockTime) {
 		return
 	}
 
@@ -303,12 +305,15 @@ func (vm *VM) TriggerRewardsTx(block *Block) {
 			if err != nil {
 				log.Warn("cannot marshall reward message", "error", err)
 			}
-			vm.RequestCrossChain(ids.ID{}, request, nil)
+			vm.SendCrossChainRequest(
+				constants.PlatformChainID,
+				request,
+				&RewardsCrossChainMsgHandler{},
+			)
 			break
 		}
 	}
 
-	blockTime := blockTimeBN.Uint64()
 	state, err := vm.blockChain.StateAt(block.ethBlock.Root())
 	if err != nil {
 		return
@@ -330,7 +335,7 @@ func (vm *VM) TriggerRewardsTx(block *Block) {
 	}
 	log.Info("Issue CollectRewardsTx", "amount",
 		tx.UnsignedAtomicTx.(*UnsignedCollectRewardsTx).Ins[0].Amount)
-	vm.issueTx(tx, true /*=local*/)
+	vm.mempool.AddLocalTx(tx)
 }
 
 // EVMStateTransfer executes the state update from the atomic export transaction
@@ -447,4 +452,17 @@ func feeRewardExportMinTimeInterval(vm *VM) uint64 {
 		return 3600
 	}
 	return vm.ethConfig.Genesis.FeeRewardExportMinTimeInterval
+}
+
+type RewardsCrossChainMsgHandler struct {
+}
+
+func (h *RewardsCrossChainMsgHandler) OnResponse(response []byte) error {
+	log.Info("CollectRewards cross-chain request success", "response", string(response))
+	return nil
+}
+
+func (h *RewardsCrossChainMsgHandler) OnFailure() error {
+	log.Error("CollectRewards cross-chain request failed")
+	return nil
 }
