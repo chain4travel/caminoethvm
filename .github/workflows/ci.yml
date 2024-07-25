@@ -1,7 +1,5 @@
 name: CI
 on:
-  push:
-    branches: [ chain4travel, dev ]
   pull_request:
     branches: [ chain4travel, dev ]
   workflow_dispatch:
@@ -18,24 +16,24 @@ on:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - name: check out
       if: ${{ github.event_name != 'workflow_dispatch' }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: check out ${{ github.event.inputs.caminoethvmBranch }}
       if: ${{ github.event_name == 'workflow_dispatch' }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: ${{ github.event.inputs.caminoethvmBranch }}
     - name: check out chain4travel/caminogo ${{ github.event.inputs.caminogoBranch }}
       if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.caminogoBranch != '' }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: chain4travel/caminogo
         ref: ${{ github.event.inputs.caminogoBranch }}
         path: caminogo
-    - uses: actions/setup-go@v2
+    - uses: actions/setup-go@v5
       with:
         go-version: '~1.20.8'
     - name: change caminogo dep
@@ -58,24 +56,24 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-11.0, ubuntu-20.04, windows-latest]
+        os: [ubuntu-latest]
     steps:
     - name: check out
       if: ${{ github.event_name != 'workflow_dispatch' }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: check out ${{ github.event.inputs.caminoethvmBranch }}
       if: ${{ github.event_name == 'workflow_dispatch' }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: ${{ github.event.inputs.caminoethvmBranch }}
     - name: check out chain4travel/caminogo ${{ github.event.inputs.caminogoBranch }}
       if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.caminogoBranch != '' }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: chain4travel/caminogo
         ref: ${{ github.event.inputs.caminogoBranch }}
         path: caminogo
-    - uses: actions/setup-go@v2
+    - uses: actions/setup-go@v5
       with:
         go-version: '~1.20.8'
         check-latest: true
@@ -97,25 +95,25 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-latest]
     steps:
     - name: check out
       if: ${{ github.event_name != 'workflow_dispatch' }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: check out ${{ github.event.inputs.caminoethvmBranch }}
       if: ${{ github.event_name == 'workflow_dispatch' }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: ${{ github.event.inputs.caminoethvmBranch }}
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: check out chain4travel/caminogo ${{ github.event.inputs.caminogoBranch }}
       if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.caminogoBranch != '' }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: chain4travel/caminogo
         ref: ${{ github.event.inputs.caminogoBranch }}
         path: caminogo
-    - uses: actions/setup-go@v2
+    - uses: actions/setup-go@v5
       with:
         go-version: '~1.20.8'
         check-latest: true
