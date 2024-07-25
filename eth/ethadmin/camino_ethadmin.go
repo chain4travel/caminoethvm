@@ -32,8 +32,12 @@ var (
 )
 
 const (
-	KYC_VERIFIED = 1
-	KYC_EXPIRED  = 2
+	NOT_VERIFIED = 0b0000 // 0
+	KYC_VERIFIED = 0b0001 // 1, bit 0
+	KYC_EXPIRED  = 0b0010 // 2, bit 1
+	KYB_VERIFIED = 0b1000 // 8, bit 3
+
+	VERIFIED = KYC_VERIFIED | KYB_VERIFIED
 )
 
 type AdminControllerBackend interface {
@@ -139,16 +143,18 @@ func (a *AdminController) GetFixedBaseFee(head *types.Header, state admin.StateD
 
 func (a *AdminController) KycVerified(head *types.Header, state admin.StateDB, addr common.Address) bool {
 	if a.cfg.IsSunrisePhase0(head.Time) {
-		// Calculate storage position
-		storagePos := crypto.Keccak256Hash(append(addr.Hash().Bytes(), common.HexToHash("0x2").Bytes()...))
 		// Get the KYC states
-		kycStates := new(big.Int).SetBytes(state.GetState(contractAddr, storagePos).Bytes()).Uint64()
+		kycStates := new(big.Int).SetBytes(state.GetState(contractAddr, kycStoragePosition(addr)).Bytes()).Uint64()
 		// Return true if KYC flag is set
-		return (kycStates & KYC_VERIFIED) != 0
+		return (kycStates & VERIFIED) != 0
 	}
 	return true
 }
 
 func (a *AdminController) inScanRange(head *types.Header) bool {
 	return head.Number.Cmp(&a.lastChangeHeight) >= 0 && head.Number.Cmp(&a.scanHeight) <= 0
+}
+
+func kycStoragePosition(addr common.Address) common.Hash {
+	return crypto.Keccak256Hash(append(addr.Hash().Bytes(), common.HexToHash("0x2").Bytes()...))
 }
