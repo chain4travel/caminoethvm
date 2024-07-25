@@ -42,6 +42,8 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/ava-labs/avalanchego/utils/constants"
+	"github.com/ava-labs/avalanchego/version"
 	"github.com/ava-labs/coreth/precompile"
 	"github.com/ava-labs/coreth/utils"
 	"github.com/ethereum/go-ethereum/common"
@@ -55,101 +57,19 @@ var (
 	AvalancheFujiChainID = big.NewInt(43113)
 	// AvalancheLocalChainID ...
 	AvalancheLocalChainID = big.NewInt(43112)
-	// CaminoChainID ...
-	CaminoChainID = big.NewInt(500)
-	// CaminoChainID ...
-	ColumbusChainID = big.NewInt(501)
-	// KopernikusChainID ...
-	KopernikusChainID = big.NewInt(502)
 
 	errNonGenesisForkByHeight = errors.New("coreth only supports forking by height at the genesis block")
 )
 
 var (
 	// AvalancheMainnetChainConfig is the configuration for Avalanche Main Network
-	AvalancheMainnetChainConfig = &ChainConfig{
-		ChainID:                         AvalancheMainnetChainID,
-		HomesteadBlock:                  big.NewInt(0),
-		DAOForkBlock:                    big.NewInt(0),
-		DAOForkSupport:                  true,
-		EIP150Block:                     big.NewInt(0),
-		EIP155Block:                     big.NewInt(0),
-		EIP158Block:                     big.NewInt(0),
-		ByzantiumBlock:                  big.NewInt(0),
-		ConstantinopleBlock:             big.NewInt(0),
-		PetersburgBlock:                 big.NewInt(0),
-		IstanbulBlock:                   big.NewInt(0),
-		MuirGlacierBlock:                big.NewInt(0),
-		ApricotPhase1BlockTimestamp:     utils.TimeToNewUint64(time.Date(2021, time.March, 31, 14, 0, 0, 0, time.UTC)),
-		ApricotPhase2BlockTimestamp:     utils.TimeToNewUint64(time.Date(2021, time.May, 10, 11, 0, 0, 0, time.UTC)),
-		ApricotPhase3BlockTimestamp:     utils.TimeToNewUint64(time.Date(2021, time.August, 24, 14, 0, 0, 0, time.UTC)),
-		ApricotPhase4BlockTimestamp:     utils.TimeToNewUint64(time.Date(2021, time.September, 22, 21, 0, 0, 0, time.UTC)),
-		ApricotPhase5BlockTimestamp:     utils.TimeToNewUint64(time.Date(2021, time.December, 2, 18, 0, 0, 0, time.UTC)),
-		SunrisePhase0BlockTimestamp:     nil,
-		ApricotPhasePre6BlockTimestamp:  utils.TimeToNewUint64(time.Date(2022, time.September, 5, 1, 30, 0, 0, time.UTC)),
-		ApricotPhase6BlockTimestamp:     utils.TimeToNewUint64(time.Date(2022, time.September, 6, 20, 0, 0, 0, time.UTC)),
-		ApricotPhasePost6BlockTimestamp: utils.TimeToNewUint64(time.Date(2022, time.September, 7, 3, 0, 0, 0, time.UTC)),
-		BanffBlockTimestamp:             utils.TimeToNewUint64(time.Date(2022, time.October, 18, 16, 0, 0, 0, time.UTC)),
-		CortinaBlockTimestamp:           utils.TimeToNewUint64(time.Date(2023, time.April, 25, 15, 0, 0, 0, time.UTC)),
-		// TODO Add DUpgrade timestamp
-	}
+	AvalancheMainnetChainConfig = getChainConfig(constants.MainnetID, AvalancheMainnetChainID)
 
 	// AvalancheFujiChainConfig is the configuration for the Fuji Test Network
-	AvalancheFujiChainConfig = &ChainConfig{
-		ChainID:                     AvalancheFujiChainID,
-		HomesteadBlock:              big.NewInt(0),
-		DAOForkBlock:                big.NewInt(0),
-		DAOForkSupport:              true,
-		EIP150Block:                 big.NewInt(0),
-		EIP155Block:                 big.NewInt(0),
-		EIP158Block:                 big.NewInt(0),
-		ByzantiumBlock:              big.NewInt(0),
-		ConstantinopleBlock:         big.NewInt(0),
-		PetersburgBlock:             big.NewInt(0),
-		IstanbulBlock:               big.NewInt(0),
-		MuirGlacierBlock:            big.NewInt(0),
-		ApricotPhase1BlockTimestamp: utils.TimeToNewUint64(time.Date(2021, time.March, 26, 14, 0, 0, 0, time.UTC)),
-		ApricotPhase2BlockTimestamp: utils.TimeToNewUint64(time.Date(2021, time.May, 5, 14, 0, 0, 0, time.UTC)),
-		ApricotPhase3BlockTimestamp: utils.TimeToNewUint64(time.Date(2021, time.August, 16, 19, 0, 0, 0, time.UTC)),
-		ApricotPhase4BlockTimestamp: utils.TimeToNewUint64(time.Date(2021, time.September, 16, 21, 0, 0, 0, time.UTC)),
-		ApricotPhase5BlockTimestamp: utils.TimeToNewUint64(time.Date(2021, time.November, 24, 15, 0, 0, 0, time.UTC)),
-		// Camino Network Upgrades
-		SunrisePhase0BlockTimestamp:     nil,
-		ApricotPhasePre6BlockTimestamp:  utils.TimeToNewUint64(time.Date(2022, time.September, 6, 20, 0, 0, 0, time.UTC)),
-		ApricotPhase6BlockTimestamp:     utils.TimeToNewUint64(time.Date(2022, time.September, 6, 20, 0, 0, 0, time.UTC)),
-		ApricotPhasePost6BlockTimestamp: utils.TimeToNewUint64(time.Date(2022, time.September, 7, 6, 0, 0, 0, time.UTC)),
-		BanffBlockTimestamp:             utils.TimeToNewUint64(time.Date(2022, time.October, 3, 14, 0, 0, 0, time.UTC)),
-		CortinaBlockTimestamp:           utils.TimeToNewUint64(time.Date(2023, time.April, 6, 15, 0, 0, 0, time.UTC)),
-		// TODO Add DUpgrade timestamp
-	}
+	AvalancheFujiChainConfig = getChainConfig(constants.FujiID, AvalancheFujiChainID)
 
 	// AvalancheLocalChainConfig is the configuration for the Avalanche Local Network
-	AvalancheLocalChainConfig = &ChainConfig{
-		ChainID:                         AvalancheLocalChainID,
-		HomesteadBlock:                  big.NewInt(0),
-		DAOForkBlock:                    big.NewInt(0),
-		DAOForkSupport:                  true,
-		EIP150Block:                     big.NewInt(0),
-		EIP155Block:                     big.NewInt(0),
-		EIP158Block:                     big.NewInt(0),
-		ByzantiumBlock:                  big.NewInt(0),
-		ConstantinopleBlock:             big.NewInt(0),
-		PetersburgBlock:                 big.NewInt(0),
-		IstanbulBlock:                   big.NewInt(0),
-		MuirGlacierBlock:                big.NewInt(0),
-		ApricotPhase1BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhase2BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhase4BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhase5BlockTimestamp:     utils.NewUint64(0),
-		SunrisePhase0BlockTimestamp:     nil,
-		ApricotPhasePre6BlockTimestamp:  utils.NewUint64(0),
-		ApricotPhase6BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhasePost6BlockTimestamp: utils.NewUint64(0),
-		BanffBlockTimestamp:             utils.NewUint64(0),
-		CortinaBlockTimestamp:           utils.NewUint64(0),
-		DUpgradeBlockTimestamp:          utils.NewUint64(0),
-	}
+	AvalancheLocalChainConfig = getChainConfig(constants.LocalID, AvalancheLocalChainID)
 
 	TestChainConfig = &ChainConfig{
 		AvalancheContext:                AvalancheContext{common.Hash{1}},
@@ -170,35 +90,6 @@ var (
 		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase4BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase5BlockTimestamp:     utils.NewUint64(0),
-		SunrisePhase0BlockTimestamp:     nil,
-		ApricotPhasePre6BlockTimestamp:  utils.NewUint64(0),
-		ApricotPhase6BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhasePost6BlockTimestamp: utils.NewUint64(0),
-		BanffBlockTimestamp:             utils.NewUint64(0),
-		CortinaBlockTimestamp:           utils.NewUint64(0),
-		DUpgradeBlockTimestamp:          utils.NewUint64(0),
-	}
-
-	TestCaminoChainConfig = &ChainConfig{
-		AvalancheContext:                AvalancheContext{common.Hash{1}},
-		ChainID:                         big.NewInt(1),
-		HomesteadBlock:                  big.NewInt(0),
-		DAOForkBlock:                    nil,
-		DAOForkSupport:                  false,
-		EIP150Block:                     big.NewInt(0),
-		EIP155Block:                     big.NewInt(0),
-		EIP158Block:                     big.NewInt(0),
-		ByzantiumBlock:                  big.NewInt(0),
-		ConstantinopleBlock:             big.NewInt(0),
-		PetersburgBlock:                 big.NewInt(0),
-		IstanbulBlock:                   big.NewInt(0),
-		MuirGlacierBlock:                big.NewInt(0),
-		ApricotPhase1BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhase2BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhase4BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhase5BlockTimestamp:     utils.NewUint64(0),
-		SunrisePhase0BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhasePre6BlockTimestamp:  utils.NewUint64(0),
 		ApricotPhase6BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhasePost6BlockTimestamp: utils.NewUint64(0),
@@ -226,7 +117,6 @@ var (
 		ApricotPhase3BlockTimestamp:     nil,
 		ApricotPhase4BlockTimestamp:     nil,
 		ApricotPhase5BlockTimestamp:     nil,
-		SunrisePhase0BlockTimestamp:     nil,
 		ApricotPhasePre6BlockTimestamp:  nil,
 		ApricotPhase6BlockTimestamp:     nil,
 		ApricotPhasePost6BlockTimestamp: nil,
@@ -254,7 +144,6 @@ var (
 		ApricotPhase3BlockTimestamp:     nil,
 		ApricotPhase4BlockTimestamp:     nil,
 		ApricotPhase5BlockTimestamp:     nil,
-		SunrisePhase0BlockTimestamp:     nil,
 		ApricotPhasePre6BlockTimestamp:  nil,
 		ApricotPhase6BlockTimestamp:     nil,
 		ApricotPhasePost6BlockTimestamp: nil,
@@ -282,7 +171,6 @@ var (
 		ApricotPhase3BlockTimestamp:     nil,
 		ApricotPhase4BlockTimestamp:     nil,
 		ApricotPhase5BlockTimestamp:     nil,
-		SunrisePhase0BlockTimestamp:     nil,
 		ApricotPhasePre6BlockTimestamp:  nil,
 		ApricotPhase6BlockTimestamp:     nil,
 		ApricotPhasePost6BlockTimestamp: nil,
@@ -310,7 +198,6 @@ var (
 		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase4BlockTimestamp:     nil,
 		ApricotPhase5BlockTimestamp:     nil,
-		SunrisePhase0BlockTimestamp:     nil,
 		ApricotPhasePre6BlockTimestamp:  nil,
 		ApricotPhase6BlockTimestamp:     nil,
 		ApricotPhasePost6BlockTimestamp: nil,
@@ -338,7 +225,6 @@ var (
 		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase4BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase5BlockTimestamp:     nil,
-		SunrisePhase0BlockTimestamp:     nil,
 		ApricotPhasePre6BlockTimestamp:  nil,
 		ApricotPhase6BlockTimestamp:     nil,
 		ApricotPhasePost6BlockTimestamp: nil,
@@ -366,7 +252,6 @@ var (
 		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase4BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase5BlockTimestamp:     utils.NewUint64(0),
-		SunrisePhase0BlockTimestamp:     nil,
 		ApricotPhasePre6BlockTimestamp:  nil,
 		ApricotPhase6BlockTimestamp:     nil,
 		ApricotPhasePost6BlockTimestamp: nil,
@@ -394,7 +279,6 @@ var (
 		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase4BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase5BlockTimestamp:     utils.NewUint64(0),
-		SunrisePhase0BlockTimestamp:     nil,
 		ApricotPhasePre6BlockTimestamp:  utils.NewUint64(0),
 		ApricotPhase6BlockTimestamp:     nil,
 		ApricotPhasePost6BlockTimestamp: nil,
@@ -422,7 +306,6 @@ var (
 		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase4BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase5BlockTimestamp:     utils.NewUint64(0),
-		SunrisePhase0BlockTimestamp:     nil,
 		ApricotPhasePre6BlockTimestamp:  utils.NewUint64(0),
 		ApricotPhase6BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhasePost6BlockTimestamp: nil,
@@ -450,7 +333,6 @@ var (
 		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase4BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase5BlockTimestamp:     utils.NewUint64(0),
-		SunrisePhase0BlockTimestamp:     nil,
 		ApricotPhasePre6BlockTimestamp:  utils.NewUint64(0),
 		ApricotPhase6BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhasePost6BlockTimestamp: utils.NewUint64(0),
@@ -478,7 +360,6 @@ var (
 		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase4BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase5BlockTimestamp:     utils.NewUint64(0),
-		SunrisePhase0BlockTimestamp:     nil,
 		ApricotPhasePre6BlockTimestamp:  utils.NewUint64(0),
 		ApricotPhase6BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhasePost6BlockTimestamp: utils.NewUint64(0),
@@ -506,7 +387,6 @@ var (
 		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase4BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase5BlockTimestamp:     utils.NewUint64(0),
-		SunrisePhase0BlockTimestamp:     nil,
 		ApricotPhasePre6BlockTimestamp:  utils.NewUint64(0),
 		ApricotPhase6BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhasePost6BlockTimestamp: utils.NewUint64(0),
@@ -534,7 +414,6 @@ var (
 		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase4BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhase5BlockTimestamp:     utils.NewUint64(0),
-		SunrisePhase0BlockTimestamp:     nil,
 		ApricotPhasePre6BlockTimestamp:  utils.NewUint64(0),
 		ApricotPhase6BlockTimestamp:     utils.NewUint64(0),
 		ApricotPhasePost6BlockTimestamp: utils.NewUint64(0),
@@ -542,12 +421,15 @@ var (
 		CortinaBlockTimestamp:           utils.NewUint64(0),
 	}
 
-	TestSunrisePhase0Config = &ChainConfig{
-		AvalancheContext:                AvalancheContext{common.Hash{1}},
-		ChainID:                         big.NewInt(1),
+	TestRules = TestChainConfig.AvalancheRules(new(big.Int), 0)
+)
+
+func getChainConfig(networkID uint32, chainID *big.Int) *ChainConfig {
+	return &ChainConfig{
+		ChainID:                         chainID,
 		HomesteadBlock:                  big.NewInt(0),
-		DAOForkBlock:                    nil,
-		DAOForkSupport:                  false,
+		DAOForkBlock:                    big.NewInt(0),
+		DAOForkSupport:                  true,
 		EIP150Block:                     big.NewInt(0),
 		EIP155Block:                     big.NewInt(0),
 		EIP158Block:                     big.NewInt(0),
@@ -556,21 +438,28 @@ var (
 		PetersburgBlock:                 big.NewInt(0),
 		IstanbulBlock:                   big.NewInt(0),
 		MuirGlacierBlock:                big.NewInt(0),
-		ApricotPhase1BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhase2BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhase3BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhase4BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhase5BlockTimestamp:     utils.NewUint64(0),
-		SunrisePhase0BlockTimestamp:     utils.NewUint64(0),
-		ApricotPhasePre6BlockTimestamp:  nil,
-		ApricotPhase6BlockTimestamp:     nil,
-		ApricotPhasePost6BlockTimestamp: nil,
-		BanffBlockTimestamp:             nil,
-		CortinaBlockTimestamp:           nil,
-		DUpgradeBlockTimestamp:          nil,
+		ApricotPhase1BlockTimestamp:     getUpgradeTime(networkID, version.ApricotPhase1Times),
+		ApricotPhase2BlockTimestamp:     getUpgradeTime(networkID, version.ApricotPhase2Times),
+		ApricotPhase3BlockTimestamp:     getUpgradeTime(networkID, version.ApricotPhase3Times),
+		ApricotPhase4BlockTimestamp:     getUpgradeTime(networkID, version.ApricotPhase4Times),
+		ApricotPhase5BlockTimestamp:     getUpgradeTime(networkID, version.ApricotPhase5Times),
+		ApricotPhasePre6BlockTimestamp:  getUpgradeTime(networkID, version.ApricotPhasePre6Times),
+		ApricotPhase6BlockTimestamp:     getUpgradeTime(networkID, version.ApricotPhase6Times),
+		ApricotPhasePost6BlockTimestamp: getUpgradeTime(networkID, version.ApricotPhasePost6Times),
+		BanffBlockTimestamp:             getUpgradeTime(networkID, version.BanffTimes),
+		CortinaBlockTimestamp:           getUpgradeTime(networkID, version.CortinaTimes),
+		DUpgradeBlockTimestamp:          getUpgradeTime(networkID, version.DTimes),
 	}
-	TestRules = TestChainConfig.AvalancheRules(new(big.Int), 0)
-)
+}
+
+func getUpgradeTime(networkID uint32, upgradeTimes map[uint32]time.Time) *uint64 {
+	if upgradeTime, ok := upgradeTimes[networkID]; ok {
+		return utils.TimeToNewUint64(upgradeTime)
+	}
+	// If the upgrade time isn't specified, default being enabled in the
+	// genesis.
+	return utils.NewUint64(0)
+}
 
 // ChainConfig is the core config which determines the blockchain settings.
 //
@@ -622,12 +511,16 @@ type ChainConfig struct {
 	BanffBlockTimestamp *uint64 `json:"banffBlockTimestamp,omitempty"`
 	// Cortina increases the block gas limit to 15M. (nil = no fork, 0 = already activated)
 	CortinaBlockTimestamp *uint64 `json:"cortinaBlockTimestamp,omitempty"`
+	// Berlin does nothing
+	BerlinBlockTimestamp *uint64 `json:"berlinBlockTimestamp,omitempty"`
 	// DUpgrade activates the Shanghai Execution Spec Upgrade from Ethereum (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/shanghai.md#included-eips)
 	// and Avalanche Warp Messaging. (nil = no fork, 0 = already activated)
 	// Note: EIP-4895 is excluded since withdrawals are not relevant to the Avalanche C-Chain or Subnets running the EVM.
 	DUpgradeBlockTimestamp *uint64 `json:"dUpgradeBlockTimestamp,omitempty"`
 	// Cancun activates the Cancun upgrade from Ethereum. (nil = no fork, 0 = already activated)
 	CancunTime *uint64 `json:"cancunTime,omitempty"`
+
+	// Athens phase does nothing for c-chain, so it is not included in the ChainConfig.
 }
 
 // AvalancheContext provides Avalanche specific context directly into the EVM.
@@ -795,14 +688,6 @@ func (c *ChainConfig) IsCortina(time uint64) bool {
 // with a timestamp after the DUpgrade upgrade time.
 func (c *ChainConfig) IsDUpgrade(time uint64) bool {
 	return utils.IsTimestampForked(c.DUpgradeBlockTimestamp, time)
-}
-
-// Camino Upgrades:
-
-// IsSunrisePhase0 returns whether [blockTimestamp] represents a block
-// with a timestamp after the Sunrise Phase 0 upgrade time.
-func (c *ChainConfig) IsSunrisePhase0(time uint64) bool {
-	return utils.IsTimestampForked(c.SunrisePhase0BlockTimestamp, time)
 }
 
 // IsCancun returns whether [time] represents a block

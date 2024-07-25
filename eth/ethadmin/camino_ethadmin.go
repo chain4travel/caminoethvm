@@ -145,8 +145,9 @@ func (a *AdminController) KycVerified(head *types.Header, state admin.StateDB, a
 	if a.cfg.IsSunrisePhase0(head.Time) {
 		// Get the KYC states
 		kycStates := new(big.Int).SetBytes(state.GetState(contractAddr, kycStoragePosition(addr)).Bytes()).Uint64()
-		// Return true if KYC flag is set
-		return (kycStates & VERIFIED) != 0
+		// Return true if KYC or KYB flag is set (KYB after Berlin phase)
+		return !a.cfg.IsBerlin(head.Time) && (kycStates&KYC_VERIFIED) != 0 ||
+			a.cfg.IsBerlin(head.Time) && (kycStates&VERIFIED) != 0
 	}
 	return true
 }
