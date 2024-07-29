@@ -19,44 +19,95 @@ func TestKycVerified(t *testing.T) {
 		Time: sunriseTimestamp,
 	}
 
-	adminCtrl := NewController(nil, &params.ChainConfig{
-		SunrisePhase0BlockTimestamp: &sunriseTimestamp,
-	})
-
 	tests := map[string]struct {
 		stateDB        func(c *gomock.Controller) *admin.MockStateDB
+		config         *params.ChainConfig
 		header         *types.Header
 		address        common.Address
 		expectedResult bool
 	}{
-		"Not verified": {
+		"Not verified: Before Berlin": {
 			stateDB: func(c *gomock.Controller) *admin.MockStateDB {
 				stateDB := admin.NewMockStateDB(c)
 				stateDB.EXPECT().GetState(contractAddr, kycStoragePosition(address)).
 					Return(common.BigToHash(big.NewInt(NOT_VERIFIED)))
 				return stateDB
 			},
+			config: &params.ChainConfig{
+				SunrisePhase0BlockTimestamp: &sunriseTimestamp,
+			},
 			header:         sunriseActiveHeader,
 			address:        address,
 			expectedResult: false,
 		},
-		"KYC verified": {
+		"Not verified: After Berlin": {
+			stateDB: func(c *gomock.Controller) *admin.MockStateDB {
+				stateDB := admin.NewMockStateDB(c)
+				stateDB.EXPECT().GetState(contractAddr, kycStoragePosition(address)).
+					Return(common.BigToHash(big.NewInt(NOT_VERIFIED)))
+				return stateDB
+			},
+			config: &params.ChainConfig{
+				SunrisePhase0BlockTimestamp: &sunriseTimestamp,
+				BerlinBlockTimestamp:        &sunriseTimestamp,
+			},
+			header:         sunriseActiveHeader,
+			address:        address,
+			expectedResult: false,
+		},
+		"KYC verified: Before Berlin": {
 			stateDB: func(c *gomock.Controller) *admin.MockStateDB {
 				stateDB := admin.NewMockStateDB(c)
 				stateDB.EXPECT().GetState(contractAddr, kycStoragePosition(address)).
 					Return(common.BigToHash(big.NewInt(KYC_VERIFIED)))
 				return stateDB
 			},
+			config: &params.ChainConfig{
+				SunrisePhase0BlockTimestamp: &sunriseTimestamp,
+			},
 			header:         sunriseActiveHeader,
 			address:        address,
 			expectedResult: true,
 		},
-		"KYB verified": {
+		"KYC verified: After Berlin": {
+			stateDB: func(c *gomock.Controller) *admin.MockStateDB {
+				stateDB := admin.NewMockStateDB(c)
+				stateDB.EXPECT().GetState(contractAddr, kycStoragePosition(address)).
+					Return(common.BigToHash(big.NewInt(KYC_VERIFIED)))
+				return stateDB
+			},
+			config: &params.ChainConfig{
+				SunrisePhase0BlockTimestamp: &sunriseTimestamp,
+				BerlinBlockTimestamp:        &sunriseTimestamp,
+			},
+			header:         sunriseActiveHeader,
+			address:        address,
+			expectedResult: true,
+		},
+		"KYB verified: Before Berlin": {
 			stateDB: func(c *gomock.Controller) *admin.MockStateDB {
 				stateDB := admin.NewMockStateDB(c)
 				stateDB.EXPECT().GetState(contractAddr, kycStoragePosition(address)).
 					Return(common.BigToHash(big.NewInt(KYB_VERIFIED)))
 				return stateDB
+			},
+			config: &params.ChainConfig{
+				SunrisePhase0BlockTimestamp: &sunriseTimestamp,
+			},
+			header:         sunriseActiveHeader,
+			address:        address,
+			expectedResult: false,
+		},
+		"KYB verified: After Berlin": {
+			stateDB: func(c *gomock.Controller) *admin.MockStateDB {
+				stateDB := admin.NewMockStateDB(c)
+				stateDB.EXPECT().GetState(contractAddr, kycStoragePosition(address)).
+					Return(common.BigToHash(big.NewInt(KYB_VERIFIED)))
+				return stateDB
+			},
+			config: &params.ChainConfig{
+				SunrisePhase0BlockTimestamp: &sunriseTimestamp,
+				BerlinBlockTimestamp:        &sunriseTimestamp,
 			},
 			header:         sunriseActiveHeader,
 			address:        address,
@@ -67,6 +118,7 @@ func TestKycVerified(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			c := gomock.NewController(t)
+			adminCtrl := NewController(nil, tt.config)
 			result := adminCtrl.KycVerified(tt.header, tt.stateDB(c), tt.address)
 			require.Equal(t, tt.expectedResult, result)
 		})
