@@ -49,9 +49,6 @@ type Network interface {
 	// SendAppRequest sends message to given nodeID, notifying handler when there's a response or timeout
 	SendAppRequest(nodeID ids.NodeID, message []byte, handler message.ResponseHandler) error
 
-	// RequestCrossChain sends message to a given chainID, notifying handler when there's a response or timeout
-	RequestCrossChain(chainID ids.ID, message []byte, handler message.ResponseHandler) error
-
 	// Gossip sends given gossip message to peers
 	Gossip(gossip []byte) error
 
