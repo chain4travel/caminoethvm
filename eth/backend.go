@@ -257,7 +257,6 @@ func New(
 	if config.AllowUnprotectedTxs {
 		log.Info("Unprotected transactions allowed")
 	}
-
 	gpoParams := config.GPO
 	eth.APIBackend.gpo, err = gasprice.NewOracle(eth.APIBackend, gpoParams)
 	if err != nil {
