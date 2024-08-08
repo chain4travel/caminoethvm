@@ -35,7 +35,7 @@ jobs:
         path: caminogo
     - uses: actions/setup-go@v5
       with:
-        go-version: 1.18
+        go-version: 1.19
     - name: change caminogo dep
       if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.caminogoBranch != '' }}
       run: |
@@ -75,7 +75,7 @@ jobs:
         path: caminogo
     - uses: actions/setup-go@v5
       with:
-        go-version: 1.18
+        go-version: 1.19
     - name: change caminogo dep
       if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.caminogoBranch != '' }}
       run: |
@@ -114,7 +114,7 @@ jobs:
         path: caminogo
     - uses: actions/setup-go@v5
       with:
-        go-version: 1.18
+        go-version: 1.19
     - name: change caminogo dep
       if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.caminogoBranch != '' }}
       run: |
