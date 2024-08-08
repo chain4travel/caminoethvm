@@ -6,6 +6,9 @@ package params
 import (
 	"math/big"
 
+	"github.com/ava-labs/avalanchego/utils/constants"
+	"github.com/ava-labs/avalanchego/version"
+	"github.com/ava-labs/coreth/utils"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -15,91 +18,36 @@ const (
 	SunrisePhase0BaseFee       uint64 = 200_000_000_000
 )
 
+// Camino ChainIDs
+var (
+	// CaminoChainID ...
+	CaminoChainID = big.NewInt(500)
+	// CaminoChainID ...
+	ColumbusChainID = big.NewInt(501)
+	// KopernikusChainID ...
+	KopernikusChainID = big.NewInt(502)
+)
+
 var (
 	// CaminoChainConfig is the configuration for Camino Main Network
-	CaminoChainConfig = &ChainConfig{
-		ChainID:                         CaminoChainID,
-		HomesteadBlock:                  common.Big0,
-		DAOForkBlock:                    common.Big0,
-		DAOForkSupport:                  true,
-		EIP150Block:                     common.Big0,
-		EIP150Hash:                      common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
-		EIP155Block:                     common.Big0,
-		EIP158Block:                     common.Big0,
-		ByzantiumBlock:                  common.Big0,
-		ConstantinopleBlock:             common.Big0,
-		PetersburgBlock:                 common.Big0,
-		IstanbulBlock:                   common.Big0,
-		MuirGlacierBlock:                common.Big0,
-		ApricotPhase1BlockTimestamp:     common.Big0,
-		ApricotPhase2BlockTimestamp:     common.Big0,
-		ApricotPhase3BlockTimestamp:     common.Big0,
-		ApricotPhase4BlockTimestamp:     common.Big0,
-		ApricotPhase5BlockTimestamp:     common.Big0,
-		SunrisePhase0BlockTimestamp:     common.Big0,
-		ApricotPhasePre6BlockTimestamp:  common.Big0,
-		ApricotPhase6BlockTimestamp:     common.Big0,
-		ApricotPhasePost6BlockTimestamp: common.Big0,
-		BanffBlockTimestamp:             common.Big0,
-		// TODO Add Cortina timestamps
-	}
+	CaminoChainConfig = getCaminoChainConfig(constants.CaminoID, CaminoChainID)
 
 	// ColumbusChainConfig is the configuration for Columbus Test Network
-	ColumbusChainConfig = &ChainConfig{
-		ChainID:                         ColumbusChainID,
-		HomesteadBlock:                  common.Big0,
-		DAOForkBlock:                    common.Big0,
-		DAOForkSupport:                  true,
-		EIP150Block:                     common.Big0,
-		EIP150Hash:                      common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
-		EIP155Block:                     common.Big0,
-		EIP158Block:                     common.Big0,
-		ByzantiumBlock:                  common.Big0,
-		ConstantinopleBlock:             common.Big0,
-		PetersburgBlock:                 common.Big0,
-		IstanbulBlock:                   common.Big0,
-		MuirGlacierBlock:                common.Big0,
-		ApricotPhase1BlockTimestamp:     common.Big0,
-		ApricotPhase2BlockTimestamp:     common.Big0,
-		ApricotPhase3BlockTimestamp:     common.Big0,
-		ApricotPhase4BlockTimestamp:     common.Big0,
-		ApricotPhase5BlockTimestamp:     common.Big0,
-		SunrisePhase0BlockTimestamp:     common.Big0,
-		ApricotPhasePre6BlockTimestamp:  common.Big0,
-		ApricotPhase6BlockTimestamp:     common.Big0,
-		ApricotPhasePost6BlockTimestamp: common.Big0,
-		BanffBlockTimestamp:             common.Big0,
-		// TODO Add Cortina timestamps
-	}
+	ColumbusChainConfig = getCaminoChainConfig(constants.ColumbusID, ColumbusChainID)
 
 	// KopernikusChainConfig is the configuration for Kopernikus Dev Network
-	KopernikusChainConfig = &ChainConfig{
-		ChainID:                         KopernikusChainID,
-		HomesteadBlock:                  common.Big0,
-		DAOForkBlock:                    common.Big0,
-		DAOForkSupport:                  true,
-		EIP150Block:                     common.Big0,
-		EIP150Hash:                      common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
-		EIP155Block:                     common.Big0,
-		EIP158Block:                     common.Big0,
-		ByzantiumBlock:                  common.Big0,
-		ConstantinopleBlock:             common.Big0,
-		PetersburgBlock:                 common.Big0,
-		IstanbulBlock:                   common.Big0,
-		MuirGlacierBlock:                common.Big0,
-		ApricotPhase1BlockTimestamp:     common.Big0,
-		ApricotPhase2BlockTimestamp:     common.Big0,
-		ApricotPhase3BlockTimestamp:     common.Big0,
-		ApricotPhase4BlockTimestamp:     common.Big0,
-		ApricotPhase5BlockTimestamp:     common.Big0,
-		SunrisePhase0BlockTimestamp:     common.Big0,
-		ApricotPhasePre6BlockTimestamp:  common.Big0,
-		ApricotPhase6BlockTimestamp:     common.Big0,
-		ApricotPhasePost6BlockTimestamp: common.Big0,
-		BanffBlockTimestamp:             common.Big0,
-		// TODO Add Cortina timestamps
-	}
+	KopernikusChainConfig = getCaminoChainConfig(constants.KopernikusID, KopernikusChainID)
+
+	TestCaminoChainConfig = &ChainConfig{AvalancheContext{common.Hash{1}}, big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0), big.NewInt(0)}
 )
+
+func getCaminoChainConfig(networkID uint32, chainID *big.Int) *ChainConfig {
+	chainConfig := getChainConfig(networkID, chainID)
+	chainConfig.EIP150Hash = common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0")
+	chainConfig.SunrisePhase0BlockTimestamp = getUpgradeTime(networkID, version.SunrisePhase0Times)
+	chainConfig.BerlinBlockTimestamp = getUpgradeTime(networkID, version.BerlinPhaseTimes)
+	return chainConfig
+}
 
 // CaminoRules returns the Camino modified rules to support Camino
 // network upgrades
@@ -108,4 +56,16 @@ func (c *ChainConfig) CaminoRules(blockNum, blockTimestamp *big.Int) Rules {
 
 	rules.IsSunrisePhase0 = c.IsSunrisePhase0(blockTimestamp)
 	return rules
+}
+
+// IsSunrisePhase0 returns whether [blockTimestamp] represents a block
+// with a timestamp after the Sunrise Phase 0 upgrade time.
+func (c *ChainConfig) IsSunrisePhase0(time *big.Int) bool {
+	return utils.IsForked(c.SunrisePhase0BlockTimestamp, time)
+}
+
+// IsBerlin returns whether [time] represents a block
+// with a timestamp after the Berlin upgrade time.
+func (c *ChainConfig) IsBerlin(time *big.Int) bool {
+	return utils.IsForked(c.BerlinBlockTimestamp, time)
 }

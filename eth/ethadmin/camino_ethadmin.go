@@ -142,11 +142,13 @@ func (a *AdminController) GetFixedBaseFee(head *types.Header, state admin.StateD
 }
 
 func (a *AdminController) KycVerified(head *types.Header, state admin.StateDB, addr common.Address) bool {
-	if a.cfg.IsSunrisePhase0(big.NewInt(int64(head.Time))) {
+	timestamp := big.NewInt(int64(head.Time))
+	if a.cfg.IsSunrisePhase0(timestamp) {
 		// Get the KYC states
 		kycStates := new(big.Int).SetBytes(state.GetState(contractAddr, kycStoragePosition(addr)).Bytes()).Uint64()
-		// Return true if KYC flag is set
-		return (kycStates & VERIFIED) != 0
+		// Return true if KYC or KYB flag is set (KYB after Berlin phase)
+		return !a.cfg.IsBerlin(timestamp) && (kycStates&KYC_VERIFIED) != 0 ||
+			a.cfg.IsBerlin(timestamp) && (kycStates&VERIFIED) != 0
 	}
 	return true
 }

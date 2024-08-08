@@ -4,7 +4,7 @@
 GOPATH="$(go env GOPATH)"
 
 # Set binary location
-binary_path=${CAMINOETHVM_BINARY_PATH:-"$GOPATH/src/github.com/chain4travel/camino-node/build/plugins/evm"}
+binary_path=${CAMINOETHVM_BINARY_PATH:-"$GOPATH/src/github.com/chain4travel/caminogo/build/plugins/evm"}
 
 # Avalabs docker hub
 dockerhub_repo="c4tplatform/caminoethvm"
@@ -23,7 +23,7 @@ module=$(grep caminogo $CAMINOETHVM_PATH/go.mod)
 # trim leading
 module="${module#"${module%%[![:space:]]*}"}"
 t=(${module//\ / })
-caminogo_tag=${t[1]}
+caminogo_tag=${t[4]}
 
 build_image_id=${BUILD_IMAGE_ID:-"$caminogo_tag-$caminoethvm_short_commit"}
 
