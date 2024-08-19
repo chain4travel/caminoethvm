@@ -44,8 +44,20 @@ var (
 func getCaminoChainConfig(networkID uint32, chainID *big.Int) *ChainConfig {
 	chainConfig := getChainConfig(networkID, chainID)
 	chainConfig.EIP150Hash = common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0")
-	chainConfig.SunrisePhase0BlockTimestamp = getUpgradeTime(networkID, version.SunrisePhase0Times)
+
+	chainConfig.ApricotPhase1BlockTimestamp = common.Big0
+	chainConfig.ApricotPhase2BlockTimestamp = common.Big0
+	chainConfig.ApricotPhase3BlockTimestamp = common.Big0
+	chainConfig.ApricotPhase4BlockTimestamp = common.Big0
+	chainConfig.ApricotPhase5BlockTimestamp = common.Big0
+	chainConfig.ApricotPhasePre6BlockTimestamp = common.Big0
+	chainConfig.ApricotPhase6BlockTimestamp = common.Big0
+	chainConfig.ApricotPhasePost6BlockTimestamp = common.Big0
+	chainConfig.BanffBlockTimestamp = common.Big0
+
+	chainConfig.SunrisePhase0BlockTimestamp = common.Big0
 	chainConfig.BerlinBlockTimestamp = getUpgradeTime(networkID, version.BerlinPhaseTimes)
+
 	return chainConfig
 }
 
