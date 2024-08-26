@@ -56,11 +56,20 @@ func (bv blockValidatorCamino) SyntacticVerify(b *Block, rules params.Rules) err
 			ethHeader.Nonce.Uint64(), errInvalidNonce,
 		)
 	}
-	if ethHeader.GasLimit != params.ApricotPhase1GasLimit {
-		return fmt.Errorf(
-			"expected gas limit to be %d in apricot phase 1 but got %d",
-			params.ApricotPhase1GasLimit, ethHeader.GasLimit,
-		)
+	if rules.IsCortina {
+		if ethHeader.GasLimit != params.CortinaGasLimit {
+			return fmt.Errorf(
+				"expected gas limit to be %d after cortina but got %d",
+				params.CortinaGasLimit, ethHeader.GasLimit,
+			)
+		}
+	} else if rules.IsApricotPhase1 {
+		if ethHeader.GasLimit != params.ApricotPhase1GasLimit {
+			return fmt.Errorf(
+				"expected gas limit to be %d after apricot phase 1 but got %d",
+				params.ApricotPhase1GasLimit, ethHeader.GasLimit,
+			)
+		}
 	}
 	if ethHeader.MixDigest != (common.Hash{}) {
 		return fmt.Errorf("invalid mix digest: %v", ethHeader.MixDigest)
